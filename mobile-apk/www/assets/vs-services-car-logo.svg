@@ -1,0 +1,46 @@
+<svg width="320" height="160" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="body" x1="74" y1="66" x2="241" y2="132" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFC"/>
+      <stop offset="0.45" stop-color="#D7DEE7"/>
+      <stop offset="1" stop-color="#8A98A8"/>
+    </linearGradient>
+    <linearGradient id="trim" x1="93" y1="73" x2="213" y2="124" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5A6675"/>
+      <stop offset="1" stop-color="#1E252E"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="118" y1="67" x2="195" y2="104" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAF6FF"/>
+      <stop offset="1" stop-color="#86A3B8"/>
+    </linearGradient>
+    <radialGradient id="wheel" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(120 119) rotate(90) scale(24)">
+      <stop stop-color="#444E59"/>
+      <stop offset="1" stop-color="#0F141A"/>
+    </radialGradient>
+    <radialGradient id="wheel2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(222 119) rotate(90) scale(24)">
+      <stop stop-color="#444E59"/>
+      <stop offset="1" stop-color="#0F141A"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="171" cy="134" rx="104" ry="10" fill="rgba(0,0,0,0.18)"/>
+
+  <path d="M82 104L96 78C101 69 111 63 122 63H189C205 63 219 72 227 86L242 104C251 105 259 112 259 122V125C259 129 256 132 252 132H241C237 119 226 109 212 109C198 109 186 119 182 132H160C156 119 144 109 130 109C116 109 104 119 100 132H88C80 132 74 126 74 118V114C74 109 77 105 82 104Z" fill="url(#body)"/>
+  <path d="M96 78C101 69 111 63 122 63H189C205 63 219 72 227 86L232 96H90L96 78Z" fill="url(#trim)"/>
+  <path d="M115 67H147L157 95H97L103 80C106 72 110 67 115 67Z" fill="url(#glass)"/>
+  <path d="M152 67H187C198 67 208 73 215 84L222 95H163L152 67Z" fill="url(#glass)"/>
+
+  <path d="M83 105H108" stroke="#DCE4EB" stroke-width="4" stroke-linecap="round"/>
+  <path d="M226 105H245" stroke="#F0C36A" stroke-width="4" stroke-linecap="round"/>
+  <path d="M97 98H230" stroke="rgba(255,255,255,0.38)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M98 96L108 76" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M211 79L224 96" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-linecap="round"/>
+
+  <circle cx="120" cy="119" r="23" fill="url(#wheel)"/>
+  <circle cx="120" cy="119" r="11" fill="#D6DEE6"/>
+  <circle cx="222" cy="119" r="23" fill="url(#wheel2)"/>
+  <circle cx="222" cy="119" r="11" fill="#D6DEE6"/>
+
+  <path d="M73 112L87 111" stroke="#6C7785" stroke-width="2" stroke-linecap="round"/>
+  <path d="M247 111L259 113" stroke="#6C7785" stroke-width="2" stroke-linecap="round"/>
+</svg>
