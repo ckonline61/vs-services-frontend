@@ -59,13 +59,19 @@ const STATE = {
   user: JSON.parse(localStorage.getItem('user') || 'null'),
   apiUrl: localStorage.getItem('apiUrl') || defaultApiUrl,
   lang: localStorage.getItem('lang') || 'en',
+  theme: localStorage.getItem('theme') || 'light',
   cart: JSON.parse(localStorage.getItem('cart') || '[]'),
   services: [],
   products: [],
   bookings: [],
+  orders: [],
   history: [],
   reminders: [],
   rewards: null,
+  wishlist: [],
+  recommendations: [],
+  productSearch: '',
+  productCategory: '',
   support: { branches: [], emergency: [], faq: [], tips: [], packages: [], coupons: [] },
   current: 'splash',
   data: {},
@@ -105,6 +111,25 @@ function save() {
   localStorage.setItem('cart', JSON.stringify(STATE.cart));
   localStorage.setItem('apiUrl', STATE.apiUrl);
   localStorage.setItem('lang', STATE.lang);
+  localStorage.setItem('theme', STATE.theme);
+}
+
+function applyTheme() {
+  document.body.setAttribute('data-theme', STATE.theme === 'dark' ? 'dark' : 'light');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', STATE.theme === 'dark' ? '#0A1933' : '#0A1933');
+}
+
+function toggleTheme() {
+  STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
+  save();
+  applyTheme();
+  if (STATE.token) api('/users/me', 'PUT', { themePreference: STATE.theme });
+  render();
+}
+
+function isWished(productId) {
+  return (STATE.wishlist || []).some(p => (p._id || p) === productId);
 }
 
 function money(value) {
@@ -152,7 +177,24 @@ function tabbar(active) {
 }
 
 function bookingStatusBadge(status) {
-  return `<span class="badge b-${status}">${String(status || '').replace(/_/g, ' ').toUpperCase()}</span>`;
+  const s = String(status || '').toLowerCase();
+  return `<span class="badge-dot badge-${s}">${s.replace(/_/g, ' ')}</span>`;
+}
+
+function initials(name) {
+  if (!name) return 'VS';
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
+}
+
+function greetingText() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function emptyState(icon, title, desc) {
+  return `<div class="empty"><span class="empty-ic">${icon}</span><div class="empty-title">${title}</div><div class="empty-desc">${desc || ''}</div></div>`;
 }
 
 function rewardCard() {
@@ -161,12 +203,12 @@ function rewardCard() {
     walletBalance: STATE.user?.walletBalance || 0,
     referralCode: STATE.user?.referralCode || '-'
   };
-  return `<div class="card">
-    <div class="mini-title">${t('rewards')}</div>
+  return `<div class="card reward-glow">
+    <div class="mini-title">🎁 ${t('rewards')}</div>
     <div class="mini-grid">
-      <div class="mini-stat"><b>${rewards.walletPoints || 0}</b><span>Points</span></div>
-      <div class="mini-stat"><b>${money(rewards.walletBalance || 0)}</b><span>Wallet</span></div>
-      <div class="mini-stat"><b>${rewards.referralCode || '-'}</b><span>Referral</span></div>
+      <div class="mini-stat"><b>${rewards.walletPoints || 0}</b><span>POINTS</span></div>
+      <div class="mini-stat"><b>${money(rewards.walletBalance || 0)}</b><span>WALLET</span></div>
+      <div class="mini-stat"><b>${rewards.referralCode || '-'}</b><span>REFERRAL</span></div>
     </div>
   </div>`;
 }
@@ -203,40 +245,66 @@ const screens = {
 
   login: () => `
     <div class="login">
-      ${logo()}
-      <div class="sub">Guest login, demo login, aur profile setup free hai. OTP ki zarurat nahi.</div>
-      <label class="label">Name</label>
-      <input id="setupName" placeholder="Vinod Kumar" value="${STATE.user?.name || ''}">
-      <label class="label">Mobile</label>
-      <input id="setupMobile" placeholder="10-digit mobile" maxlength="10" value="${STATE.user?.mobile || ''}">
-      <button class="btn" onclick="registerGuest()">${t('login')}</button>
-      <button class="btn btn-out" onclick="demoLogin()">One Tap Demo Login</button>
-      <details style="margin-top:14px">
-        <summary>Advanced API URL</summary>
-        <input id="apiUrlInput" placeholder="https://..." value="${STATE.apiUrl}">
-      </details>
+      <button class="login-close" onclick="nav('home')" aria-label="Close">&times;</button>
+      <div class="login-top">
+        ${logo()}
+        <div class="login-title">Welcome to VS SERVICES</div>
+        <div class="sub">Guest login free hai • No OTP • No password<br>Sirf naam aur mobile daalo, ho gaya.</div>
+      </div>
+      <div class="login-form">
+        <label class="label">Your Name</label>
+        <input id="setupName" placeholder="e.g. Vinod Kumar" value="${STATE.user?.name || ''}">
+        <label class="label">Mobile Number</label>
+        <input id="setupMobile" placeholder="10-digit mobile" maxlength="10" inputmode="numeric" value="${STATE.user?.mobile || ''}">
+        <button class="btn btn-gradient" onclick="registerGuest()">Continue &rarr;</button>
+        <div class="divider"><span>OR</span></div>
+        <button class="btn btn-out" onclick="demoLogin()">⚡ One-Tap Demo Login</button>
+        <button class="btn btn-ghost" onclick="nav('home')">Skip for now</button>
+        <details class="adv-api">
+          <summary>Advanced: change API URL</summary>
+          <input id="apiUrlInput" placeholder="https://..." value="${STATE.apiUrl}">
+        </details>
+        <div class="login-foot">Problem? Call <a href="tel:8839533202">8839533202</a> or <a href="https://wa.me/918839533202">WhatsApp</a></div>
+      </div>
     </div>`,
 
   home: () => `
     ${topbar(t('appName'))}
     <div class="screen">
-      <div class="banner">
-        ${logo(true)}
-        <div class="hero-row">
-          <div>
-            <h2>${STATE.user?.name ? `Hi ${STATE.user.name}!` : t('welcome')}</h2>
-            <p>Service history, car profile, reminders, pickup-drop, coupons, rewards aur admin-ready booking flow sab ek hi app me.</p>
-          </div>
-          <button class="chip active" onclick="nav('${STATE.token ? 'profile' : 'login'}')">${STATE.token ? 'Profile' : 'Login'}</button>
+      <div class="hero">
+        <div class="hero-greeting">${greetingText()}${STATE.user?.name ? ',' : ''}</div>
+        <div class="hero-title">${STATE.user?.name ? STATE.user.name.split(' ')[0] : 'Welcome!'}</div>
+        <div class="hero-sub">Aapki car ki complete care — booking, parts, reminders, rewards — sab ek jagah.</div>
+        <div class="hero-cta">
+          <span class="chip-cta primary" onclick="nav('booking')">🔧 Book Service</span>
+          <span class="chip-cta" onclick="nav('${STATE.token ? 'profile' : 'login'}')">${STATE.token ? '👤 Profile' : '🔑 Login'}</span>
+          <span class="chip-cta" onclick="window.location.href='tel:8839533202'">📞 Call Us</span>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><b>${STATE.bookings.length}</b><span>BOOKINGS</span></div>
+          <div class="hero-stat"><b>${(STATE.rewards?.walletPoints || STATE.user?.walletPoints || 0)}</b><span>POINTS</span></div>
+          <div class="hero-stat"><b>${STATE.user?.cars?.length || 0}</b><span>MY CARS</span></div>
         </div>
       </div>
       <div class="section">${t('quick')}</div>
       <div class="grid quick-grid">
-        <div class="action" onclick="nav('booking')"><div class="ic">SERVICE</div><div class="t">Book Service</div></div>
-        <div class="action" onclick="nav('support')"><div class="ic">HELP</div><div class="t">Support Hub</div></div>
-        <div class="action" onclick="nav('profile')"><div class="ic">CAR</div><div class="t">Car Profile</div></div>
-        <div class="action" onclick="nav('bookings')"><div class="ic">TRACK</div><div class="t">Track Status</div></div>
+        <div class="action" onclick="nav('booking')"><div class="ic-wrap">🔧</div><div class="t">Book Service</div></div>
+        <div class="action" onclick="nav('accessories')"><div class="ic-wrap">🛒</div><div class="t">Shop Parts</div></div>
+        <div class="action" onclick="nav('orders')"><div class="ic-wrap">📦</div><div class="t">My Orders</div></div>
+        <div class="action" onclick="nav('wishlist')"><div class="ic-wrap">❤️</div><div class="t">Wishlist</div></div>
+        <div class="action" onclick="nav('bookings')"><div class="ic-wrap">📅</div><div class="t">Track Booking</div></div>
+        <div class="action" onclick="nav('support')"><div class="ic-wrap">🛟</div><div class="t">Support</div></div>
       </div>
+      ${STATE.recommendations.length ? `<div class="rec-card">
+        <div class="rec-title">🤖 Recommended for You</div>
+        ${STATE.recommendations.slice(0, 3).map(rec => `
+          <div class="rec-item" onclick="${rec.serviceId ? `nav('booking',{serviceId:'${rec.serviceId}'})` : 'nav(\'support\')'}">
+            <div class="rec-name">${rec.name}</div>
+            <div class="rec-reason">${rec.reason}</div>
+            <span class="rec-prio ${rec.priority || ''}">${(rec.priority || 'info').toUpperCase()}</span>
+            ${rec.basePrice ? `<span style="float:right;font-weight:700">${money(rec.basePrice)}</span>` : ''}
+          </div>`).join('')}
+      </div>` : ''}
       ${rewardCard()}
       <div class="section">${t('services')}</div>
       ${STATE.services.map(service => `
@@ -244,7 +312,8 @@ const screens = {
           <div class="info">
             <div class="name">${service.name}</div>
             <div class="desc">${service.description || ''}</div>
-            <div class="muted">${service.estimatedTime || '-'} • ${service.category}</div>
+            <span class="badge-category">${service.category}</span>
+            <div class="muted" style="margin-top:6px">⏱ ${service.estimatedTime || '-'}</div>
             <div class="price">${money(service.basePrice)}</div>
           </div>
           <div class="svc-actions">
@@ -260,22 +329,70 @@ const screens = {
     </div>
     ${tabbar('home')}`,
 
-  accessories: () => `
+  accessories: () => {
+    const search = (STATE.productSearch || '').toLowerCase();
+    const cat = STATE.productCategory || '';
+    const categories = [...new Set(STATE.products.map(p => p.category).filter(Boolean))];
+    const filtered = STATE.products.filter(p => {
+      if (cat && p.category !== cat) return false;
+      if (search && !(p.name || '').toLowerCase().includes(search)) return false;
+      return true;
+    });
+    return `
     ${topbar('Accessories')}
+    <div class="search-wrap">
+      <input id="productSearchInput" placeholder="Search products..." value="${STATE.productSearch || ''}" oninput="STATE.productSearch=this.value;filterProductsDebounced()">
+      <button class="chip small" onclick="nav('wishlist')">❤ ${STATE.wishlist.length}</button>
+    </div>
+    <div class="cat-chips">
+      <div class="chip ${!cat ? 'active' : ''}" onclick="STATE.productCategory='';render()">All</div>
+      ${categories.map(c => `<div class="chip ${cat === c ? 'active' : ''}" onclick="STATE.productCategory='${c}';render()">${c}</div>`).join('')}
+    </div>
     <div class="screen">
-      <div class="section">Spare Parts & Accessories</div>
       <div class="pgrid">
-        ${STATE.products.map(p => `
+        ${filtered.length ? filtered.map(p => `
           <div class="pcard" onclick="nav('product',{id:'${p._id}'})">
+            <button class="wish-heart ${isWished(p._id) ? 'on' : ''}" onclick="event.stopPropagation();toggleWish('${p._id}')">${isWished(p._id) ? '♥' : '♡'}</button>
             <div class="img">AUTO</div>
             <div class="pname">${p.name}</div>
             <div class="muted">${p.category}</div>
             <div><span class="price">${money(p.discountPrice || p.price)}</span>${p.discountPrice ? `<span class="strike">${money(p.price)}</span>` : ''}</div>
-          </div>`).join('')}
+          </div>`).join('') : `<div class="empty">No products match</div>`}
       </div>
     </div>
     ${STATE.cart.length ? `<div class="fab" onclick="nav('cart')">Cart (${STATE.cart.length})</div>` : ''}
+    ${tabbar('accessories')}`;
+  },
+
+  wishlist: () => `
+    ${topbar('My Wishlist', { screen: 'accessories' })}
+    <div class="screen">
+      ${STATE.wishlist.length ? `<div class="pgrid">${STATE.wishlist.map(p => `
+        <div class="pcard" onclick="nav('product',{id:'${p._id}'})">
+          <button class="wish-heart on" onclick="event.stopPropagation();toggleWish('${p._id}')">♥</button>
+          <div class="img">AUTO</div>
+          <div class="pname">${p.name}</div>
+          <div class="muted">${p.category || ''}</div>
+          <div><span class="price">${money(p.discountPrice || p.price)}</span></div>
+        </div>`).join('')}</div>` : emptyState('💝', 'Wishlist khali hai', 'Shop me jake dil wala icon tap karo')}
+    </div>
     ${tabbar('accessories')}`,
+
+  orders: () => `
+    ${topbar('My Orders', { screen: 'home' })}
+    <div class="screen">
+      ${STATE.orders.length ? STATE.orders.map(o => `
+        <div class="bk">
+          <div class="info">
+            <div class="bid">${o.orderId}</div>
+            <div class="name">${(o.items || []).map(i => i.name).join(', ')}</div>
+            <div class="sub">${new Date(o.createdAt).toDateString()} • ${o.items?.length || 0} item(s)</div>
+            <div class="sub">${money(o.totalAmount)} • ${(o.paymentMode || '').toUpperCase()}</div>
+          </div>
+          ${bookingStatusBadge(o.orderStatus)}
+        </div>`).join('') : emptyState('📦', 'No orders yet', 'Shop me jake explore karo')}
+    </div>
+    ${tabbar('home')}`,
 
   product: () => {
     const p = STATE.products.find(x => x._id === STATE.data.id);
@@ -292,6 +409,7 @@ const screens = {
           <label class="label inline">Need this part with service?</label>
           <textarea id="partsReqText" placeholder="Example: Include this with my next service booking"></textarea>
           <button class="btn" onclick="addCart('${p._id}')">Add to Cart</button>
+          <button class="btn btn-out" onclick="toggleWish('${p._id}')">${isWished(p._id) ? '♥ Remove from Wishlist' : '♡ Add to Wishlist'}</button>
           <button class="btn btn-out" onclick="savePartsDraft('${p.name}')">Save as Spare Parts Request</button>
         </div>
       </div>`;
@@ -397,11 +515,11 @@ const screens = {
           <div class="info">
             <div class="bid">${b.bookingId}</div>
             <div class="name">${b.serviceId?.name || 'Service'}</div>
-            <div class="sub">${new Date(b.bookingDate).toDateString()} • ${b.timeSlot || '-'}</div>
-            <div class="sub">${money(b.totalAmount)} • ${humanMode(b.serviceMode)}</div>
+            <div class="sub">📅 ${new Date(b.bookingDate).toDateString()} • ${b.timeSlot || '-'}</div>
+            <div class="sub">💰 ${money(b.totalAmount)} • ${humanMode(b.serviceMode)}</div>
           </div>
           ${bookingStatusBadge(b.status)}
-        </div>`).join('') : `<div class="empty">No bookings yet</div>`}
+        </div>`).join('') : emptyState('🗓️', 'No bookings yet', 'Book your first service to see it here')}
       <div class="section">${t('history')}</div>
       <div class="card">${historyList()}</div>
     </div>
@@ -421,8 +539,12 @@ const screens = {
           <div class="kv"><span>Total</span><span>${money(booking.totalAmount)}</span></div>
           ${booking.estimatedNextServiceDue ? `<div class="kv"><span>Next Service Due</span><span>${new Date(booking.estimatedNextServiceDue).toDateString()}</span></div>` : ''}
         </div>
-        ${booking.statusTimeline?.length ? `<div class="card"><div class="mini-title">Status Timeline</div>${booking.statusTimeline.map(item => `
-          <div class="timeline-item"><b>${item.status.replace(/_/g, ' ')}</b><div class="muted">${item.note || ''}</div><div class="muted">${new Date(item.at).toLocaleString()}</div></div>`).join('')}</div>` : ''}
+        ${booking.statusTimeline?.length ? `<div class="card"><div class="mini-title">📍 Status Timeline</div><div class="timeline">${booking.statusTimeline.map((item, i) => `
+          <div class="tl-item ${(i < booking.statusTimeline.length - 1 || booking.status === 'completed') ? 'done' : ''}">
+            <div class="tl-status">${item.status.replace(/_/g, ' ')}</div>
+            ${item.note ? `<div class="tl-note">${item.note}</div>` : ''}
+            <div class="tl-time">${new Date(item.at).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}</div>
+          </div>`).join('')}</div></div>` : ''}
         ${booking.estimate ? `<div class="card"><div class="mini-title">Estimate</div>
           <div class="kv"><span>Base</span><span>${money(booking.estimate.basePrice)}</span></div>
           <div class="kv"><span>Discount</span><span>${money(booking.estimate.discount)}</span></div>
@@ -477,19 +599,28 @@ const screens = {
     ${topbar('Profile')}
     <div class="screen">
       <div class="profile-h">
-        ${logo(true)}
+        <div class="avatar">${initials(STATE.user?.name || 'Guest')}</div>
         <h2>${STATE.user?.name || 'Guest'}</h2>
-        <div>${STATE.user?.mobile || 'No mobile linked'}</div>
+        <div>${STATE.user?.mobile ? '📱 ' + STATE.user.mobile : 'No mobile linked'}</div>
       </div>
       <div class="card">
-        <div class="mini-title">Profile & Language</div>
+        <div class="mini-title">Profile & Settings</div>
         <input id="pName" placeholder="Name" value="${STATE.user?.name || ''}">
         <input id="pEmail" placeholder="Email" value="${STATE.user?.email || ''}">
         <div class="row">
           <div class="chip ${STATE.lang === 'en' ? 'active' : ''}" onclick="setLang('en')">English</div>
           <div class="chip ${STATE.lang === 'hi' ? 'active' : ''}" onclick="setLang('hi')">Hindi</div>
+          <div class="chip ${STATE.theme === 'dark' ? 'active' : ''}" onclick="toggleTheme()">${STATE.theme === 'dark' ? '☀ Light' : '🌙 Dark'}</div>
         </div>
         <button class="btn" onclick="saveProfile()">Save Profile</button>
+      </div>
+      <div class="card">
+        <div class="mini-title">⚡ Quick Links</div>
+        <div class="quick-tray">
+          <div class="chip" onclick="nav('orders')"><span class="tic">📦</span>Orders<br><small>${STATE.orders.length}</small></div>
+          <div class="chip" onclick="nav('wishlist')"><span class="tic">❤️</span>Wishlist<br><small>${STATE.wishlist.length}</small></div>
+          <div class="chip" onclick="nav('bookings')"><span class="tic">📅</span>Bookings<br><small>${STATE.bookings.length}</small></div>
+        </div>
       </div>
       ${rewardCard()}
       <div class="card">
@@ -552,20 +683,47 @@ async function loadInitData() {
   if (support.success) STATE.support = support;
 
   if (STATE.token) {
-    const [me, bookings, history, reminders, rewards] = await Promise.all([
+    const [me, bookings, orders, history, reminders, rewards, wishlist, recs] = await Promise.all([
       api('/users/me'),
       api('/bookings/my'),
+      api('/orders/my'),
       api('/users/history'),
       api('/users/reminders'),
-      api('/users/rewards')
+      api('/users/rewards'),
+      api('/users/wishlist'),
+      api('/users/recommendations')
     ]);
-    if (me.success) STATE.user = me.user;
+    if (me.success) {
+      STATE.user = me.user;
+      if (me.user?.themePreference && !localStorage.getItem('theme')) {
+        STATE.theme = me.user.themePreference;
+        applyTheme();
+      }
+    }
     STATE.bookings = bookings.bookings || [];
+    STATE.orders = orders.orders || [];
     STATE.history = history.history || [];
     STATE.reminders = reminders.reminders || [];
     STATE.rewards = rewards.rewards || null;
+    STATE.wishlist = wishlist.wishlist || [];
+    STATE.recommendations = recs.recommendations || [];
     save();
   }
+}
+
+async function toggleWish(productId) {
+  if (!STATE.token) return nav('login');
+  const response = await api('/users/wishlist/' + productId, 'POST');
+  if (!response.success) return toast(response.message || 'Wishlist update failed');
+  STATE.wishlist = response.wishlist;
+  toast(response.inWishlist ? 'Added to wishlist' : 'Removed from wishlist');
+  render();
+}
+
+let _filterTimer;
+function filterProductsDebounced() {
+  clearTimeout(_filterTimer);
+  _filterTimer = setTimeout(() => render(), 250);
 }
 
 async function registerGuest() {
@@ -796,11 +954,15 @@ async function downloadInvoice(id) {
   const invoice = response.invoice;
   const blob = new Blob([invoice.html || 'Invoice unavailable'], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${invoice.invoiceNo}.html`;
-  a.click();
-  URL.revokeObjectURL(url);
+  // Open in new tab for print/view; fallback to download
+  const win = window.open(url, '_blank');
+  if (!win) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${invoice.invoiceNo}.html`;
+    a.click();
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 8000);
 }
 
 async function payNow(bookingId, amount) {
@@ -853,6 +1015,7 @@ async function placeOrder() {
 }
 
 (async () => {
+  applyTheme();
   render();
   const splashDelay = new Promise(resolve => setTimeout(resolve, 1200));
   await Promise.all([loadInitData(), splashDelay]);

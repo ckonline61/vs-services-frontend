@@ -13,6 +13,11 @@ mobile-apk/android/
 mobile-apk/.gradle/
 mobile-apk/dist/
 
+admin-apk/node_modules/
+admin-apk/android/
+admin-apk/.gradle/
+admin-apk/dist/
+
 admin-panel/.DS_Store
 
 *.log
