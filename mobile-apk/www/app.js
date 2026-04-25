@@ -76,12 +76,17 @@ const STATE = {
   current: 'splash',
   data: {},
   bookingForm: {},
-  payMode: 'cod'
+  payMode: 'cod',
+  navStack: [],
+  loading: false
 };
 
 const t = (key) => I18N[STATE.lang]?.[key] || I18N.en[key] || key;
 
-async function api(path, method = 'GET', body) {
+let _apiInflight = 0;
+async function api(path, method = 'GET', body, opts = {}) {
+  const showSpin = opts.silent !== true;
+  if (showSpin) { _apiInflight++; if (_apiInflight === 1) showLoader('Loading...'); }
   try {
     const response = await fetch(STATE.apiUrl + path, {
       method,
@@ -94,6 +99,8 @@ async function api(path, method = 'GET', body) {
     return await response.json();
   } catch (e) {
     return { success: false, message: 'Network error: ' + e.message };
+  } finally {
+    if (showSpin) { _apiInflight = Math.max(0, _apiInflight - 1); if (_apiInflight === 0) hideLoader(); }
   }
 }
 
@@ -145,9 +152,50 @@ function humanMode(mode) {
 }
 
 function nav(screen, data) {
+  if (STATE.current && STATE.current !== screen && STATE.current !== 'splash') {
+    STATE.navStack.push({ screen: STATE.current, data: STATE.data });
+    if (STATE.navStack.length > 30) STATE.navStack.shift();
+  }
   STATE.current = screen;
   STATE.data = data || {};
+  try { history.pushState({ screen }, '', '#' + screen); } catch (e) {}
   render();
+}
+
+function navBack() {
+  if (STATE.navStack && STATE.navStack.length > 0) {
+    const prev = STATE.navStack.pop();
+    STATE.current = prev.screen;
+    STATE.data = prev.data || {};
+    render();
+    return true;
+  }
+  // top-level tabs: jump to home if not already
+  if (STATE.current !== 'home' && STATE.current !== 'splash' && STATE.current !== 'login') {
+    STATE.current = 'home';
+    STATE.data = {};
+    render();
+    return true;
+  }
+  return false; // allow app to exit
+}
+
+function showLoader(msg) {
+  let el = document.getElementById('globalLoader');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'globalLoader';
+    el.className = 'global-loader';
+    el.innerHTML = '<div class="gl-card"><div class="loader"></div><div class="gl-msg"></div></div>';
+    document.body.appendChild(el);
+  }
+  el.querySelector('.gl-msg').textContent = msg || 'Loading...';
+  el.classList.add('show');
+}
+
+function hideLoader() {
+  const el = document.getElementById('globalLoader');
+  if (el) el.classList.remove('show');
 }
 
 function logo(compact = false) {
@@ -1014,10 +1062,45 @@ async function placeOrder() {
   nav('home');
 }
 
+// Hardware back button — Capacitor App plugin (if available) + popstate fallback
+window.addEventListener('popstate', (e) => {
+  if (!navBack()) {
+    // No screen left — let WebView handle (will exit app)
+    if (window.Capacitor?.Plugins?.App) window.Capacitor.Plugins.App.exitApp();
+  } else {
+    try { history.pushState({ screen: STATE.current }, '', '#' + STATE.current); } catch (e2) {}
+  }
+});
+
+document.addEventListener('deviceready', () => {
+  if (window.Capacitor?.Plugins?.App?.addListener) {
+    window.Capacitor.Plugins.App.addListener('backButton', () => {
+      if (!navBack()) window.Capacitor.Plugins.App.exitApp();
+    });
+  }
+}, false);
+
+// Restrict numeric inputs (mobile, OTP, pincode) to digits only
+document.addEventListener('input', (e) => {
+  const el = e.target;
+  if (!el || !el.matches) return;
+  if (el.matches('input[inputmode="numeric"], input[type="tel"]')) {
+    const max = parseInt(el.getAttribute('maxlength') || '0', 10);
+    let v = (el.value || '').replace(/\D/g, '');
+    if (max > 0) v = v.slice(0, max);
+    if (v !== el.value) el.value = v;
+  }
+}, true);
+
 (async () => {
   applyTheme();
   render();
+  try { history.replaceState({ screen: 'splash' }, '', '#splash'); } catch (e) {}
   const splashDelay = new Promise(resolve => setTimeout(resolve, 1200));
   await Promise.all([loadInitData(), splashDelay]);
-  nav(STATE.token ? 'home' : 'home');
+  STATE.navStack = [];
+  STATE.current = 'home';
+  STATE.data = {};
+  try { history.replaceState({ screen: 'home' }, '', '#home'); } catch (e) {}
+  render();
 })();

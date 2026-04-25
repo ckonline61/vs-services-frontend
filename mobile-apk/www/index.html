@@ -273,6 +273,13 @@ body[data-theme="dark"] .tabbar{background:#0F2344;border-top-color:#1C4277}
 .card.reward-glow::after{content:'';position:absolute;top:-30%;right:-20%;width:160px;height:160px;background:radial-gradient(circle,rgba(74,226,144,.18),transparent 70%);pointer-events:none}
 body[data-theme="dark"] .card.reward-glow{background:linear-gradient(135deg,#13294B 0%,#0F2344 100%)}
 @media (max-width:360px){.mini-grid{grid-template-columns:1fr}.hero-row{flex-direction:column}.quick-grid{grid-template-columns:repeat(2,1fr)}}
+.global-loader{position:fixed;inset:0;background:rgba(10,25,51,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9999}
+.global-loader.show{display:flex;animation:fade .2s}
+.global-loader .gl-card{background:#fff;padding:22px 28px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 18px 40px rgba(0,0,0,.25);min-width:160px}
+body[data-theme="dark"] .global-loader .gl-card{background:#13294B;color:#fff}
+.global-loader .loader{width:36px;height:36px;border:3px solid rgba(10,25,51,.15);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.global-loader .gl-msg{font-size:13px;font-weight:600;color:var(--t)}
+body[data-theme="dark"] .global-loader .gl-msg{color:#E8F0FF}
 </style>
 </head>
 <body>

@@ -31,6 +31,9 @@ if not exist "android" (
   call npx cap sync android
 )
 
+echo Generating app icons (car logo)...
+powershell -ExecutionPolicy Bypass -File "%~dp0..\GENERATE_ICONS.ps1"
+
 echo.
 echo [5/5] Starting Gradle build... (5-20 min lag sakta hai)
 echo ====================================================
