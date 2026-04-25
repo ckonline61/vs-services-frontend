@@ -2,184 +2,261 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>VS Admin</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0F2A47">
+<title>VS Services Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-:root { --primary:#2D8FE6; --dark:#1B6FC2; --navy:#0F2A47; --navy2:#13294B; --accent:#4AE290; --bg:#F3F8FC; --card:#fff; --text:#1F2D3A; --light:#6F8292; --border:#D8E4EE; --ok:#2E7D32; --danger:#C62828; }
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:'Plus Jakarta Sans','Inter',sans-serif;letter-spacing:-.01em}
-body{background:var(--bg);color:var(--text)}
-.layout{display:flex;min-height:100vh}
-.sidebar{width:240px;background:#0F2A47;color:#fff;padding:20px}
-.sidebar h1{font-size:22px;margin-bottom:30px}
-.sidebar a{display:block;color:#fff;padding:12px 10px;text-decoration:none;border-radius:8px;margin-bottom:4px;cursor:pointer}
-.sidebar a:hover,.sidebar a.active{background:rgba(255,255,255,.12)}
-.main{flex:1;padding:24px;overflow:auto}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.topbar h2{font-size:22px}
-.btn{background:var(--primary);color:#fff;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:14px}
-.btn:hover{background:var(--dark)}
-.btn-sm{padding:6px 10px;font-size:12px}
-.btn-secondary{background:#fff;color:var(--primary);border:1px solid var(--primary)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.stat{background:var(--card);padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.stat .label{color:var(--light);font-size:13px}
-.stat .value{font-size:28px;font-weight:bold;color:var(--primary);margin-top:6px}
-.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:20px}
-table{width:100%;border-collapse:collapse}
-th,td{text-align:left;padding:10px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top}
-th{background:#fafcff;font-weight:600}
-.badge{padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold;color:#fff;display:inline-block}
-.b-booked{background:#1976D2}.b-confirmed{background:#388E3C}.b-assigned{background:#F57C00}.b-pickup_scheduled{background:#00838F}
-.b-in_progress{background:#7B1FA2}.b-completed{background:#2E7D32}.b-cancelled{background:#C62828}
-.b-pending{background:#F9A825}.b-paid{background:#2E7D32}.b-failed{background:#C62828}
-input,select,textarea{width:100%;padding:9px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:10px}
-.row{display:flex;gap:10px}.row>*{flex:1}
-.hidden{display:none}
-.login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0F2A47}
-.login-card{background:#fff;padding:40px;border-radius:14px;width:360px}
-.login-card h1{color:var(--primary);margin-bottom:20px;text-align:center}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100}
-.modal{background:#fff;padding:24px;border-radius:12px;width:520px;max-width:92%}
-.muted{color:var(--light);font-size:12px}
-.m-brand{display:none}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0F2A47; --navy2:#13294B; --navy3:#1A3960;
+  --accent:#4AE290; --accent2:#3DC97D;
+  --warn:#FFB845; --danger:#F26B6B;
+  --bg:#F4F7FB; --surface:#FFFFFF; --surface2:#F8FAFD;
+  --border:#E2E8F0; --text:#0F1F35; --muted:#6B7A92;
+  --shadow:0 8px 24px rgba(15,42,71,.06); --shadow-lg:0 16px 40px rgba(15,42,71,.12);
+}
+html,body{font-family:'Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+.hidden{display:none !important}
+
+/* App Shell */
+.app{min-height:100vh;display:flex;flex-direction:column;padding-bottom:72px}
+.topbar{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:50;box-shadow:0 4px 20px rgba(15,42,71,.15)}
+.topbar .brand{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:17px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+.topbar .brand::before{content:"⚡";font-size:20px}
+.topbar .page-title{font-size:13px;opacity:.75;font-weight:500;margin-left:auto}
+.topbar .top-action{background:rgba(255,255,255,.12);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;backdrop-filter:blur(8px)}
+
+.main{flex:1;padding:16px;max-width:780px;width:100%;margin:0 auto}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;z-index:60;height:64px;box-shadow:0 -4px 16px rgba(15,42,71,.06);padding-bottom:env(safe-area-inset-bottom,0)}
+.bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:10.5px;font-weight:600;padding:8px 4px;text-decoration:none;transition:.2s}
+.bottom-nav a .icn{font-size:20px;line-height:1}
+.bottom-nav a.active{color:var(--navy)}
+.bottom-nav a.active .icn{transform:scale(1.1)}
+
+/* Cards */
+.card{background:var(--surface);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px;color:var(--navy);display:flex;align-items:center;gap:8px}
+.card-section-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:18px 6px 10px}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--surface);border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,var(--accent),transparent 70%);opacity:.15}
+.stat .lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.stat .val{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:var(--navy);margin-top:6px}
+.stat .delta{font-size:11px;color:var(--accent2);font-weight:600;margin-top:2px}
+.stat.gradient{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;border:none}
+.stat.gradient .lbl,.stat.gradient .val{color:#fff}
+.stat.gradient .lbl{opacity:.75}
+.stat.warn::before{background:radial-gradient(circle,var(--warn),transparent 70%)}
+.stat.danger::before{background:radial-gradient(circle,var(--danger),transparent 70%)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;border-radius:10px;font-weight:600;font-size:13px;background:var(--navy);color:#fff;transition:.2s;line-height:1}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,var(--accent2),var(--accent))}
+.btn.outline{background:transparent;color:var(--navy);border:1.5px solid var(--border)}
+.btn.danger{background:var(--danger)}
+.btn.warn{background:var(--warn);color:var(--navy)}
+.btn.sm{padding:7px 11px;font-size:12px;border-radius:8px}
+.btn.full{width:100%}
+.btn.icon{width:36px;height:36px;padding:0;border-radius:10px;font-size:14px}
+
+/* Forms */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);font-size:14px;outline:none;transition:.15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,42,71,.08)}
+.field textarea{min-height:70px;resize:vertical}
+.field .hint{font-size:11px;color:var(--muted);margin-top:4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Login screen */
+.login-page{min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 50%,var(--navy3) 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 25px 60px rgba(0,0,0,.35)}
+.login-logo{width:64px;height:64px;margin:0 auto 14px;background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;box-shadow:0 12px 28px rgba(15,42,71,.25)}
+.login-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;text-align:center;color:var(--navy);margin-bottom:4px}
+.login-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:22px}
+.login-card .field input{padding:13px}
+.btn-link{background:none;color:var(--navy);font-weight:600;font-size:12px;padding:8px;width:100%;text-align:center}
+.creds-hint{background:#F0F7FD;border:1px solid #DCE9F5;border-radius:10px;padding:10px 12px;font-size:12px;color:var(--navy);margin:6px 0 14px;text-align:center}
+.creds-hint b{font-weight:700}
+
+/* Item Lists (replaces tables) */
+.list{display:flex;flex-direction:column;gap:10px}
+.item{background:var(--surface);border-radius:12px;padding:14px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.item-title{font-weight:700;font-size:14px;color:var(--navy)}
+.item-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.item-amt{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--navy);font-size:15px}
+.item-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.meta-chip{background:var(--surface2);border:1px solid var(--border);padding:4px 9px;border-radius:7px;font-size:11px;color:var(--muted);font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.meta-chip b{color:var(--text);font-weight:600}
+.item-actions{display:flex;gap:6px;flex-wrap:wrap;border-top:1px dashed var(--border);padding-top:10px;margin-top:6px}
+.item-actions select,.item-actions .btn{font-size:12px}
+.item-actions select{padding:7px 9px;border:1.5px solid var(--border);border-radius:8px;background:#fff;flex:1;min-width:120px}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;text-transform:capitalize}
+.b-booked,.b-placed{background:#E1ECFB;color:#1F4E8A}
+.b-confirmed,.b-shipped{background:#E0EEF8;color:#1A6BAA}
+.b-assigned,.b-pickup_scheduled{background:#FFF4D9;color:#A06800}
+.b-in_progress{background:#FFE7CC;color:#A85100}
+.b-completed,.b-delivered,.b-paid{background:#D4F7E2;color:#1B7A3E}
+.b-cancelled,.b-failed{background:#FCE0E0;color:#A12626}
+.b-pending{background:#F1F1F1;color:#555}
+
+/* Search bar */
+.search-bar{display:flex;gap:8px;margin-bottom:12px}
+.search-bar input{flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff}
+.search-bar input:focus{border-color:var(--navy);outline:none}
+
+/* Tabs subnav */
+.subtabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding:2px}
+.subtabs::-webkit-scrollbar{display:none}
+.subtab{flex-shrink:0;padding:8px 14px;border-radius:8px;background:#fff;border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.subtab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(15,42,71,.5);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:200;animation:fadeIn .2s}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:22px;max-height:90vh;overflow-y:auto;animation:slideUp .25s}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-head h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;color:var(--navy)}
+.modal-close{font-size:22px;color:var(--muted);background:#F1F4F9;width:32px;height:32px;border-radius:8px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* Empty / Loading */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;opacity:.4;margin-bottom:10px}
+.empty-msg{font-size:14px;font-weight:600;margin-bottom:4px}
+.empty-sub{font-size:12px}
+
 .global-loader{position:fixed;inset:0;background:rgba(15,42,71,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:9999}
 .global-loader.show{display:flex}
-.global-loader .gl-card{background:#fff;padding:22px 28px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:12px;box-shadow:0 18px 40px rgba(0,0,0,.3);min-width:170px}
-.global-loader .gl-spin{width:36px;height:36px;border:3px solid rgba(15,42,71,.15);border-top-color:var(--accent,#4AE290);border-radius:50%;animation:spin 1s linear infinite}
-.global-loader .gl-msg{font-size:13px;font-weight:600;color:var(--navy,#0F2A47)}
+.gl-card{background:#fff;padding:20px 26px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:160px;box-shadow:var(--shadow-lg)}
+.gl-spin{width:34px;height:34px;border:3px solid rgba(15,42,71,.12);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+.gl-msg{font-size:12px;font-weight:600;color:var(--navy)}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media (max-width:768px){
-  .layout{grid-template-columns:1fr}
-  .sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;height:62px;display:flex;flex-direction:row;justify-content:space-around;align-items:center;padding:0;z-index:50;border-top:1px solid rgba(255,255,255,.1)}
-  .sidebar h1{display:none}
-  .sidebar a{flex:1;text-align:center;padding:8px 4px;font-size:10px;border-radius:0;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1}
-  .sidebar a::before{font-size:18px}
-  .sidebar a[data-tab="dash"]::before{content:"📊"}
-  .sidebar a[data-tab="bookings"]::before{content:"📅"}
-  .sidebar a[data-tab="orders"]::before{content:"📦"}
-  .sidebar a[data-tab="staff"]::before{content:"👥"}
-  .sidebar a[data-tab="services"]::before{content:"🔧"}
-  .sidebar a[data-tab="products"]::before{content:"🛍"}
-  .sidebar a[data-tab="users"]::before{content:"👤"}
-  .main{padding:16px;padding-bottom:80px}
-  .topbar{padding:14px 16px;position:sticky;top:0;background:#fff;z-index:40}
-  .m-brand{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:16px}
-  .m-brand::before{content:"⚡";font-size:18px}
-  .stats{grid-template-columns:repeat(2,1fr);gap:10px}
-  .stat{padding:14px}
-  .stat .v{font-size:20px}
-  table{display:block;overflow-x:auto;white-space:nowrap;font-size:13px}
-  table thead{display:none}
-  table,table tbody,table tr,table td{display:block;white-space:normal}
-  table tr{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;padding:10px}
-  table td{border:none;padding:6px 0;display:flex;justify-content:space-between;gap:10px}
-  table td::before{content:attr(data-label);font-weight:600;color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
-  .modal{width:94%;padding:18px}
-  .row{flex-direction:column;gap:0}
-  .login-card{width:88%;padding:28px}
-  .btn{padding:10px 14px;font-size:14px}
+
+/* Toast */
+.toast{position:fixed;left:20px;right:20px;bottom:90px;background:var(--navy);color:#fff;padding:13px 16px;border-radius:12px;text-align:center;z-index:300;font-weight:600;font-size:13px;box-shadow:var(--shadow-lg);animation:toastIn .3s}
+.toast.success{background:linear-gradient(135deg,var(--accent2),var(--accent))}
+.toast.error{background:var(--danger)}
+@keyframes toastIn{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* Switch */
+.switch{position:relative;display:inline-block;width:42px;height:24px}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#CBD3E0;border-radius:24px;transition:.2s}
+.slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+input:checked+.slider{background:var(--accent2)}
+input:checked+.slider::before{transform:translateX(18px)}
+
+@media (min-width:768px){
+  .stats-grid{grid-template-columns:repeat(4,1fr)}
 }
 </style>
 </head>
 <body>
 
-<div id="login" class="login">
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-page">
   <div class="login-card">
-    <h1>VS SERVICES<br><small style="font-size:13px;color:#666">Admin Dashboard</small></h1>
-    <input id="loginMobile" placeholder="10-digit Mobile" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" value="9999999999">
-    <input id="loginPassword" type="password" placeholder="Password" value="admin123">
-    <input id="loginUrl" placeholder="API URL" value="https://vs-services-api.onrender.com/api">
-    <button class="btn" style="width:100%" onclick="login()">Login</button>
-    <p style="font-size:12px;color:#888;margin-top:14px;text-align:center">Default: <b>9999999999</b> / <b>admin123</b></p>
-    <button class="btn" style="width:100%;background:#666;margin-top:8px" onclick="bootstrapAdmin()">First time? Setup Admin</button>
+    <div class="login-logo">⚡</div>
+    <div class="login-title">VS SERVICES Admin</div>
+    <div class="login-sub">Manage everything from your phone</div>
+    <div class="creds-hint">Default: <b>9999999999</b> / <b>admin123</b></div>
+    <div class="field">
+      <label>Mobile Number</label>
+      <input id="loginMobile" placeholder="10-digit mobile" maxlength="10" inputmode="numeric" value="9999999999">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="loginPassword" type="password" placeholder="Password" value="admin123">
+    </div>
+    <button class="btn primary full" onclick="doLogin()">Login →</button>
+    <button class="btn-link" onclick="bootstrapAdmin()">First time? Setup Admin</button>
+    <details style="margin-top:8px">
+      <summary style="font-size:12px;color:var(--muted);cursor:pointer;text-align:center;padding:6px">Advanced: API URL</summary>
+      <input id="loginUrl" style="margin-top:8px;width:100%;padding:9px;border:1px solid var(--border);border-radius:8px;font-size:12px" value="https://vs-services-api.onrender.com/api">
+    </details>
   </div>
 </div>
 
-<div id="dashboard" class="layout hidden">
-  <div class="sidebar">
-    <h1>VS SERVICES</h1>
-    <a onclick="navTab('dash')" class="active" data-tab="dash">Dashboard</a>
-    <a onclick="navTab('bookings')" data-tab="bookings">Bookings</a>
-    <a onclick="navTab('orders')" data-tab="orders">Orders</a>
-    <a onclick="navTab('team')" data-tab="team">Team</a>
-    <a onclick="navTab('services')" data-tab="services">Services</a>
-    <a onclick="navTab('products')" data-tab="products">Products</a>
-    <a onclick="logout()" style="margin-top:40px">Logout</a>
+<!-- MAIN APP -->
+<div id="app" class="app hidden">
+  <div class="topbar">
+    <div class="brand">VS Admin</div>
+    <div class="page-title" id="pageTitle">Dashboard</div>
+    <button class="top-action" onclick="doLogout()" title="Logout">⏻</button>
   </div>
 
   <div class="main">
-    <div class="m-brand">VS SERVICES Admin</div>
-    <div id="dash" class="tab">
-      <div class="topbar"><h2>Dashboard</h2></div>
-      <div class="stats">
-        <div class="stat"><div class="label">Total Bookings</div><div class="value" id="s-bookings">0</div></div>
-        <div class="stat"><div class="label">Pending Bookings</div><div class="value" id="s-pending">0</div></div>
-        <div class="stat"><div class="label">Total Orders</div><div class="value" id="s-orders">0</div></div>
-        <div class="stat"><div class="label">Revenue (Paid)</div><div class="value" id="s-revenue">Rs 0</div></div>
+    <!-- DASHBOARD -->
+    <div id="tab-dash" class="tab-pane">
+      <div class="stats-grid">
+        <div class="stat gradient"><div class="lbl">Total Bookings</div><div class="val" id="s-bookings">0</div></div>
+        <div class="stat warn"><div class="lbl">Pending</div><div class="val" id="s-pending">0</div></div>
+        <div class="stat"><div class="lbl">Total Orders</div><div class="val" id="s-orders">0</div></div>
+        <div class="stat"><div class="lbl">Revenue</div><div class="val" id="s-revenue">₹0</div></div>
       </div>
-      <div class="card">
-        <h3>Recent Bookings</h3>
-        <table id="recentTable">
-          <thead><tr><th>ID</th><th>Customer</th><th>Service</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+      <div class="card-section-title">Recent Bookings</div>
+      <div id="recentList" class="list"></div>
     </div>
 
-    <div id="bookings" class="tab hidden">
-      <div class="topbar"><h2>All Bookings</h2></div>
-      <div class="card">
-        <table id="bookingsTable">
-          <thead><tr><th>ID</th><th>Customer</th><th>Service</th><th>Car</th><th>Date</th><th>Mode</th><th>Coupon</th><th>Parts Req</th><th>Amount</th><th>Payment</th><th>Assigned Staff</th><th>Status</th><th>Review</th><th>Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
+    <!-- BOOKINGS -->
+    <div id="tab-bookings" class="tab-pane hidden">
+      <div class="search-bar">
+        <input id="bkSearch" placeholder="🔍 Search booking ID, customer, mobile..." oninput="filterBookings()">
       </div>
+      <div class="subtabs" id="bkSubtabs"></div>
+      <div id="bookingsList" class="list"></div>
     </div>
 
-    <div id="orders" class="tab hidden">
-      <div class="topbar"><h2>Accessory Orders</h2></div>
-      <div class="card">
-        <table id="ordersTable">
-          <thead><tr><th>ID</th><th>Customer</th><th>Items</th><th>Amount</th><th>Payment</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
+    <!-- ORDERS -->
+    <div id="tab-orders" class="tab-pane hidden">
+      <div class="search-bar">
+        <input id="ordSearch" placeholder="🔍 Search order ID or customer..." oninput="filterOrders()">
       </div>
+      <div class="subtabs" id="ordSubtabs"></div>
+      <div id="ordersList" class="list"></div>
     </div>
 
-    <div id="team" class="tab hidden">
-      <div class="topbar"><h2>Team / Staff</h2><button class="btn" onclick="openStaffModal()">+ Add Staff</button></div>
-      <div class="card">
-        <table id="staffTable">
-          <thead><tr><th>Name</th><th>Mobile</th><th>Role</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <!-- SERVICES -->
+    <div id="tab-services" class="tab-pane hidden">
+      <button class="btn primary full" style="margin-bottom:14px" onclick="openServiceModal()">+ Add New Service</button>
+      <div id="servicesList" class="list"></div>
     </div>
 
-    <div id="services" class="tab hidden">
-      <div class="topbar"><h2>Services</h2><button class="btn" onclick="openServiceModal()">+ Add Service</button></div>
-      <div class="card">
-        <table id="servicesTable">
-          <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Time</th><th>Active</th><th>Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <!-- PRODUCTS -->
+    <div id="tab-products" class="tab-pane hidden">
+      <button class="btn primary full" style="margin-bottom:14px" onclick="openProductModal()">+ Add New Product</button>
+      <div id="productsList" class="list"></div>
     </div>
 
-    <div id="products" class="tab hidden">
-      <div class="topbar"><h2>Products</h2><button class="btn" onclick="openProductModal()">+ Add Product</button></div>
-      <div class="card">
-        <table id="productsTable">
-          <thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Active</th><th>Action</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <!-- TEAM -->
+    <div id="tab-team" class="tab-pane hidden">
+      <button class="btn primary full" style="margin-bottom:14px" onclick="openStaffModal()">+ Add Staff Member</button>
+      <div id="staffList" class="list"></div>
     </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <a onclick="navTab('dash')" id="nav-dash" class="active"><span class="icn">📊</span>Home</a>
+    <a onclick="navTab('bookings')" id="nav-bookings"><span class="icn">📅</span>Bookings</a>
+    <a onclick="navTab('orders')" id="nav-orders"><span class="icn">📦</span>Orders</a>
+    <a onclick="navTab('services')" id="nav-services"><span class="icn">🔧</span>Services</a>
+    <a onclick="navTab('products')" id="nav-products"><span class="icn">🛍</span>Shop</a>
+    <a onclick="navTab('team')" id="nav-team"><span class="icn">👥</span>Team</a>
   </div>
 </div>
 
@@ -188,371 +265,519 @@ input,select,textarea{width:100%;padding:9px;border:1px solid var(--border);bord
 <script>
 let API = localStorage.getItem('apiUrl') || 'https://vs-services-api.onrender.com/api';
 let TOKEN = localStorage.getItem('adminToken');
-
 let _inflight = 0;
+
+const STATE = {
+  bookings: [],
+  orders: [],
+  services: [],
+  products: [],
+  staff: [],
+  bookingFilter: 'all',
+  orderFilter: 'all',
+  bookingSearch: '',
+  orderSearch: '',
+  currentTab: 'dash',
+  navStack: []
+};
+
+const BOOKING_STATUSES = ['booked','confirmed','assigned','pickup_scheduled','in_progress','completed','cancelled'];
+const ORDER_STATUSES = ['placed','confirmed','shipped','delivered','cancelled'];
+const SERVICE_CATEGORIES = ['service','checkup','repair','denting_painting'];
+const PRODUCT_CATEGORIES = ['seat_cover','mats','perfume','audio','lights','accessory'];
+
+// ============ Helpers ============
 function showLoader(msg){
-  let el = document.getElementById('globalLoader');
+  let el=document.getElementById('globalLoader');
   if(!el){
-    el = document.createElement('div');
-    el.id = 'globalLoader';
-    el.className = 'global-loader';
-    el.innerHTML = '<div class="gl-card"><div class="gl-spin"></div><div class="gl-msg"></div></div>';
+    el=document.createElement('div');el.id='globalLoader';el.className='global-loader';
+    el.innerHTML='<div class="gl-card"><div class="gl-spin"></div><div class="gl-msg"></div></div>';
     document.body.appendChild(el);
   }
-  el.querySelector('.gl-msg').textContent = msg || 'Loading...';
+  el.querySelector('.gl-msg').textContent=msg||'Loading...';
   el.classList.add('show');
 }
-function hideLoader(){ const el = document.getElementById('globalLoader'); if(el) el.classList.remove('show'); }
+function hideLoader(){const el=document.getElementById('globalLoader');if(el)el.classList.remove('show');}
 
-async function req(path, method='GET', body) {
+function toast(msg, type='success'){
+  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2800);
+}
+
+async function req(path, method='GET', body){
   _inflight++; if(_inflight===1) showLoader();
-  try {
-    const res = await fetch(API + path, {
+  try{
+    const res=await fetch(API+path,{
       method,
-      headers: { 'Content-Type':'application/json', ...(TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {}) },
-      body: body ? JSON.stringify(body) : undefined
+      headers:{'Content-Type':'application/json',...(TOKEN?{Authorization:'Bearer '+TOKEN}:{})},
+      body:body?JSON.stringify(body):undefined
     });
     return await res.json();
-  } catch(e){
-    return { success:false, message:'Network error: '+e.message };
-  } finally {
-    _inflight = Math.max(0,_inflight-1); if(_inflight===0) hideLoader();
+  }catch(e){return{success:false,message:'Network error: '+e.message}}
+  finally{_inflight=Math.max(0,_inflight-1);if(_inflight===0)hideLoader();}
+}
+
+function fmtMoney(n){return '₹' + (n||0).toLocaleString('en-IN');}
+function fmtDate(d){if(!d)return '-';const x=new Date(d);return x.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtMode(m){return ({at_garage:'At Garage',home_service:'Home Service',pickup_drop:'Pickup & Drop'})[m]||m||'-';}
+function badge(status){return `<span class="badge b-${status}">${(status||'').replace(/_/g,' ')}</span>`;}
+
+function emptyState(icon, msg, sub){return `<div class="empty"><div class="empty-icon">${icon}</div><div class="empty-msg">${msg}</div><div class="empty-sub">${sub||''}</div></div>`;}
+
+function closeModal(){document.querySelector('.modal-bg')?.remove();}
+function openModal(html){
+  document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()">${html}</div>`;
+}
+
+// ============ Auth ============
+async function doLogin(){
+  const mobile=document.getElementById('loginMobile').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  API=document.getElementById('loginUrl').value.trim();
+  localStorage.setItem('apiUrl',API);
+  if(!mobile||!password){return toast('Enter mobile & password','error')}
+  const r=await req('/auth/admin-login','POST',{mobile,password});
+  if(r.success && (r.user.role==='admin' || r.user.role==='staff')){
+    TOKEN=r.token; localStorage.setItem('adminToken',TOKEN);
+    enterApp();
+  } else {
+    toast(r.message||'Login failed','error');
   }
 }
 
-// Hardware back button — admin tabs
-const ADMIN_NAV = [];
-function navTab(tab){
-  if(ADMIN_NAV[ADMIN_NAV.length-1] !== tab) ADMIN_NAV.push(tab);
-  if(ADMIN_NAV.length>30) ADMIN_NAV.shift();
-  show(tab);
-  try { history.pushState({tab}, '', '#'+tab); } catch(e){}
+async function bootstrapAdmin(){
+  const mobile=document.getElementById('loginMobile').value.trim()||'9999999999';
+  const password=document.getElementById('loginPassword').value||'admin123';
+  API=document.getElementById('loginUrl').value.trim();
+  localStorage.setItem('apiUrl',API);
+  const r=await req('/auth/bootstrap-admin','POST',{mobile,password,name:'Admin'});
+  if(r.success){toast('Admin ready! Now tap Login','success')}
+  else{toast('Setup failed: '+r.message,'error')}
 }
+
+function doLogout(){
+  if(!confirm('Logout?'))return;
+  localStorage.removeItem('adminToken');
+  TOKEN=null;
+  location.reload();
+}
+
+function enterApp(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  STATE.navStack=['dash'];
+  navTab('dash',true);
+}
+
+// ============ Navigation ============
+const TAB_TITLES={dash:'Dashboard',bookings:'Bookings',orders:'Orders',services:'Services',products:'Products',team:'Team'};
+
+function navTab(tab, fresh){
+  if(!fresh && STATE.currentTab !== tab) STATE.navStack.push(tab);
+  if(STATE.navStack.length>30) STATE.navStack.shift();
+  STATE.currentTab=tab;
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.add('hidden'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  document.querySelectorAll('.bottom-nav a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('nav-'+tab)?.classList.add('active');
+  document.getElementById('pageTitle').textContent=TAB_TITLES[tab]||'';
+  try{history.pushState({tab},'','#'+tab)}catch(e){}
+  loadTab(tab);
+}
+
 function adminBack(){
-  // close any open modal first
-  const modal = document.querySelector('.modal-bg');
-  if(modal){ modal.remove(); return true; }
-  if(ADMIN_NAV.length > 1){
-    ADMIN_NAV.pop();
-    const prev = ADMIN_NAV[ADMIN_NAV.length-1];
-    show(prev);
+  const modal=document.querySelector('.modal-bg');
+  if(modal){modal.remove();return true;}
+  if(STATE.navStack.length>1){
+    STATE.navStack.pop();
+    const prev=STATE.navStack[STATE.navStack.length-1];
+    STATE.currentTab=prev;
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.add('hidden'));
+    document.getElementById('tab-'+prev).classList.remove('hidden');
+    document.querySelectorAll('.bottom-nav a').forEach(a=>a.classList.remove('active'));
+    document.getElementById('nav-'+prev)?.classList.add('active');
+    document.getElementById('pageTitle').textContent=TAB_TITLES[prev]||'';
+    loadTab(prev);
     return true;
   }
   return false;
 }
-window.addEventListener('popstate', () => {
-  if(!adminBack() && window.Capacitor?.Plugins?.App) window.Capacitor.Plugins.App.exitApp();
-  else { try { history.pushState({tab:ADMIN_NAV[ADMIN_NAV.length-1]||'dash'},'','#'+(ADMIN_NAV[ADMIN_NAV.length-1]||'dash')); } catch(e){} }
+
+window.addEventListener('popstate',()=>{
+  if(!adminBack() && window.Capacitor?.Plugins?.App){window.Capacitor.Plugins.App.exitApp();}
+  else{try{history.pushState({tab:STATE.currentTab},'','#'+STATE.currentTab)}catch(e){}}
 });
-document.addEventListener('deviceready', () => {
+document.addEventListener('deviceready',()=>{
   if(window.Capacitor?.Plugins?.App?.addListener){
-    window.Capacitor.Plugins.App.addListener('backButton', () => {
-      if(!adminBack()) window.Capacitor.Plugins.App.exitApp();
+    window.Capacitor.Plugins.App.addListener('backButton',()=>{
+      if(!adminBack())window.Capacitor.Plugins.App.exitApp();
     });
   }
-}, false);
+},false);
 
-// Numeric input enforcement
-document.addEventListener('input', (e) => {
-  const el = e.target;
-  if(!el || !el.matches) return;
-  if(el.matches('input[inputmode="numeric"], input[type="tel"]')){
-    const max = parseInt(el.getAttribute('maxlength')||'0',10);
-    let v = (el.value||'').replace(/\D/g,'');
-    if(max>0) v = v.slice(0,max);
-    if(v !== el.value) el.value = v;
+document.addEventListener('input',(e)=>{
+  const el=e.target;if(!el?.matches)return;
+  if(el.matches('input[inputmode="numeric"]')){
+    const max=parseInt(el.getAttribute('maxlength')||'0',10);
+    let v=(el.value||'').replace(/\D/g,'');
+    if(max>0)v=v.slice(0,max);
+    if(v!==el.value)el.value=v;
   }
-}, true);
+},true);
 
-async function login() {
-  const mobile = document.getElementById('loginMobile').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  API = document.getElementById('loginUrl').value.trim();
-  localStorage.setItem('apiUrl', API);
-  const r = await req('/auth/admin-login', 'POST', { mobile, password });
-  if (r.success && (r.user.role === 'admin' || r.user.role === 'staff')) {
-    TOKEN = r.token;
-    localStorage.setItem('adminToken', TOKEN);
-    showDashboard();
-  } else {
-    alert((r.message || 'Invalid login') + '\n\nIf this is a new install, tap "First time? Setup Admin" first.');
-  }
+function loadTab(tab){
+  if(tab==='dash')loadDashboard();
+  else if(tab==='bookings')loadBookings();
+  else if(tab==='orders')loadOrders();
+  else if(tab==='services')loadServices();
+  else if(tab==='products')loadProducts();
+  else if(tab==='team')loadStaff();
 }
 
-async function bootstrapAdmin() {
-  const mobile = document.getElementById('loginMobile').value.trim() || '9999999999';
-  const password = document.getElementById('loginPassword').value || 'admin123';
-  API = document.getElementById('loginUrl').value.trim();
-  localStorage.setItem('apiUrl', API);
-  const r = await req('/auth/bootstrap-admin', 'POST', { mobile, password, name: 'Admin' });
-  if (r.success) {
-    alert('Admin ready!\nMobile: ' + r.mobile + '\nPassword: ' + r.password + '\n\nNow tap Login.');
-  } else {
-    alert('Setup failed: ' + (r.message || 'unknown'));
-  }
-}
+// ============ Dashboard ============
+async function loadDashboard(){
+  const [b,o]=await Promise.all([req('/bookings'),req('/orders')]);
+  const bookings=b.bookings||[];const orders=o.orders||[];
+  STATE.bookings=bookings;STATE.orders=orders;
+  document.getElementById('s-bookings').textContent=bookings.length;
+  document.getElementById('s-pending').textContent=bookings.filter(x=>['booked','confirmed','assigned','in_progress','pickup_scheduled'].includes(x.status)).length;
+  document.getElementById('s-orders').textContent=orders.length;
+  const revenue=[...bookings,...orders].filter(x=>x.paymentStatus==='paid').reduce((s,x)=>s+(x.totalAmount||0),0);
+  document.getElementById('s-revenue').textContent=fmtMoney(revenue);
 
-function logout() {
-  localStorage.removeItem('adminToken');
-  location.reload();
-}
-
-function show(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
-  document.getElementById(tab).classList.remove('hidden');
-  document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
-  document.querySelector(`[data-tab="${tab}"]`)?.classList.add('active');
-  if (tab === 'dash') loadDashboard();
-  if (tab === 'bookings') loadBookings();
-  if (tab === 'orders') loadOrders();
-  if (tab === 'team') loadStaff();
-  if (tab === 'services') loadServices();
-  if (tab === 'products') loadProducts();
-}
-
-async function showDashboard() {
-  document.getElementById('login').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
-  ADMIN_NAV.length = 0;
-  ADMIN_NAV.push('dash');
-  try { history.replaceState({tab:'dash'}, '', '#dash'); } catch(e){}
-  loadDashboard();
-}
-
-async function loadDashboard() {
-  const b = await req('/bookings');
-  const o = await req('/orders');
-  const bookings = b.bookings || [];
-  const orders = o.orders || [];
-  document.getElementById('s-bookings').textContent = bookings.length;
-  document.getElementById('s-pending').textContent = bookings.filter(x => ['booked','confirmed','assigned','pickup_scheduled'].includes(x.status)).length;
-  document.getElementById('s-orders').textContent = orders.length;
-  const revenue = [...bookings, ...orders].filter(x => x.paymentStatus === 'paid').reduce((sum, x) => sum + (x.totalAmount || 0), 0);
-  document.getElementById('s-revenue').textContent = 'Rs ' + revenue;
-  document.querySelector('#recentTable tbody').innerHTML = bookings.slice(0, 10).map(x => `
-    <tr>
-      <td data-label="ID">${x.bookingId}</td>
-      <td data-label="Customer">${x.userId?.name || x.userId?.mobile || '-'}</td>
-      <td data-label="Service">${x.serviceId?.name || '-'}</td>
-      <td data-label="Date">${new Date(x.bookingDate).toLocaleDateString()}</td>
-      <td data-label="Amount">Rs ${x.totalAmount}</td>
-      <td data-label="Status"><span class="badge b-${x.status}">${x.status}</span></td>
-    </tr>`).join('');
-}
-
-async function loadBookings() {
-  const r = await req('/bookings');
-  const s = await req('/users/staff');
-  const staffOptions = [{ _id: '', name: 'Unassigned', role: 'staff' }, ...(s.staff || []).filter(x => x.role === 'staff')];
-  const statuses = ['booked','confirmed','assigned','pickup_scheduled','in_progress','completed','cancelled'];
-  document.querySelector('#bookingsTable tbody').innerHTML = (r.bookings || []).map(x => `
-    <tr>
-      <td data-label="ID">${x.bookingId}</td>
-      <td data-label="Customer">${x.userId?.name || x.userId?.mobile || '-'}</td>
-      <td data-label="Service">${x.serviceId?.name || '-'}</td>
-      <td data-label="Car">${x.car?.carNumber || '-'}</td>
-      <td data-label="Date">${new Date(x.bookingDate).toLocaleDateString()} ${x.timeSlot || ''}</td>
-      <td data-label="Mode">${x.serviceMode}</td>
-      <td data-label="Coupon">${x.couponCode || '-'}</td>
-      <td data-label="Parts Req">${x.sparePartsRequest || '-'}</td>
-      <td data-label="Amount">Rs ${x.totalAmount}</td>
-      <td data-label="Payment"><span class="badge b-${x.paymentStatus}">${x.paymentStatus}</span></td>
-      <td data-label="Staff">
-        <div class="muted">${x.assignedStaff?.name || 'Not assigned'}</div>
-        <select onchange="assignStaff('${x._id}', this.value)">
-          ${staffOptions.map(staff => `<option value="${staff._id}" ${(x.assignedStaff?._id || '') === staff._id ? 'selected' : ''}>${staff.name}</option>`).join('')}
-        </select>
-      </td>
-      <td data-label="Status">
-        <select onchange="updateStatus('${x._id}', this.value)">
-          ${statuses.map(s => `<option ${s === x.status ? 'selected' : ''}>${s}</option>`).join('')}
-        </select>
-      </td>
-      <td data-label="Review">${x.review ? `${'★'.repeat(x.review.rating)}<br><span class="muted">${x.review.comment || ''}</span>` : '-'}</td>
-      <td data-label="Action"><button class="btn btn-sm" onclick="markPaid('${x._id}', ${x.totalAmount})">Mark Paid</button></td>
-    </tr>`).join('');
-}
-
-async function assignStaff(id, staffId) {
-  await req('/bookings/' + id + '/assign', 'PUT', { staffId: staffId || undefined });
-  loadBookings();
-}
-
-async function updateStatus(id, status) {
-  await req('/bookings/' + id + '/status', 'PUT', { status });
-  loadBookings();
-}
-
-async function markPaid(id, amount) {
-  await req('/payments/cash-confirm', 'POST', { bookingId: id, amount });
-  alert('Marked paid');
-  loadBookings();
-}
-
-async function loadOrders() {
-  const r = await req('/orders');
-  const statuses = ['placed','confirmed','shipped','delivered','cancelled'];
-  document.querySelector('#ordersTable tbody').innerHTML = (r.orders || []).map(x => `
-    <tr>
-      <td data-label="ID">${x.orderId}</td>
-      <td data-label="Customer">${x.userId?.name || x.userId?.mobile || '-'}</td>
-      <td data-label="Items">${x.items.length} items</td>
-      <td data-label="Amount">Rs ${x.totalAmount}</td>
-      <td data-label="Payment"><span class="badge b-${x.paymentStatus}">${x.paymentStatus}</span></td>
-      <td data-label="Status"><span class="badge b-${x.orderStatus === 'delivered' ? 'completed' : 'booked'}">${x.orderStatus}</span></td>
-      <td data-label="Action">
-        <select onchange="updateOrderStatus('${x._id}', this.value)">
-          ${statuses.map(s => `<option ${s === x.orderStatus ? 'selected' : ''}>${s}</option>`).join('')}
-        </select>
-      </td>
-    </tr>`).join('');
-}
-
-async function updateOrderStatus(id, orderStatus) {
-  await req('/orders/' + id + '/status', 'PUT', { orderStatus });
-  loadOrders();
-}
-
-async function loadStaff() {
-  const r = await req('/users/staff');
-  document.querySelector('#staffTable tbody').innerHTML = (r.staff || []).map(x => `
-    <tr><td data-label="Name">${x.name || '-'}</td><td data-label="Mobile">${x.mobile || '-'}</td><td data-label="Role">${x.role}</td></tr>`).join('');
-}
-
-async function loadServices() {
-  const r = await req('/services');
-  document.querySelector('#servicesTable tbody').innerHTML = (r.services || []).map(x => `
-    <tr>
-      <td data-label="Name">${x.name}</td>
-      <td data-label="Category">${x.category}</td>
-      <td data-label="Price">Rs ${x.basePrice}</td>
-      <td data-label="Time">${x.estimatedTime || '-'}</td>
-      <td data-label="Active">${x.isActive ? 'Yes' : 'No'}</td>
-      <td data-label="Action"><button class="btn btn-sm" onclick="delService('${x._id}')">Disable</button></td>
-    </tr>`).join('');
-}
-
-async function delService(id) {
-  await req('/services/' + id, 'DELETE');
-  loadServices();
-}
-
-function openServiceModal() {
-  document.getElementById('modalRoot').innerHTML = `
-    <div class="modal-bg" onclick="if(event.target===this)this.remove()">
-      <div class="modal">
-        <h3>Add Service</h3>
-        <input id="m-name" placeholder="Name">
-        <input id="m-desc" placeholder="Description">
-        <div class="row">
-          <input id="m-price" type="number" placeholder="Base Price">
-          <input id="m-time" placeholder="Est. Time">
+  const recent=bookings.slice(0,8);
+  const list=document.getElementById('recentList');
+  if(!recent.length){list.innerHTML=emptyState('📭','No bookings yet','Bookings will appear here');return;}
+  list.innerHTML=recent.map(x=>`
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <div class="item-title">${x.bookingId||x._id?.slice(-6)}</div>
+          <div class="item-sub">${x.userId?.name||x.userId?.mobile||'Customer'} • ${x.serviceId?.name||'Service'}</div>
         </div>
-        <select id="m-cat">
-          <option value="service">Service</option>
-          <option value="checkup">Checkup</option>
-          <option value="repair">Repair</option>
-          <option value="denting_painting">Denting/Painting</option>
-        </select>
-        <button class="btn" onclick="saveService()">Save</button>
+        <div class="item-amt">${fmtMoney(x.totalAmount)}</div>
       </div>
-    </div>`;
-}
-
-async function saveService() {
-  await req('/services', 'POST', {
-    name: document.getElementById('m-name').value,
-    description: document.getElementById('m-desc').value,
-    basePrice: +document.getElementById('m-price').value,
-    estimatedTime: document.getElementById('m-time').value,
-    category: document.getElementById('m-cat').value
-  });
-  document.querySelector('.modal-bg').remove();
-  loadServices();
-}
-
-async function loadProducts() {
-  const r = await req('/products');
-  document.querySelector('#productsTable tbody').innerHTML = (r.products || []).map(x => `
-    <tr>
-      <td data-label="Name">${x.name}</td>
-      <td data-label="Category">${x.category}</td>
-      <td data-label="Price">Rs ${x.discountPrice || x.price}</td>
-      <td data-label="Stock">${x.stock}</td>
-      <td data-label="Active">${x.isActive ? 'Yes' : 'No'}</td>
-      <td data-label="Action"><button class="btn btn-sm" onclick="delProduct('${x._id}')">Disable</button></td>
-    </tr>`).join('');
-}
-
-function openStaffModal() {
-  document.getElementById('modalRoot').innerHTML = `
-    <div class="modal-bg" onclick="if(event.target===this)this.remove()">
-      <div class="modal">
-        <h3>Add Staff</h3>
-        <input id="st-name" placeholder="Name">
-        <input id="st-mobile" placeholder="Mobile">
-        <input id="st-password" placeholder="Password">
-        <select id="st-role"><option value="staff">Staff</option><option value="admin">Admin</option></select>
-        <button class="btn" onclick="saveStaff()">Save</button>
+      <div class="item-meta">
+        <span class="meta-chip">📅 ${fmtDate(x.bookingDate)}</span>
+        ${badge(x.status)}
       </div>
-    </div>`;
+    </div>`).join('');
 }
 
-async function saveStaff() {
-  await req('/users/staff', 'POST', {
-    name: document.getElementById('st-name').value,
-    mobile: document.getElementById('st-mobile').value,
-    password: document.getElementById('st-password').value,
-    role: document.getElementById('st-role').value
-  });
-  document.querySelector('.modal-bg').remove();
-  loadStaff();
+// ============ Bookings ============
+async function loadBookings(){
+  const r=await req('/bookings');
+  STATE.bookings=r.bookings||[];
+  // staff for assign dropdown
+  const s=await req('/users/staff');
+  STATE.staff=(s.staff||[]).filter(x=>x.role==='staff');
+  renderBookingFilters();
+  renderBookings();
 }
 
-async function delProduct(id) {
-  await req('/products/' + id, 'DELETE');
-  loadProducts();
+function renderBookingFilters(){
+  const counts={all:STATE.bookings.length};
+  BOOKING_STATUSES.forEach(s=>counts[s]=STATE.bookings.filter(b=>b.status===s).length);
+  const filters=[['all','All']].concat(BOOKING_STATUSES.map(s=>[s,s.replace(/_/g,' ')]));
+  document.getElementById('bkSubtabs').innerHTML=filters.map(([k,l])=>`
+    <div class="subtab ${STATE.bookingFilter===k?'active':''}" onclick="STATE.bookingFilter='${k}';renderBookings();renderBookingFilters()">${l} <span style="opacity:.7">(${counts[k]||0})</span></div>`).join('');
 }
 
-function openProductModal() {
-  document.getElementById('modalRoot').innerHTML = `
-    <div class="modal-bg" onclick="if(event.target===this)this.remove()">
-      <div class="modal">
-        <h3>Add Product</h3>
-        <input id="p-name" placeholder="Name">
-        <select id="p-cat">
-          <option value="seat_cover">Seat Cover</option>
-          <option value="mats">Mats</option>
-          <option value="perfume">Perfume</option>
-          <option value="audio">Audio</option>
-          <option value="lights">Lights</option>
-          <option value="accessory">Other</option>
-        </select>
-        <input id="p-desc" placeholder="Description">
-        <div class="row">
-          <input id="p-price" type="number" placeholder="Price">
-          <input id="p-discount" type="number" placeholder="Discount Price">
+function filterBookings(){STATE.bookingSearch=document.getElementById('bkSearch').value.toLowerCase();renderBookings();}
+
+function renderBookings(){
+  const list=document.getElementById('bookingsList');
+  let items=STATE.bookings;
+  if(STATE.bookingFilter!=='all') items=items.filter(x=>x.status===STATE.bookingFilter);
+  if(STATE.bookingSearch){
+    const q=STATE.bookingSearch;
+    items=items.filter(x=>(x.bookingId||'').toLowerCase().includes(q)||(x.userId?.name||'').toLowerCase().includes(q)||(x.userId?.mobile||'').includes(q));
+  }
+  if(!items.length){list.innerHTML=emptyState('📅','No bookings','Try changing the filter');return;}
+  list.innerHTML=items.map(x=>`
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <div class="item-title">${x.bookingId||'#'+x._id?.slice(-6)}</div>
+          <div class="item-sub">👤 ${x.userId?.name||'-'} • 📞 ${x.userId?.mobile||'-'}</div>
         </div>
-        <input id="p-stock" type="number" placeholder="Stock">
-        <button class="btn" onclick="saveProduct()">Save</button>
+        <div class="item-amt">${fmtMoney(x.totalAmount)}</div>
       </div>
-    </div>`;
+      <div class="item-meta">
+        <span class="meta-chip">🔧 <b>${x.serviceId?.name||'Service'}</b></span>
+        <span class="meta-chip">🚗 ${x.car?.carNumber||'-'}</span>
+        <span class="meta-chip">📅 ${fmtDate(x.bookingDate)} ${x.timeSlot||''}</span>
+        <span class="meta-chip">📍 ${fmtMode(x.serviceMode)}</span>
+        ${x.couponCode?`<span class="meta-chip">🎟 ${x.couponCode}</span>`:''}
+        ${x.sparePartsRequest?`<span class="meta-chip">🔩 ${x.sparePartsRequest}</span>`:''}
+        ${badge(x.status)}
+        ${badge(x.paymentStatus)}
+      </div>
+      ${x.review?`<div class="item-meta"><span class="meta-chip">${'⭐'.repeat(x.review.rating)} <b>${x.review.comment||''}</b></span></div>`:''}
+      <div class="item-actions">
+        <select onchange="updateStatus('${x._id}',this.value)">
+          ${BOOKING_STATUSES.map(s=>`<option value="${s}" ${s===x.status?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')}
+        </select>
+        <select onchange="assignStaff('${x._id}',this.value)">
+          <option value="">Unassigned</option>
+          ${STATE.staff.map(st=>`<option value="${st._id}" ${(x.assignedStaff?._id||'')===st._id?'selected':''}>👥 ${st.name||st.mobile}</option>`).join('')}
+        </select>
+        ${x.paymentStatus!=='paid'?`<button class="btn primary sm" onclick="markPaid('${x._id}',${x.totalAmount})">Mark Paid</button>`:''}
+      </div>
+    </div>`).join('');
 }
 
-async function saveProduct() {
-  await req('/products', 'POST', {
-    name: document.getElementById('p-name').value,
-    category: document.getElementById('p-cat').value,
-    description: document.getElementById('p-desc').value,
-    price: +document.getElementById('p-price').value,
-    discountPrice: +document.getElementById('p-discount').value || undefined,
-    stock: +document.getElementById('p-stock').value
-  });
-  document.querySelector('.modal-bg').remove();
-  loadProducts();
+async function updateStatus(id,status){
+  const r=await req('/bookings/'+id+'/status','PUT',{status});
+  if(r.success){toast('Status updated');loadBookings()}else{toast(r.message||'Failed','error')}
+}
+async function assignStaff(id,staffId){
+  const r=await req('/bookings/'+id+'/assign','PUT',{staffId:staffId||undefined});
+  if(r.success){toast('Staff assigned');loadBookings()}else{toast(r.message||'Failed','error')}
+}
+async function markPaid(id,amount){
+  const r=await req('/payments/cash-confirm','POST',{bookingId:id,amount});
+  if(r.success){toast('Payment confirmed');loadBookings()}else{toast(r.message||'Failed','error')}
 }
 
-if (TOKEN) showDashboard();
+// ============ Orders ============
+async function loadOrders(){
+  const r=await req('/orders');
+  STATE.orders=r.orders||[];
+  renderOrderFilters();
+  renderOrders();
+}
+function renderOrderFilters(){
+  const counts={all:STATE.orders.length};
+  ORDER_STATUSES.forEach(s=>counts[s]=STATE.orders.filter(o=>o.orderStatus===s).length);
+  const filters=[['all','All']].concat(ORDER_STATUSES.map(s=>[s,s]));
+  document.getElementById('ordSubtabs').innerHTML=filters.map(([k,l])=>`
+    <div class="subtab ${STATE.orderFilter===k?'active':''}" onclick="STATE.orderFilter='${k}';renderOrders();renderOrderFilters()">${l} <span style="opacity:.7">(${counts[k]||0})</span></div>`).join('');
+}
+function filterOrders(){STATE.orderSearch=document.getElementById('ordSearch').value.toLowerCase();renderOrders();}
+function renderOrders(){
+  const list=document.getElementById('ordersList');
+  let items=STATE.orders;
+  if(STATE.orderFilter!=='all') items=items.filter(x=>x.orderStatus===STATE.orderFilter);
+  if(STATE.orderSearch){
+    const q=STATE.orderSearch;
+    items=items.filter(x=>(x.orderId||'').toLowerCase().includes(q)||(x.userId?.name||'').toLowerCase().includes(q)||(x.userId?.mobile||'').includes(q));
+  }
+  if(!items.length){list.innerHTML=emptyState('📦','No orders','Orders will appear here');return;}
+  list.innerHTML=items.map(x=>`
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <div class="item-title">${x.orderId||'#'+x._id?.slice(-6)}</div>
+          <div class="item-sub">👤 ${x.userId?.name||'-'} • 📞 ${x.userId?.mobile||'-'}</div>
+        </div>
+        <div class="item-amt">${fmtMoney(x.totalAmount)}</div>
+      </div>
+      <div class="item-meta">
+        <span class="meta-chip">🛍 <b>${x.items?.length||0} items</b></span>
+        ${badge(x.orderStatus)}
+        ${badge(x.paymentStatus)}
+      </div>
+      <div class="item-actions">
+        <select onchange="updateOrderStatus('${x._id}',this.value)">
+          ${ORDER_STATUSES.map(s=>`<option value="${s}" ${s===x.orderStatus?'selected':''}>${s}</option>`).join('')}
+        </select>
+        <button class="btn outline sm" onclick="viewOrderItems('${x._id}')">View Items</button>
+      </div>
+    </div>`).join('');
+}
+async function updateOrderStatus(id,status){
+  const r=await req('/orders/'+id+'/status','PUT',{orderStatus:status});
+  if(r.success){toast('Order updated');loadOrders()}else{toast(r.message||'Failed','error')}
+}
+function viewOrderItems(id){
+  const o=STATE.orders.find(x=>x._id===id);
+  if(!o)return;
+  openModal(`<div class="modal">
+    <div class="modal-head"><h3>Order Items</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+    ${(o.items||[]).map(i=>`<div class="item"><div class="item-head"><div><div class="item-title">${i.productId?.name||i.name||'Item'}</div><div class="item-sub">Qty: ${i.quantity}</div></div><div class="item-amt">${fmtMoney(i.price*i.quantity)}</div></div></div>`).join('')||'<div class="empty">No items</div>'}
+  </div>`);
+}
+
+// ============ Services ============
+async function loadServices(){
+  const r=await req('/services');
+  STATE.services=r.services||[];
+  const list=document.getElementById('servicesList');
+  if(!STATE.services.length){list.innerHTML=emptyState('🔧','No services','Tap + to add one');return;}
+  list.innerHTML=STATE.services.map(x=>`
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <div class="item-title">${x.name}</div>
+          <div class="item-sub">${x.category} ${x.estimatedTime?'• ⏱ '+x.estimatedTime:''}</div>
+        </div>
+        <div class="item-amt">${fmtMoney(x.basePrice)}</div>
+      </div>
+      ${x.description?`<div class="item-sub" style="margin-bottom:10px">${x.description}</div>`:''}
+      <div class="item-actions">
+        <label class="switch"><input type="checkbox" ${x.isActive?'checked':''} onchange="toggleService('${x._id}',this.checked)"><span class="slider"></span></label>
+        <span style="font-size:12px;color:var(--muted);align-self:center">${x.isActive?'Active':'Inactive'}</span>
+        <span style="flex:1"></span>
+        <button class="btn outline sm" onclick="openServiceModal('${x._id}')">Edit</button>
+        <button class="btn danger sm" onclick="delService('${x._id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function openServiceModal(id){
+  const x=id?STATE.services.find(s=>s._id===id):{};
+  openModal(`<div class="modal">
+    <div class="modal-head"><h3>${id?'Edit':'Add'} Service</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="field"><label>Name</label><input id="m-name" value="${x.name||''}" placeholder="e.g. Full Body Wash"></div>
+    <div class="field"><label>Category</label><select id="m-cat">${SERVICE_CATEGORIES.map(c=>`<option value="${c}" ${x.category===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="row2">
+      <div class="field"><label>Base Price (₹)</label><input id="m-price" type="number" value="${x.basePrice||''}" placeholder="500"></div>
+      <div class="field"><label>Est. Time</label><input id="m-time" value="${x.estimatedTime||''}" placeholder="45 min"></div>
+    </div>
+    <div class="field"><label>Description</label><textarea id="m-desc" placeholder="Service details...">${x.description||''}</textarea></div>
+    <button class="btn primary full" onclick="saveService('${id||''}')">${id?'Update':'Create'} Service</button>
+  </div>`);
+}
+
+async function saveService(id){
+  const data={
+    name:document.getElementById('m-name').value.trim(),
+    description:document.getElementById('m-desc').value.trim(),
+    basePrice:+document.getElementById('m-price').value,
+    estimatedTime:document.getElementById('m-time').value.trim(),
+    category:document.getElementById('m-cat').value
+  };
+  if(!data.name||!data.basePrice){return toast('Name & price required','error')}
+  const r=id?await req('/services/'+id,'PUT',data):await req('/services','POST',data);
+  if(r.success){toast(id?'Service updated':'Service added');closeModal();loadServices()}
+  else{toast(r.message||'Failed','error')}
+}
+
+async function toggleService(id,active){
+  const r=await req('/services/'+id,'PUT',{isActive:active});
+  if(r.success){toast(active?'Activated':'Deactivated');loadServices()}else{toast('Failed','error');loadServices()}
+}
+
+async function delService(id){
+  if(!confirm('Delete this service?'))return;
+  const r=await req('/services/'+id,'DELETE');
+  if(r.success){toast('Deleted');loadServices()}else{toast(r.message||'Failed','error')}
+}
+
+// ============ Products ============
+async function loadProducts(){
+  const r=await req('/products');
+  STATE.products=r.products||[];
+  const list=document.getElementById('productsList');
+  if(!STATE.products.length){list.innerHTML=emptyState('🛍','No products','Tap + to add one');return;}
+  list.innerHTML=STATE.products.map(x=>`
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <div class="item-title">${x.name}</div>
+          <div class="item-sub">${x.category} • Stock: ${x.stock}</div>
+        </div>
+        <div class="item-amt">${x.discountPrice?`<span style="text-decoration:line-through;color:var(--muted);font-size:12px">${fmtMoney(x.price)}</span> ${fmtMoney(x.discountPrice)}`:fmtMoney(x.price)}</div>
+      </div>
+      ${x.description?`<div class="item-sub" style="margin-bottom:10px">${x.description}</div>`:''}
+      ${x.stock<5?`<div class="meta-chip" style="background:#FFE5E5;color:#A12626;border-color:#F8C8C8;margin-bottom:8px">⚠ Low stock</div>`:''}
+      <div class="item-actions">
+        <label class="switch"><input type="checkbox" ${x.isActive?'checked':''} onchange="toggleProduct('${x._id}',this.checked)"><span class="slider"></span></label>
+        <span style="font-size:12px;color:var(--muted);align-self:center">${x.isActive?'Active':'Inactive'}</span>
+        <span style="flex:1"></span>
+        <button class="btn outline sm" onclick="openProductModal('${x._id}')">Edit</button>
+        <button class="btn danger sm" onclick="delProduct('${x._id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function openProductModal(id){
+  const x=id?STATE.products.find(p=>p._id===id):{};
+  openModal(`<div class="modal">
+    <div class="modal-head"><h3>${id?'Edit':'Add'} Product</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="field"><label>Name</label><input id="p-name" value="${x.name||''}" placeholder="e.g. Premium Seat Cover"></div>
+    <div class="field"><label>Category</label><select id="p-cat">${PRODUCT_CATEGORIES.map(c=>`<option value="${c}" ${x.category===c?'selected':''}>${c}</option>`).join('')}</select></div>
+    <div class="field"><label>Description</label><textarea id="p-desc" placeholder="Product details...">${x.description||''}</textarea></div>
+    <div class="row2">
+      <div class="field"><label>Price (₹)</label><input id="p-price" type="number" value="${x.price||''}"></div>
+      <div class="field"><label>Discount Price</label><input id="p-discount" type="number" value="${x.discountPrice||''}"></div>
+    </div>
+    <div class="field"><label>Stock</label><input id="p-stock" type="number" value="${x.stock||0}"></div>
+    <button class="btn primary full" onclick="saveProduct('${id||''}')">${id?'Update':'Create'} Product</button>
+  </div>`);
+}
+
+async function saveProduct(id){
+  const data={
+    name:document.getElementById('p-name').value.trim(),
+    category:document.getElementById('p-cat').value,
+    description:document.getElementById('p-desc').value.trim(),
+    price:+document.getElementById('p-price').value,
+    discountPrice:+document.getElementById('p-discount').value||undefined,
+    stock:+document.getElementById('p-stock').value
+  };
+  if(!data.name||!data.price){return toast('Name & price required','error')}
+  const r=id?await req('/products/'+id,'PUT',data):await req('/products','POST',data);
+  if(r.success){toast(id?'Updated':'Added');closeModal();loadProducts()}
+  else{toast(r.message||'Failed','error')}
+}
+
+async function toggleProduct(id,active){
+  const r=await req('/products/'+id,'PUT',{isActive:active});
+  if(r.success){toast(active?'Activated':'Deactivated');loadProducts()}else{loadProducts()}
+}
+
+async function delProduct(id){
+  if(!confirm('Delete this product?'))return;
+  const r=await req('/products/'+id,'DELETE');
+  if(r.success){toast('Deleted');loadProducts()}else{toast(r.message||'Failed','error')}
+}
+
+// ============ Staff ============
+async function loadStaff(){
+  const r=await req('/users/staff');
+  STATE.staff=r.staff||[];
+  const list=document.getElementById('staffList');
+  if(!STATE.staff.length){list.innerHTML=emptyState('👥','No team members','Tap + to add staff');return;}
+  list.innerHTML=STATE.staff.map(x=>`
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <div class="item-title">${x.name||'(no name)'}</div>
+          <div class="item-sub">📞 ${x.mobile||'-'}</div>
+        </div>
+        <span class="badge ${x.role==='admin'?'b-completed':'b-confirmed'}">${x.role}</span>
+      </div>
+    </div>`).join('');
+}
+
+function openStaffModal(){
+  openModal(`<div class="modal">
+    <div class="modal-head"><h3>Add Staff Member</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="field"><label>Full Name</label><input id="st-name" placeholder="Staff name"></div>
+    <div class="field"><label>Mobile</label><input id="st-mobile" maxlength="10" inputmode="numeric" placeholder="10-digit mobile"></div>
+    <div class="field"><label>Password</label><input id="st-password" placeholder="Set password"></div>
+    <div class="field"><label>Role</label><select id="st-role"><option value="staff">Staff</option><option value="admin">Admin</option></select></div>
+    <button class="btn primary full" onclick="saveStaff()">Add Member</button>
+  </div>`);
+}
+
+async function saveStaff(){
+  const data={
+    name:document.getElementById('st-name').value.trim(),
+    mobile:document.getElementById('st-mobile').value.trim(),
+    password:document.getElementById('st-password').value,
+    role:document.getElementById('st-role').value
+  };
+  if(!data.name||!data.mobile||!data.password){return toast('All fields required','error')}
+  const r=await req('/users/staff','POST',data);
+  if(r.success){toast('Staff added');closeModal();loadStaff()}
+  else{toast(r.message||'Failed','error')}
+}
+
+// ============ Init ============
+if(TOKEN){enterApp()}
 </script>
 </body>
 </html>
