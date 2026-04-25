@@ -78,7 +78,10 @@ const STATE = {
   bookingForm: {},
   payMode: 'cod',
   navStack: [],
-  loading: false
+  loading: false,
+  coupons: [],
+  notifications: [],
+  notifUnread: 0
 };
 
 const t = (key) => I18N[STATE.lang]?.[key] || I18N.en[key] || key;
@@ -207,6 +210,7 @@ function topbar(title, back) {
     ${back ? `<span class="back" onclick="nav('${back.screen}', ${back.data ? JSON.stringify(back.data).replace(/"/g, '&quot;') : 'null'})">&#8592;</span>` : ''}
     <span>${title}</span>
     <span style="flex:1"></span>
+    ${STATE.token ? `<button class="lang-toggle" onclick="openNotifications()" style="margin-right:6px;position:relative">🔔${STATE.notifUnread ? `<span style="position:absolute;top:-4px;right:-4px;background:#FF4D6D;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;border:1.5px solid var(--navy)">${STATE.notifUnread}</span>` : ''}</button>` : ''}
     <button class="lang-toggle" onclick="toggleLang()">${STATE.lang.toUpperCase()}</button>
   </div>`;
 }
@@ -709,9 +713,145 @@ const screens = {
         ${historyList()}
       </div>
       <div class="card stack-list">
-        <button class="btn btn-out" onclick="nav('support')">Open Support Hub</button>
+        <button class="btn btn-out" onclick="openNotifications()">🔔 Notifications ${STATE.notifUnread ? `<span style="background:#FF4D6D;color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;margin-left:4px">${STATE.notifUnread}</span>` : ''}</button>
+        <button class="btn btn-out" onclick="nav('offers')">🎟 Offers & Coupons</button>
+        <button class="btn btn-out" onclick="nav('refer')">🎁 Refer & Earn ₹100</button>
+        <button class="btn btn-out" onclick="nav('packages')">📦 Service Packages</button>
+        <button class="btn btn-out" onclick="nav('branches')">📍 Find a Branch</button>
+        <button class="btn btn-out" onclick="nav('emergency')">🚨 Emergency Help</button>
+        <button class="btn btn-out" onclick="nav('support')">🛟 Support Hub</button>
         <button class="btn btn-er" onclick="logout()">Logout</button>
       </div>
+    </div>
+    ${tabbar('profile')}`,
+
+  // ========== NEW SCREENS ==========
+
+  notifications: () => `
+    ${topbar('Notifications', { screen: 'profile' })}
+    <div class="screen">
+      ${(STATE.notifications || []).length ? STATE.notifications.map(n => `
+        <div class="card" style="display:flex;gap:12px;align-items:flex-start;${n.isRead ? '' : 'border-left:4px solid var(--p)'}">
+          <div style="width:40px;height:40px;border-radius:50%;background:#E8F1FB;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${n.title.split(' ')[0]}</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:14px">${n.title}</div>
+            <div class="muted" style="margin-top:2px">${n.body}</div>
+            <div class="muted" style="font-size:11px;margin-top:4px">${new Date(n.createdAt).toLocaleString()}</div>
+          </div>
+        </div>`).join('') : `<div class="empty-pro"><div class="ep-icon">🔔</div><div class="ep-title">No notifications yet</div><div class="ep-msg">Booking & order updates aapko yahan dikhenge.</div></div>`}
+    </div>
+    ${tabbar('profile')}`,
+
+  offers: () => {
+    const list = (STATE.coupons && STATE.coupons.length) ? STATE.coupons : (STATE.support?.coupons || []).map(c => ({ code: c.code, description: c.description, discountValue: c.value }));
+    return `
+      ${topbar('Offers & Coupons', { screen: 'profile' })}
+      <div class="screen">
+        ${list.length ? list.map(c => `
+          <div class="card" style="background:linear-gradient(135deg,#fff,#f0f7fd);border:1px dashed var(--p)">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;color:var(--p);letter-spacing:1px">${c.code}</div>
+              <button class="btn btn-sm" onclick="copyCoupon('${c.code}')">Copy</button>
+            </div>
+            <div class="muted" style="margin-top:6px">${c.description || ''}</div>
+            ${c.discountType === 'percent' ? `<div style="margin-top:6px;font-weight:600">${c.discountValue}% OFF${c.maxDiscount ? ' (max ' + money(c.maxDiscount) + ')' : ''}</div>` :
+              c.discountType === 'flat' ? `<div style="margin-top:6px;font-weight:600">${money(c.discountValue)} OFF</div>` :
+              c.discountValue ? `<div style="margin-top:6px;font-weight:600">${c.discountValue}</div>` : ''}
+            ${c.minOrderAmount ? `<div class="muted" style="font-size:11px">Min order: ${money(c.minOrderAmount)}</div>` : ''}
+            ${c.validUntil ? `<div class="muted" style="font-size:11px">Valid till ${new Date(c.validUntil).toDateString()}</div>` : ''}
+          </div>`).join('') : `<div class="empty-pro"><div class="ep-icon">🎟</div><div class="ep-title">No active offers</div><div class="ep-msg">Naye offers ke liye baad me check karo.</div></div>`}
+      </div>
+      ${tabbar('profile')}`;
+  },
+
+  refer: () => `
+    ${topbar('Refer & Earn', { screen: 'profile' })}
+    <div class="screen">
+      <div class="card" style="text-align:center;padding:30px 20px;background:linear-gradient(135deg,#0A1933,#1C4277);color:#fff">
+        <div style="font-size:48px">🎁</div>
+        <h2 style="margin:10px 0;font-size:22px;color:#fff">Earn ₹100 per friend</h2>
+        <div style="opacity:.85;font-size:13px;margin-bottom:18px">Apne friends ko VS Services bulao. Unka pehla service hone par dono ko ₹100 wallet credit milega.</div>
+        <div style="background:rgba(255,255,255,.15);padding:14px;border-radius:12px;border:2px dashed rgba(255,255,255,.4)">
+          <div style="font-size:11px;opacity:.7;letter-spacing:2px;font-weight:600">YOUR REFERRAL CODE</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;letter-spacing:3px;margin-top:6px">${STATE.user?.referralCode || '-'}</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:18px;justify-content:center">
+          <button class="btn btn-sm" style="background:#25D366" onclick="shareReferral('whatsapp')">📱 WhatsApp</button>
+          <button class="btn btn-sm" style="background:#4267B2" onclick="shareReferral('share')">🔗 Share</button>
+          <button class="btn btn-sm btn-out" onclick="copyCoupon('${STATE.user?.referralCode || ''}')">Copy</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="mini-title">How it works</div>
+        <ol style="padding-left:20px;line-height:1.9;font-size:13px;color:var(--l)">
+          <li>Apna referral code share karo friends ko</li>
+          <li>Friend pehli baar app kholega aur code use karega</li>
+          <li>Jab friend ka pehla service complete hoga, dono ko ₹100 wallet credit milega</li>
+        </ol>
+      </div>
+    </div>
+    ${tabbar('profile')}`,
+
+  packages: () => `
+    ${topbar('Service Packages', { screen: 'profile' })}
+    <div class="screen">
+      ${(STATE.support?.packages || []).map((pkg, i) => `
+        <div class="card" style="background:linear-gradient(135deg,${i === 0 ? '#FFF8E1,#FFE0B2' : '#E8F5E9,#C8E6C9'});position:relative;overflow:hidden">
+          ${i === 1 ? `<span class="offer-pill" style="position:absolute;top:14px;right:14px">Most Popular</span>` : ''}
+          <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;color:var(--navy)">${pkg.name}</h3>
+          <div style="font-size:32px;font-weight:800;color:var(--p);font-family:'Plus Jakarta Sans',sans-serif;margin:6px 0">${money(pkg.price)}</div>
+          <ul style="list-style:none;padding:0;margin:14px 0 12px">
+            ${pkg.benefits.map(b => `<li style="padding:6px 0;display:flex;gap:8px;font-size:13px"><span style="color:var(--accent);font-weight:700">✓</span> ${b}</li>`).join('')}
+          </ul>
+          <button class="btn" onclick="nav('booking')">Book This Package</button>
+        </div>`).join('')}
+      <div class="empty-pro" style="display:${(STATE.support?.packages || []).length ? 'none' : 'flex'}">
+        <div class="ep-icon">📦</div>
+        <div class="ep-title">Packages loading...</div>
+      </div>
+    </div>
+    ${tabbar('profile')}`,
+
+  branches: () => `
+    ${topbar('Find a Branch', { screen: 'profile' })}
+    <div class="screen">
+      ${(STATE.support?.branches || []).map(branch => `
+        <div class="card">
+          <div style="display:flex;gap:14px;align-items:flex-start">
+            <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--p),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📍</div>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:15px">${branch.name}</div>
+              <div class="muted" style="margin-top:4px">${branch.address}</div>
+              <div class="muted" style="font-size:11px;margin-top:4px">⏰ ${branch.timings}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <a class="btn btn-sm" style="flex:1;text-decoration:none;text-align:center" href="${branch.mapUrl}" target="_blank">🗺 Directions</a>
+            <a class="btn btn-sm btn-out" style="flex:1;text-decoration:none;text-align:center" href="tel:${branch.phone.replace(/\s+/g, '')}">📞 Call</a>
+          </div>
+        </div>`).join('')}
+    </div>
+    ${tabbar('profile')}`,
+
+  emergency: () => `
+    ${topbar('Emergency Help', { screen: 'profile' })}
+    <div class="screen">
+      <div class="card" style="background:linear-gradient(135deg,#FFE5E5,#FFCDD2);border:1px solid #FFAAAA;text-align:center">
+        <div style="font-size:42px">🚨</div>
+        <h3 style="margin:8px 0;color:#C62828;font-size:18px">24x7 Roadside Assistance</h3>
+        <div class="muted" style="margin-bottom:14px">Sab kuch 30-60 min me reach karega.</div>
+        <div style="display:flex;gap:8px;justify-content:center">
+          <a class="btn" style="text-decoration:none;background:#C62828" href="tel:8839533202">📞 Call Now</a>
+          <a class="btn btn-sm" style="text-decoration:none;background:#25D366" href="https://wa.me/918839533202?text=EMERGENCY:%20mujhe%20car%20help%20chahiye%20ASAP">💬 WhatsApp</a>
+        </div>
+      </div>
+      <div class="grid quick-grid">${(STATE.support?.emergency || []).map(item => `
+        <div class="action">
+          <div class="ic" style="font-size:26px">${({ 'jump-start':'⚡', 'puncture':'🛞', 'battery':'🔋', 'towing':'🚚' })[item.id] || '🆘'}</div>
+          <div class="t">${item.title}</div>
+          <div class="muted" style="font-size:10px;margin-top:4px">ETA ${item.eta}</div>
+          <a class="mini-link" href="tel:${item.phone.replace(/\s+/g, '')}">📞 Call</a>
+        </div>`).join('')}</div>
     </div>
     ${tabbar('profile')}`
 };
@@ -730,8 +870,14 @@ async function loadInitData() {
   STATE.products = products.products || [];
   if (support.success) STATE.support = support;
 
+  // Public coupons (offers screen)
+  try {
+    const c = await api('/coupons', 'GET', null, { silent: true });
+    if (c.success) STATE.coupons = c.coupons || [];
+  } catch (e) {}
+
   if (STATE.token) {
-    const [me, bookings, orders, history, reminders, rewards, wishlist, recs] = await Promise.all([
+    const [me, bookings, orders, history, reminders, rewards, wishlist, recs, notif] = await Promise.all([
       api('/users/me'),
       api('/bookings/my'),
       api('/orders/my'),
@@ -739,8 +885,11 @@ async function loadInitData() {
       api('/users/reminders'),
       api('/users/rewards'),
       api('/users/wishlist'),
-      api('/users/recommendations')
+      api('/users/recommendations'),
+      api('/notifications', 'GET', null, { silent: true })
     ]);
+    STATE.notifications = notif?.notifications || [];
+    STATE.notifUnread = notif?.unread || 0;
     if (me.success) {
       STATE.user = me.user;
       if (me.user?.themePreference && !localStorage.getItem('theme')) {
@@ -1144,6 +1293,41 @@ document.addEventListener('input', (e) => {
     if (v !== el.value) el.value = v;
   }
 }, true);
+
+// ========== Helpers for new screens ==========
+function copyCoupon(code) {
+  if (!code) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(() => toast('Copied: ' + code));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = code; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+    toast('Copied: ' + code);
+  }
+}
+
+function shareReferral(via) {
+  const code = STATE.user?.referralCode || '';
+  const text = `Hey! VS Services app try karo — apne car ke liye easy booking + ₹100 wallet credit milega referral code se: ${code}\nDownload: https://vs-services-api.onrender.com`;
+  if (via === 'whatsapp') {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  } else if (navigator.share) {
+    navigator.share({ title: 'VS Services Referral', text }).catch(() => {});
+  } else {
+    copyCoupon(text);
+    toast('Copied — paste anywhere');
+  }
+}
+
+async function openNotifications() {
+  nav('notifications');
+  if (STATE.notifUnread > 0) {
+    await api('/notifications/read', 'PUT', null, { silent: true });
+    STATE.notifUnread = 0;
+    STATE.notifications = (STATE.notifications || []).map(n => ({ ...n, isRead: true }));
+  }
+}
 
 (async () => {
   applyTheme();

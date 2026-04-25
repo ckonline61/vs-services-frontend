@@ -163,6 +163,20 @@ input:checked+.slider::before{transform:translateX(18px)}
 @media (min-width:768px){
   .stats-grid{grid-template-columns:repeat(4,1fr)}
 }
+
+/* More tab rows */
+.more-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);font-size:14px;font-weight:600;color:var(--text);cursor:pointer;text-decoration:none}
+.more-row:last-child{border-bottom:none}
+.more-row:active{background:var(--surface2)}
+.more-row span{color:var(--muted);font-size:18px}
+
+/* Chart */
+.bars{display:flex;align-items:flex-end;gap:6px;height:140px;padding:8px 4px;border-bottom:1px solid var(--border);position:relative}
+.bar{flex:1;background:linear-gradient(180deg,var(--accent2),var(--accent));border-radius:4px 4px 0 0;min-height:4px;position:relative;cursor:pointer;transition:opacity .2s}
+.bar:hover{opacity:.85}
+.bar-tip{position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:2px 6px;border-radius:4px;font-size:10px;white-space:nowrap}
+.bars-x{display:flex;gap:6px;padding:6px 4px;font-size:10px;color:var(--muted);font-weight:600}
+.bars-x>div{flex:1;text-align:center}
 </style>
 </head>
 <body>
@@ -247,6 +261,41 @@ input:checked+.slider::before{transform:translateX(18px)}
       <button class="btn primary full" style="margin-bottom:14px" onclick="openStaffModal()">+ Add Staff Member</button>
       <div id="staffList" class="list"></div>
     </div>
+
+    <!-- CUSTOMERS -->
+    <div id="tab-customers" class="tab-pane hidden">
+      <div class="search-bar">
+        <input id="custSearch" placeholder="🔍 Search customers..." oninput="filterCustomers()">
+      </div>
+      <div id="customersList" class="list"></div>
+    </div>
+
+    <!-- COUPONS -->
+    <div id="tab-coupons" class="tab-pane hidden">
+      <button class="btn primary full" style="margin-bottom:14px" onclick="openCouponModal()">+ Add Coupon</button>
+      <div id="couponsList" class="list"></div>
+    </div>
+
+    <!-- MORE -->
+    <div id="tab-more" class="tab-pane hidden">
+      <div class="card-section-title">Manage</div>
+      <div class="card" style="padding:0">
+        <a onclick="navTab('team')" class="more-row">👥 Team / Staff <span>›</span></a>
+        <a onclick="navTab('customers')" class="more-row">👤 Customers <span>›</span></a>
+        <a onclick="navTab('coupons')" class="more-row">🎟 Coupons <span>›</span></a>
+      </div>
+      <div class="card-section-title">Export</div>
+      <div class="card" style="padding:0">
+        <a onclick="exportCSV('bookings')" class="more-row">📥 Export Bookings (CSV) <span>›</span></a>
+        <a onclick="exportCSV('orders')" class="more-row">📥 Export Orders (CSV) <span>›</span></a>
+        <a onclick="exportCSV('customers')" class="more-row">📥 Export Customers (CSV) <span>›</span></a>
+      </div>
+      <div class="card-section-title">Reports</div>
+      <div class="card">
+        <h3>Last 7 Days Revenue</h3>
+        <div id="revChart"></div>
+      </div>
+    </div>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -256,7 +305,7 @@ input:checked+.slider::before{transform:translateX(18px)}
     <a onclick="navTab('orders')" id="nav-orders"><span class="icn">📦</span>Orders</a>
     <a onclick="navTab('services')" id="nav-services"><span class="icn">🔧</span>Services</a>
     <a onclick="navTab('products')" id="nav-products"><span class="icn">🛍</span>Shop</a>
-    <a onclick="navTab('team')" id="nav-team"><span class="icn">👥</span>Team</a>
+    <a onclick="navTab('more')" id="nav-more"><span class="icn">⋯</span>More</a>
   </div>
 </div>
 
@@ -370,7 +419,7 @@ function enterApp(){
 }
 
 // ============ Navigation ============
-const TAB_TITLES={dash:'Dashboard',bookings:'Bookings',orders:'Orders',services:'Services',products:'Products',team:'Team'};
+const TAB_TITLES={dash:'Dashboard',bookings:'Bookings',orders:'Orders',services:'Services',products:'Products',team:'Team',customers:'Customers',coupons:'Coupons',more:'More'};
 
 function navTab(tab, fresh){
   if(!fresh && STATE.currentTab !== tab) STATE.navStack.push(tab);
@@ -432,6 +481,9 @@ function loadTab(tab){
   else if(tab==='services')loadServices();
   else if(tab==='products')loadProducts();
   else if(tab==='team')loadStaff();
+  else if(tab==='customers')loadCustomers();
+  else if(tab==='coupons')loadCoupons();
+  else if(tab==='more')renderRevChart();
 }
 
 // ============ Dashboard ============
@@ -774,6 +826,183 @@ async function saveStaff(){
   const r=await req('/users/staff','POST',data);
   if(r.success){toast('Staff added');closeModal();loadStaff()}
   else{toast(r.message||'Failed','error')}
+}
+
+// ============ Customers ============
+let _custCache=[];
+async function loadCustomers(){
+  const r=await req('/users/customers');
+  _custCache=r.customers||[];
+  renderCustomers();
+}
+function filterCustomers(){
+  const q=(document.getElementById('custSearch')?.value||'').toLowerCase();
+  renderCustomers(q);
+}
+function renderCustomers(q=''){
+  const list=document.getElementById('customersList');
+  let items=_custCache;
+  if(q) items=items.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.mobile||'').includes(q)||(c.email||'').toLowerCase().includes(q));
+  if(!items.length){list.innerHTML=emptyState('👤','No customers','Customers will appear here as they register');return;}
+  list.innerHTML=items.map(c=>`
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <div class="item-title">${c.name||'(no name)'}</div>
+          <div class="item-sub">📞 ${c.mobile||'-'} ${c.email?'• ✉ '+c.email:''}</div>
+        </div>
+        <div class="item-amt" style="font-size:12px;color:var(--muted)">${new Date(c.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</div>
+      </div>
+      <div class="item-meta">
+        <span class="meta-chip">🏆 <b>${c.walletPoints||0}</b> pts</span>
+        <span class="meta-chip">💰 ${fmtMoney(c.walletBalance)}</span>
+        <span class="meta-chip">🚗 <b>${c.cars?.length||0}</b> cars</span>
+        ${c.referralCode?`<span class="meta-chip">🎁 ${c.referralCode}</span>`:''}
+      </div>
+      <div class="item-actions">
+        <a class="btn outline sm" href="tel:${c.mobile}" style="text-decoration:none">📞 Call</a>
+        <a class="btn primary sm" href="https://wa.me/91${c.mobile}" target="_blank" style="text-decoration:none">💬 WhatsApp</a>
+      </div>
+    </div>`).join('');
+}
+
+// ============ Coupons ============
+async function loadCoupons(){
+  const r=await req('/coupons/all');
+  STATE.coupons=r.coupons||[];
+  const list=document.getElementById('couponsList');
+  if(!STATE.coupons.length){list.innerHTML=emptyState('🎟','No coupons yet','Tap + to create one');return;}
+  list.innerHTML=STATE.coupons.map(c=>`
+    <div class="item">
+      <div class="item-head">
+        <div>
+          <div class="item-title" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;color:var(--accent2);letter-spacing:1px">${c.code}</div>
+          <div class="item-sub">${c.description||''}</div>
+        </div>
+        <div class="item-amt">${c.discountType==='percent'?c.discountValue+'% OFF':fmtMoney(c.discountValue)+' OFF'}</div>
+      </div>
+      <div class="item-meta">
+        ${c.minOrderAmount?`<span class="meta-chip">Min: ${fmtMoney(c.minOrderAmount)}</span>`:''}
+        ${c.maxDiscount?`<span class="meta-chip">Max: ${fmtMoney(c.maxDiscount)}</span>`:''}
+        ${c.validUntil?`<span class="meta-chip">Till ${new Date(c.validUntil).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})}</span>`:''}
+        <span class="meta-chip">Used: <b>${c.usageCount||0}x</b></span>
+      </div>
+      <div class="item-actions">
+        <label class="switch"><input type="checkbox" ${c.isActive?'checked':''} onchange="toggleCoupon('${c._id}',this.checked)"><span class="slider"></span></label>
+        <span style="font-size:12px;color:var(--muted);align-self:center">${c.isActive?'Active':'Inactive'}</span>
+        <span style="flex:1"></span>
+        <button class="btn outline sm" onclick="openCouponModal('${c._id}')">Edit</button>
+        <button class="btn danger sm" onclick="delCoupon('${c._id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+function openCouponModal(id){
+  const x=id?STATE.coupons.find(c=>c._id===id):{};
+  openModal(`<div class="modal">
+    <div class="modal-head"><h3>${id?'Edit':'Add'} Coupon</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div class="field"><label>Code (CAPS)</label><input id="cp-code" value="${x.code||''}" placeholder="WELCOME10"></div>
+    <div class="field"><label>Description</label><input id="cp-desc" value="${x.description||''}" placeholder="10% off on first booking"></div>
+    <div class="row2">
+      <div class="field"><label>Type</label><select id="cp-type"><option value="percent" ${x.discountType==='percent'?'selected':''}>Percent</option><option value="flat" ${x.discountType==='flat'?'selected':''}>Flat</option></select></div>
+      <div class="field"><label>Value</label><input id="cp-val" type="number" value="${x.discountValue||10}"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Min Order ₹</label><input id="cp-min" type="number" value="${x.minOrderAmount||0}"></div>
+      <div class="field"><label>Max Discount ₹</label><input id="cp-max" type="number" value="${x.maxDiscount||500}"></div>
+    </div>
+    <div class="field"><label>Valid Until (optional)</label><input id="cp-till" type="date" value="${x.validUntil?x.validUntil.slice(0,10):''}"></div>
+    <button class="btn primary full" onclick="saveCoupon('${id||''}')">${id?'Update':'Create'} Coupon</button>
+  </div>`);
+}
+async function saveCoupon(id){
+  const data={
+    code:document.getElementById('cp-code').value.trim().toUpperCase(),
+    description:document.getElementById('cp-desc').value.trim(),
+    discountType:document.getElementById('cp-type').value,
+    discountValue:+document.getElementById('cp-val').value,
+    minOrderAmount:+document.getElementById('cp-min').value,
+    maxDiscount:+document.getElementById('cp-max').value,
+    validUntil:document.getElementById('cp-till').value||undefined
+  };
+  if(!data.code){return toast('Code required','error')}
+  const r=id?await req('/coupons/'+id,'PUT',data):await req('/coupons','POST',data);
+  if(r.success){toast(id?'Updated':'Created');closeModal();loadCoupons()}
+  else{toast(r.message||'Failed','error')}
+}
+async function toggleCoupon(id,active){
+  await req('/coupons/'+id,'PUT',{isActive:active});
+  toast(active?'Activated':'Deactivated');loadCoupons();
+}
+async function delCoupon(id){
+  if(!confirm('Delete this coupon?'))return;
+  await req('/coupons/'+id,'DELETE');
+  toast('Deleted');loadCoupons();
+}
+
+// ============ CSV Export ============
+function csvEscape(v){if(v==null)return '';const s=String(v).replace(/"/g,'""');return /[",\n]/.test(s)?'"'+s+'"':s}
+function downloadCSV(filename,rows){
+  const csv=rows.map(r=>r.map(csvEscape).join(',')).join('\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function exportCSV(kind){
+  if(kind==='bookings'){
+    const r=await req('/bookings');
+    const rows=[['ID','Customer','Mobile','Service','Car','Date','Time','Mode','Amount','Payment','Status']];
+    (r.bookings||[]).forEach(x=>rows.push([
+      x.bookingId,x.userId?.name||'',x.userId?.mobile||'',
+      x.serviceId?.name||'',x.car?.carNumber||'',
+      new Date(x.bookingDate).toISOString().slice(0,10),x.timeSlot||'',
+      x.serviceMode||'',x.totalAmount||0,x.paymentStatus||'',x.status||''
+    ]));
+    downloadCSV(`bookings_${Date.now()}.csv`,rows);
+    toast('Bookings CSV downloaded');
+  } else if(kind==='orders'){
+    const r=await req('/orders');
+    const rows=[['ID','Customer','Mobile','Items','Amount','Payment','Status','Date']];
+    (r.orders||[]).forEach(x=>rows.push([
+      x.orderId,x.userId?.name||'',x.userId?.mobile||'',
+      (x.items||[]).map(i=>i.name+' x'+i.quantity).join(' | '),
+      x.totalAmount||0,x.paymentStatus||'',x.orderStatus||'',
+      new Date(x.createdAt).toISOString().slice(0,10)
+    ]));
+    downloadCSV(`orders_${Date.now()}.csv`,rows);
+    toast('Orders CSV downloaded');
+  } else if(kind==='customers'){
+    const r=await req('/users/customers');
+    const rows=[['Name','Mobile','Email','Wallet Points','Wallet Balance','Cars','Referral','Joined']];
+    (r.customers||[]).forEach(x=>rows.push([
+      x.name||'',x.mobile||'',x.email||'',x.walletPoints||0,
+      x.walletBalance||0,(x.cars||[]).length,x.referralCode||'',
+      new Date(x.createdAt).toISOString().slice(0,10)
+    ]));
+    downloadCSV(`customers_${Date.now()}.csv`,rows);
+    toast('Customers CSV downloaded');
+  }
+}
+
+// ============ Revenue Chart ============
+async function renderRevChart(){
+  const target=document.getElementById('revChart');
+  if(!target)return;
+  const [b,o]=await Promise.all([req('/bookings'),req('/orders')]);
+  const items=[...(b.bookings||[]),...(o.orders||[])].filter(x=>x.paymentStatus==='paid');
+  const days=[];const today=new Date();
+  for(let i=6;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    const key=d.toISOString().slice(0,10);
+    const total=items.filter(x=>(x.updatedAt||x.createdAt).slice(0,10)===key).reduce((s,x)=>s+(x.totalAmount||0),0);
+    days.push({key,label:d.toLocaleDateString('en-IN',{day:'2-digit',weekday:'short'}),total});
+  }
+  const max=Math.max(1,...days.map(d=>d.total));
+  target.innerHTML=`
+    <div class="bars">${days.map(d=>`<div class="bar" style="height:${Math.max(4,d.total/max*120)}px" title="${d.label}: ${fmtMoney(d.total)}"><div class="bar-tip" style="display:none">${fmtMoney(d.total)}</div></div>`).join('')}</div>
+    <div class="bars-x">${days.map(d=>`<div>${d.label.split(' ')[1]||d.label}</div>`).join('')}</div>
+    <div style="margin-top:10px;display:flex;justify-content:space-between;font-size:12px"><span class="muted">7 days total</span><b>${fmtMoney(days.reduce((s,d)=>s+d.total,0))}</b></div>`;
 }
 
 // ============ Init ============
