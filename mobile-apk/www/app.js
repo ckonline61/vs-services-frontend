@@ -920,8 +920,58 @@ async function previewEstimate(serviceId) {
   nav('booking', { serviceId });
 }
 
+async function ensureLoggedIn() {
+  if (STATE.token) return true;
+  // Inline quick register from booking form fields if available
+  const name = (document.getElementById('cName')?.value || document.getElementById('setupName')?.value || STATE.user?.name || '').trim();
+  const mobile = (document.getElementById('cMobile')?.value || document.getElementById('setupMobile')?.value || STATE.user?.mobile || '').trim();
+  if (/^\d{10}$/.test(mobile) && name.length >= 2) {
+    const response = await api('/auth/register-guest', 'POST', { name, mobile });
+    if (response.success) {
+      STATE.token = response.token;
+      STATE.user = response.user;
+      save();
+      return true;
+    }
+    toast(response.message || 'Registration failed');
+    return false;
+  }
+  // Otherwise prompt with name+mobile modal
+  return new Promise((resolve) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-bg';
+    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(10,25,51,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:9999';
+    wrap.innerHTML = `<div style="background:#fff;padding:24px;border-radius:16px;width:88%;max-width:340px">
+      <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;color:#0A1933;margin-bottom:6px">Quick Setup</h3>
+      <p style="font-size:13px;color:#6B7A92;margin-bottom:14px">Booking ke liye sirf naam aur mobile chahiye — OTP nahi.</p>
+      <input id="qrName" placeholder="Your Name" style="width:100%;padding:11px;border:1.5px solid #E2E8F0;border-radius:10px;margin-bottom:10px;font-size:14px">
+      <input id="qrMobile" placeholder="10-digit Mobile" maxlength="10" inputmode="numeric" style="width:100%;padding:11px;border:1.5px solid #E2E8F0;border-radius:10px;margin-bottom:14px;font-size:14px">
+      <button id="qrGo" style="width:100%;padding:12px;background:linear-gradient(135deg,#3DC97D,#4AE290);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">Continue →</button>
+      <button id="qrCancel" style="width:100%;padding:8px;margin-top:8px;background:none;color:#6B7A92;border:none;font-size:12px;cursor:pointer">Cancel</button>
+    </div>`;
+    document.body.appendChild(wrap);
+    wrap.querySelector('#qrCancel').onclick = () => { wrap.remove(); resolve(false); };
+    wrap.querySelector('#qrGo').onclick = async () => {
+      const n = wrap.querySelector('#qrName').value.trim();
+      const m = wrap.querySelector('#qrMobile').value.trim();
+      if (n.length < 2) return toast('Enter name');
+      if (!/^\d{10}$/.test(m)) return toast('Enter 10-digit mobile');
+      const response = await api('/auth/register-guest', 'POST', { name: n, mobile: m });
+      if (!response.success) { toast(response.message || 'Failed'); return; }
+      STATE.token = response.token;
+      STATE.user = response.user;
+      save();
+      wrap.remove();
+      resolve(true);
+    };
+  });
+}
+
 async function submitBooking() {
-  if (!STATE.token) return nav('login');
+  if (!STATE.token) {
+    const ok = await ensureLoggedIn();
+    if (!ok) return;
+  }
   const serviceId = STATE.bookingForm.serviceId || STATE.data.serviceId;
   if (!serviceId) return toast('Select service');
 
@@ -1045,7 +1095,10 @@ function removeCart(id) {
 }
 
 async function placeOrder() {
-  if (!STATE.token) return nav('login');
+  if (!STATE.token) {
+    const ok = await ensureLoggedIn();
+    if (!ok) return;
+  }
   const response = await api('/orders', 'POST', {
     items: STATE.cart.map(item => ({ productId: item.productId, quantity: item.quantity })),
     shippingAddress: {
