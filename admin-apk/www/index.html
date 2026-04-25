@@ -91,11 +91,12 @@ input,select,textarea{width:100%;padding:9px;border:1px solid var(--border);bord
 <div id="login" class="login">
   <div class="login-card">
     <h1>VS SERVICES<br><small style="font-size:13px;color:#666">Admin Dashboard</small></h1>
-    <input id="loginMobile" placeholder="10-digit Mobile" maxlength="10" inputmode="numeric" pattern="[0-9]{10}">
-    <input id="loginPassword" type="password" placeholder="Password">
+    <input id="loginMobile" placeholder="10-digit Mobile" maxlength="10" inputmode="numeric" pattern="[0-9]{10}" value="9999999999">
+    <input id="loginPassword" type="password" placeholder="Password" value="admin123">
     <input id="loginUrl" placeholder="API URL" value="https://vs-services-api.onrender.com/api">
     <button class="btn" style="width:100%" onclick="login()">Login</button>
-    <p style="font-size:12px;color:#888;margin-top:14px">Use admin mobile/password from backend env or local seed.</p>
+    <p style="font-size:12px;color:#888;margin-top:14px;text-align:center">Default: <b>9999999999</b> / <b>admin123</b></p>
+    <button class="btn" style="width:100%;background:#666;margin-top:8px" onclick="bootstrapAdmin()">First time? Setup Admin</button>
   </div>
 </div>
 
@@ -264,9 +265,9 @@ document.addEventListener('input', (e) => {
 }, true);
 
 async function login() {
-  const mobile = document.getElementById('loginMobile').value;
+  const mobile = document.getElementById('loginMobile').value.trim();
   const password = document.getElementById('loginPassword').value;
-  API = document.getElementById('loginUrl').value;
+  API = document.getElementById('loginUrl').value.trim();
   localStorage.setItem('apiUrl', API);
   const r = await req('/auth/admin-login', 'POST', { mobile, password });
   if (r.success && (r.user.role === 'admin' || r.user.role === 'staff')) {
@@ -274,7 +275,20 @@ async function login() {
     localStorage.setItem('adminToken', TOKEN);
     showDashboard();
   } else {
-    alert(r.message || 'Invalid login');
+    alert((r.message || 'Invalid login') + '\n\nIf this is a new install, tap "First time? Setup Admin" first.');
+  }
+}
+
+async function bootstrapAdmin() {
+  const mobile = document.getElementById('loginMobile').value.trim() || '9999999999';
+  const password = document.getElementById('loginPassword').value || 'admin123';
+  API = document.getElementById('loginUrl').value.trim();
+  localStorage.setItem('apiUrl', API);
+  const r = await req('/auth/bootstrap-admin', 'POST', { mobile, password, name: 'Admin' });
+  if (r.success) {
+    alert('Admin ready!\nMobile: ' + r.mobile + '\nPassword: ' + r.password + '\n\nNow tap Login.');
+  } else {
+    alert('Setup failed: ' + (r.message || 'unknown'));
   }
 }
 
