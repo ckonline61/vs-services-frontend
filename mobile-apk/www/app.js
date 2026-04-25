@@ -208,23 +208,25 @@ function logo(compact = false) {
 function topbar(title, back) {
   return `<div class="topbar">
     ${back ? `<span class="back" onclick="nav('${back.screen}', ${back.data ? JSON.stringify(back.data).replace(/"/g, '&quot;') : 'null'})">&#8592;</span>` : ''}
-    <span>${title}</span>
+    <span class="tb-title">${title}</span>
     <span style="flex:1"></span>
-    ${STATE.token ? `<button class="lang-toggle" onclick="openNotifications()" style="margin-right:6px;position:relative">🔔${STATE.notifUnread ? `<span style="position:absolute;top:-4px;right:-4px;background:#FF4D6D;color:#fff;border-radius:50%;min-width:16px;height:16px;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;border:1.5px solid var(--navy)">${STATE.notifUnread}</span>` : ''}</button>` : ''}
+    ${STATE.token ? `<button class="tb-icon-btn" onclick="openNotifications()" aria-label="Notifications">🔔${STATE.notifUnread ? `<span class="tb-dot">${STATE.notifUnread > 9 ? '9+' : STATE.notifUnread}</span>` : ''}</button>` : ''}
     <button class="lang-toggle" onclick="toggleLang()">${STATE.lang.toUpperCase()}</button>
   </div>`;
 }
 
 function tabbar(active) {
   const tabs = [
-    ['home', 'Home', 'home'],
-    ['accessories', 'Shop', 'shop'],
-    ['bookings', 'Bookings', 'bookings'],
-    ['profile', 'Profile', 'profile']
+    ['home', '🏠', 'home'],
+    ['accessories', '🛒', 'shop'],
+    ['bookings', '📅', 'bookings'],
+    ['profile', '👤', 'profile']
   ];
-  return `<div class="tabbar">${tabs.map(([k, label, key]) => `
+  const cartBadge = STATE.cart.length;
+  return `<div class="tabbar">${tabs.map(([k, icon, key]) => `
     <a class="${active === k ? 'active' : ''}" onclick="nav('${k}')">
-      <span class="ic">${label === 'Home' ? 'H' : label === 'Shop' ? 'S' : label === 'Bookings' ? 'B' : 'P'}</span>${t(key)}
+      <span class="ic">${icon}</span>${t(key)}
+      ${k === 'accessories' && cartBadge ? `<span class="tab-badge">${cartBadge}</span>` : ''}
     </a>`).join('')}</div>`;
 }
 
@@ -359,20 +361,23 @@ const screens = {
       </div>` : ''}
       ${rewardCard()}
       <div class="section">${t('services')}</div>
-      ${STATE.services.map(service => `
+      ${STATE.services.map(service => {
+        const icon = ({checkup:'🩺',repair:'🔧',denting_painting:'🎨',service:'⚙️'})[service.category] || '🔧';
+        return `
         <div class="svc" onclick="nav('booking',{serviceId:'${service._id}'})">
+          <div class="svc-thumb ${service.category || ''}">${icon}</div>
           <div class="info">
             <div class="name">${service.name}</div>
             <div class="desc">${service.description || ''}</div>
-            <span class="badge-category">${service.category}</span>
-            <div class="muted" style="margin-top:6px">⏱ ${service.estimatedTime || '-'}</div>
+            <span class="badge-category">${(service.category || '').replace(/_/g, ' ')}</span>
+            <div class="muted" style="margin-top:4px">⏱ ${service.estimatedTime || '-'}</div>
             <div class="price">${money(service.basePrice)}</div>
           </div>
           <div class="svc-actions">
             <button class="chip small" onclick="event.stopPropagation(); previewEstimate('${service._id}')">${t('estimate')}</button>
             <button class="chip small active" onclick="event.stopPropagation(); nav('booking',{serviceId:'${service._id}'})">${t('book')}</button>
           </div>
-        </div>`).join('')}
+        </div>`}).join('')}
       <div class="section">${t('tips')}</div>
       <div class="card stack-list">
         ${STATE.support.tips.slice(0, 2).map(tip => `<div><b>${tip.title}</b><div class="muted">${tip.body}</div></div>`).join('')}
@@ -469,27 +474,41 @@ const screens = {
 
   cart: () => {
     const total = STATE.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const itemCount = STATE.cart.reduce((s, i) => s + i.quantity, 0);
     return `
-      ${topbar('Cart', { screen: 'accessories' })}
+      ${topbar('Cart' + (itemCount ? ` (${itemCount})` : ''), { screen: 'accessories' })}
       <div class="screen">
         ${STATE.cart.length ? STATE.cart.map(item => `
-          <div class="line-item">
-            <div>
-              <b>${item.name}</b>
-              <div class="muted">${money(item.price)} x ${item.quantity}</div>
+          <div class="cart-item">
+            <div class="cart-thumb">🛍</div>
+            <div class="cart-info">
+              <div class="cart-name">${item.name}</div>
+              <div class="cart-price">${money(item.price)}</div>
             </div>
-            <button class="chip small" onclick="removeCart('${item.productId}')">Remove</button>
-          </div>`).join('') : `<div class="empty">Cart is empty</div>`}
-        ${STATE.cart.length ? `<div class="card">
-          <div class="kv"><span>Total</span><span>${money(total)}</span></div>
-          <input id="addr" placeholder="Address line">
-          <input id="city" placeholder="City">
-          <input id="pin" placeholder="Pincode">
-          <div class="row">
-            <div class="chip ${STATE.payMode === 'cod' ? 'active' : ''}" onclick="STATE.payMode='cod';render()">Cash / UPI on Delivery</div>
-            <div class="chip ${STATE.payMode === 'online' ? 'active' : ''}" onclick="STATE.payMode='online';render()">Demo Online</div>
+            <div class="cart-qty">
+              <button onclick="changeQty('${item.productId}',-1)">−</button>
+              <span class="q">${item.quantity}</span>
+              <button onclick="changeQty('${item.productId}',1)">+</button>
+            </div>
+          </div>`).join('') : `<div class="empty-pro"><div class="ep-icon">🛒</div><div class="ep-title">Cart khali hai</div><div class="ep-msg">Shop me jake apne pasand ke products add karo.</div><button class="ep-cta" onclick="nav('accessories')">Browse Shop</button></div>`}
+        ${STATE.cart.length ? `<div class="cart-summary">
+          <div class="kv"><span>Items (${itemCount})</span><span>${money(total)}</span></div>
+          <div class="kv"><span>Delivery</span><span style="color:var(--accent2);font-weight:600">FREE</span></div>
+          <div class="kv" style="border:none;padding-top:10px;font-size:16px"><span style="font-weight:700">Total</span><span style="font-weight:800;color:var(--p);font-family:'Plus Jakarta Sans',sans-serif">${money(total)}</span></div>
+          <div style="margin-top:14px">
+            <label class="label" style="margin:6px 0">Delivery Address</label>
+            <input id="addr" placeholder="Address line" value="${STATE.user?.addresses?.[0]?.line1 || ''}">
+            <div class="row" style="padding:0">
+              <input id="city" placeholder="City" value="${STATE.user?.addresses?.[0]?.city || ''}">
+              <input id="pin" placeholder="Pincode" maxlength="6" inputmode="numeric" value="${STATE.user?.addresses?.[0]?.pincode || ''}">
+            </div>
           </div>
-          <button class="btn" onclick="placeOrder()">Place Order</button>
+          <label class="label" style="margin:14px 0 6px">Payment Mode</label>
+          <div class="row" style="padding:0">
+            <div class="chip ${STATE.payMode === 'cod' ? 'active' : ''}" onclick="STATE.payMode='cod';render()">💵 Cash/UPI on Delivery</div>
+            <div class="chip ${STATE.payMode === 'online' ? 'active' : ''}" onclick="STATE.payMode='online';render()">💳 Online (demo)</div>
+          </div>
+          <button class="btn btn-gradient" onclick="placeOrder()">Place Order • ${money(total)}</button>
         </div>` : '' }
       </div>
       ${tabbar('accessories')}`;
@@ -712,15 +731,49 @@ const screens = {
         <div class="mini-title">${t('history')}</div>
         ${historyList()}
       </div>
-      <div class="card stack-list">
-        <button class="btn btn-out" onclick="openNotifications()">🔔 Notifications ${STATE.notifUnread ? `<span style="background:#FF4D6D;color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;margin-left:4px">${STATE.notifUnread}</span>` : ''}</button>
-        <button class="btn btn-out" onclick="nav('offers')">🎟 Offers & Coupons</button>
-        <button class="btn btn-out" onclick="nav('refer')">🎁 Refer & Earn ₹100</button>
-        <button class="btn btn-out" onclick="nav('packages')">📦 Service Packages</button>
-        <button class="btn btn-out" onclick="nav('branches')">📍 Find a Branch</button>
-        <button class="btn btn-out" onclick="nav('emergency')">🚨 Emergency Help</button>
-        <button class="btn btn-out" onclick="nav('support')">🛟 Support Hub</button>
-        <button class="btn btn-er" onclick="logout()">Logout</button>
+      <div class="card-section-title" style="font-size:11px;font-weight:700;color:var(--l);text-transform:uppercase;letter-spacing:1px;margin:18px 14px 8px">More</div>
+      <div class="qlink-card">
+        <div class="qlink" onclick="openNotifications()">
+          <div class="qlink-icon notif">🔔</div>
+          <div class="qlink-text"><div class="qlink-title">Notifications</div><div class="qlink-sub">Booking & order updates</div></div>
+          ${STATE.notifUnread ? `<span class="qlink-pill">${STATE.notifUnread}</span>` : ''}
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('offers')">
+          <div class="qlink-icon offer">🎟</div>
+          <div class="qlink-text"><div class="qlink-title">Offers & Coupons</div><div class="qlink-sub">${(STATE.coupons || []).length || 3} active offers</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('refer')">
+          <div class="qlink-icon refer">🎁</div>
+          <div class="qlink-text"><div class="qlink-title">Refer & Earn ₹100</div><div class="qlink-sub">Friends ko bulao, dono ko ₹100</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('packages')">
+          <div class="qlink-icon pkg">📦</div>
+          <div class="qlink-text"><div class="qlink-title">Service Packages</div><div class="qlink-sub">Silver & Gold care plans</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('branches')">
+          <div class="qlink-icon branch">📍</div>
+          <div class="qlink-text"><div class="qlink-title">Find a Branch</div><div class="qlink-sub">${(STATE.support?.branches || []).length} branches</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('emergency')">
+          <div class="qlink-icon sos">🚨</div>
+          <div class="qlink-text"><div class="qlink-title">Emergency Help</div><div class="qlink-sub">24x7 roadside assistance</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('support')">
+          <div class="qlink-icon support">🛟</div>
+          <div class="qlink-text"><div class="qlink-title">Support Hub</div><div class="qlink-sub">FAQ, tips, packages</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="logout()" style="color:var(--er)">
+          <div class="qlink-icon logout">⏻</div>
+          <div class="qlink-text"><div class="qlink-title">Logout</div><div class="qlink-sub">Sign out of this account</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
       </div>
     </div>
     ${tabbar('profile')}`,
@@ -1239,6 +1292,15 @@ function addCart(id) {
 
 function removeCart(id) {
   STATE.cart = STATE.cart.filter(item => item.productId !== id);
+  save();
+  render();
+}
+
+function changeQty(id, delta) {
+  const item = STATE.cart.find(i => i.productId === id);
+  if (!item) return;
+  item.quantity = Math.max(0, (item.quantity || 1) + delta);
+  if (item.quantity === 0) STATE.cart = STATE.cart.filter(i => i.productId !== id);
   save();
   render();
 }

@@ -398,6 +398,164 @@ body[data-theme="dark"] .bk-pro-tag{background:#0F2344;color:#9EC6E1}
 .sec-row h3{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:var(--t)}
 .sec-row .more{font-size:12px;color:var(--p);font-weight:600;cursor:pointer}
 
+/* ========== UI POLISH 2.1 ========== */
+/* Topbar polish */
+.tb-title{font-weight:700;font-size:17px;letter-spacing:.2px;flex-shrink:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb-icon-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;position:relative;margin-right:6px;transition:background .15s;backdrop-filter:blur(6px)}
+.tb-icon-btn:active{background:rgba(255,255,255,.22)}
+.tb-dot{position:absolute;top:-3px;right:-3px;background:#FF4D6D;color:#fff;border-radius:9px;min-width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700;border:2px solid var(--navy);padding:0 4px;line-height:1}
+
+/* Tabbar polish - bigger icons */
+.tabbar a{position:relative;padding:8px 0 10px}
+.tabbar a .ic{font-size:22px;line-height:1.1;display:block;margin-bottom:3px}
+.tabbar a:active{transform:scale(.92)}
+.tab-badge{position:absolute;top:4px;left:50%;transform:translateX(8px);min-width:18px;height:18px;background:#FF4D6D;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;line-height:1}
+body[data-theme="dark"] .tab-badge{border-color:#13294B}
+
+/* Profile quick links upgraded */
+.qlink-card{background:#fff;border-radius:14px;margin:10px;padding:0;overflow:hidden;border:1px solid var(--b);box-shadow:0 4px 14px rgba(95,168,211,.10)}
+body[data-theme="dark"] .qlink-card{background:#13294B;border-color:#1C4277}
+.qlink{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--b);cursor:pointer;color:var(--t);transition:background .15s}
+.qlink:last-child{border-bottom:none}
+.qlink:active{background:#f4f8fd}
+body[data-theme="dark"] .qlink:active{background:#0F2344}
+.qlink-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.qlink-icon.notif{background:linear-gradient(135deg,#FFE5E5,#FFCDD2);color:#C62828}
+.qlink-icon.offer{background:linear-gradient(135deg,#FFF3E0,#FFE0B2);color:#E65100}
+.qlink-icon.refer{background:linear-gradient(135deg,#E1F5FE,#B3E5FC);color:#0277BD}
+.qlink-icon.pkg{background:linear-gradient(135deg,#F3E5F5,#E1BEE7);color:#6A1B9A}
+.qlink-icon.branch{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);color:#2E7D32}
+.qlink-icon.sos{background:linear-gradient(135deg,#FFEBEE,#FFCDD2);color:#C62828}
+.qlink-icon.support{background:linear-gradient(135deg,#E0F7FA,#B2EBF2);color:#00838F}
+.qlink-icon.logout{background:linear-gradient(135deg,#FAFAFA,#EEEEEE);color:#616161}
+.qlink-text{flex:1}
+.qlink-title{font-weight:600;font-size:14px}
+.qlink-sub{font-size:11px;color:var(--l);margin-top:2px}
+.qlink-arrow{color:var(--l);font-size:18px}
+.qlink-pill{background:#FF4D6D;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-right:6px}
+
+/* Service cards with icons */
+.svc{padding:14px}
+.svc-thumb{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#E8F1FB,#D1E5F7);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--p);flex-shrink:0}
+.svc-thumb.checkup{background:linear-gradient(135deg,#FFF3E0,#FFE0B2);color:#E65100}
+.svc-thumb.repair{background:linear-gradient(135deg,#FFEBEE,#FFCDD2);color:#C62828}
+.svc-thumb.denting_painting{background:linear-gradient(135deg,#F3E5F5,#E1BEE7);color:#6A1B9A}
+.svc-thumb.service{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);color:#2E7D32}
+.svc .badge-category{display:inline-block;padding:2px 8px;background:#E8F1FB;color:var(--p);border-radius:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+body[data-theme="dark"] .svc .badge-category{background:rgba(45,143,230,.18);color:#9EC6E1}
+
+/* Cart quantity controls */
+.cart-item{display:flex;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:12px;margin:8px 12px;border:1px solid var(--b);box-shadow:0 4px 12px rgba(95,168,211,.06)}
+body[data-theme="dark"] .cart-item{background:#13294B;border-color:#1C4277}
+.cart-thumb{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#E8F1FB,#D1E5F7);display:flex;align-items:center;justify-content:center;color:var(--p);font-size:22px;flex-shrink:0}
+.cart-info{flex:1;min-width:0}
+.cart-name{font-weight:600;font-size:14px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cart-price{color:var(--p);font-weight:700;font-size:14px;margin-top:4px}
+.cart-qty{display:inline-flex;align-items:center;background:#f4f8fd;border:1px solid var(--b);border-radius:10px;overflow:hidden;flex-shrink:0}
+body[data-theme="dark"] .cart-qty{background:#0F2344;border-color:#1C4277}
+.cart-qty button{width:28px;height:28px;border:none;background:transparent;color:var(--t);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cart-qty button:active{background:rgba(45,143,230,.15)}
+.cart-qty .q{min-width:28px;text-align:center;font-weight:700;font-size:13px}
+.cart-summary{background:#fff;border-radius:14px;margin:10px 12px;padding:14px;border:1px solid var(--b);box-shadow:0 4px 12px rgba(95,168,211,.10)}
+body[data-theme="dark"] .cart-summary{background:#13294B;border-color:#1C4277}
+
+/* Login screen polish - close button repositioned */
+.login-close{top:env(safe-area-inset-top,12px) !important;width:38px;height:38px;font-size:22px}
+
+/* Hero stats divider */
+.hero-stats{display:flex;gap:0;margin-top:18px;background:rgba(255,255,255,.08);border-radius:12px;padding:12px;backdrop-filter:blur(6px);position:relative;z-index:2}
+.hero-stat{flex:1;text-align:center;color:#fff;position:relative}
+.hero-stat:not(:last-child)::after{content:'';position:absolute;right:0;top:15%;bottom:15%;width:1px;background:rgba(255,255,255,.18)}
+.hero-stat b{font-family:'Plus Jakarta Sans',sans-serif;display:block;font-size:18px;font-weight:800;line-height:1.1}
+.hero-stat span{font-size:9.5px;color:#9EC6E1;letter-spacing:1px;font-weight:600;display:block;margin-top:3px;text-transform:uppercase}
+
+/* Section with action */
+.section{font-size:15px}
+
+/* Better booking item - upgrade old .bk */
+.bk{padding:14px;border-radius:16px;display:block}
+.bk-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.bk-tags{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 6px}
+.bk-tag{background:#f4f8fd;color:var(--l);font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px}
+body[data-theme="dark"] .bk-tag{background:#0F2344;color:#9EC6E1}
+
+/* Action button row at bottom */
+.act-row{display:flex;gap:8px;margin:12px 0 4px}
+.act-row .btn{margin-top:0;padding:11px 12px;font-size:13px}
+
+/* Better wishlist heart */
+.wish-heart{width:30px;height:30px;font-size:13px;border:1px solid rgba(0,0,0,.06)}
+.wish-heart.on{box-shadow:0 4px 12px rgba(255,77,109,.4)}
+
+/* Cleaner pcard */
+.pcard{padding:8px;border-radius:12px;border:1px solid var(--b);box-shadow:0 3px 10px rgba(95,168,211,.06)}
+body[data-theme="dark"] .pcard{background:#13294B;border-color:#1C4277}
+.pcard .img{height:96px;border-radius:10px;font-size:18px;letter-spacing:1px;background:linear-gradient(135deg,#E8F1FB,#D1E5F7)}
+body[data-theme="dark"] .pcard .img{background:linear-gradient(135deg,#0F2344,#13294B)}
+.pcard .pname{font-size:12.5px;line-height:1.35;margin-top:8px;font-weight:600}
+
+/* Smooth screen transitions */
+.tabbar a.active::before{height:4px;width:32px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,var(--p),var(--accent))}
+
+/* Bigger touch targets */
+.svc{padding:14px;gap:14px}
+.svc .name{font-size:15.5px}
+.svc .price{font-size:17px}
+
+/* Better empty states everywhere */
+.empty{padding:60px 20px;color:var(--l)}
+
+/* Splash refinement */
+.splash-wrap{padding:20px}
+.splash-wrap .brand-logo{max-width:280px}
+
+/* Search wrap refinement */
+.search-wrap input{padding:11px 14px 11px 38px;border-radius:12px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236F8292' stroke-width='2'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>") no-repeat 12px center}
+body[data-theme="dark"] .search-wrap input{background-color:#13294B}
+
+/* Hero overflow fix on tiny screens */
+.hero{margin:12px 10px 0;padding:20px 18px}
+.hero-title{font-size:24px}
+.hero-greeting{font-size:12px}
+.hero-sub{font-size:12px}
+
+/* Profile header refinement */
+.profile-h{padding:24px 20px 28px;border-radius:0 0 28px 28px}
+.profile-h h2{font-size:22px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800}
+
+/* Quick action grid icons bigger */
+.action{padding:16px 8px;border-radius:14px;background:#fff}
+body[data-theme="dark"] .action{background:#13294B;border-color:#1C4277}
+.action .ic-wrap{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#E8F1FB,#D1E5F7);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 6px}
+body[data-theme="dark"] .action .ic-wrap{background:linear-gradient(135deg,#0F2344,#1C4277)}
+.action .t{font-size:11.5px;line-height:1.3;font-weight:600}
+
+/* Toast pos better */
+.toast{padding:13px 16px;border-radius:14px;font-weight:600;box-shadow:0 18px 40px rgba(0,0,0,.18);max-width:420px;left:50%;right:auto;transform:translateX(-50%);width:calc(100% - 40px)}
+
+/* FAB refinement */
+.fab{padding:14px 24px;border-radius:30px;font-weight:700;font-size:14px;box-shadow:0 12px 28px rgba(45,143,230,.40);display:flex;align-items:center;gap:8px}
+.fab::before{content:'🛒';font-size:16px}
+
+/* Select / dropdown polish */
+select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%236F8292'><path d='M7 10l5 5 5-5z'/></svg>") no-repeat right 10px center;padding-right:30px;cursor:pointer}
+body[data-theme="dark"] select{background-color:#13294B;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%239EC6E1'><path d='M7 10l5 5 5-5z'/></svg>")}
+
+/* Better chip active state */
+.chip.active{box-shadow:0 6px 16px rgba(45,143,230,.30)}
+
+/* Login form polish */
+.login-form{border-radius:28px 28px 0 0;padding:26px 22px 32px}
+.login-form .btn{margin-top:14px;border-radius:12px;padding:14px;font-size:15px}
+.login-form input{border-radius:12px;padding:13px 14px;font-size:14px}
+.login-title{font-size:24px;letter-spacing:-.3px}
+
+/* Booking card polish */
+.bk{padding:16px;border-radius:16px;display:flex;flex-direction:column;gap:0}
+.bk .bid{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;letter-spacing:1px;font-weight:700}
+.bk .name{font-size:15px;font-weight:700;margin-top:2px}
+.bk .sub{font-size:12px;line-height:1.5}
+
 </style>
 </head>
 <body>
