@@ -81,7 +81,10 @@ const STATE = {
   loading: false,
   coupons: [],
   notifications: [],
-  notifUnread: 0
+  notifUnread: 0,
+  chatMessages: JSON.parse(localStorage.getItem('chatMessages') || '[]'),
+  chatSuggestions: [],
+  chatTyping: false
 };
 
 const t = (key) => I18N[STATE.lang]?.[key] || I18N.en[key] || key;
@@ -546,10 +549,11 @@ const screens = {
         </div>
         ${['home_service', 'pickup_drop'].includes(STATE.bookingForm.mode || 'at_garage') ? `
           <div class="card">
+            <button class="btn btn-out" style="margin-bottom:10px" onclick="openMapPicker()">📍 Pick Location on Map</button>
             <input id="bAddr" placeholder="Address line" value="${STATE.bookingForm.addr || ''}">
             <div class="row">
               <input id="bCity" placeholder="City" value="${STATE.bookingForm.city || ''}">
-              <input id="bPin" placeholder="Pincode" value="${STATE.bookingForm.pin || ''}">
+              <input id="bPin" placeholder="Pincode" maxlength="6" inputmode="numeric" value="${STATE.bookingForm.pin || ''}">
             </div>
           </div>` : ''}
         <div class="card">
@@ -744,6 +748,12 @@ const screens = {
           <div class="qlink-text"><div class="qlink-title">Offers & Coupons</div><div class="qlink-sub">${(STATE.coupons || []).length || 3} active offers</div></div>
           <span class="qlink-arrow">›</span>
         </div>
+        <div class="qlink" onclick="nav('chatbot')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#F3E5F5,#E1BEE7);color:#7B1FA2">🤖</div>
+          <div class="qlink-text"><div class="qlink-title">CarBot AI Assistant</div><div class="qlink-sub">Car ke baare me kuch bhi pucho</div></div>
+          <span class="qlink-pill" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0)">NEW</span>
+          <span class="qlink-arrow">›</span>
+        </div>
         <div class="qlink" onclick="nav('refer')">
           <div class="qlink-icon refer">🎁</div>
           <div class="qlink-text"><div class="qlink-title">Refer & Earn ₹100</div><div class="qlink-sub">Friends ko bulao, dono ko ₹100</div></div>
@@ -868,8 +878,17 @@ const screens = {
   branches: () => `
     ${topbar('Find a Branch', { screen: 'profile' })}
     <div class="screen">
-      ${(STATE.support?.branches || []).map(branch => `
-        <div class="card">
+      <div class="map-wrap">
+        <div id="branchMap" class="map-container tall"></div>
+        <div class="map-controls">
+          <button class="map-btn" onclick="locateMe()" title="My Location">📍</button>
+          <button class="map-btn" onclick="fitBranches()" title="All branches">🗺</button>
+        </div>
+      </div>
+      <div id="branchDistance"></div>
+      <div class="section">All Branches</div>
+      ${(STATE.support?.branches || []).map((branch, i) => `
+        <div class="card" id="branch-card-${i}">
           <div style="display:flex;gap:14px;align-items:flex-start">
             <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--p),var(--accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">📍</div>
             <div style="flex:1">
@@ -879,6 +898,7 @@ const screens = {
             </div>
           </div>
           <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="btn btn-sm" style="flex:1" onclick="focusBranch(${i})">🎯 Show on Map</button>
             <a class="btn btn-sm" style="flex:1;text-decoration:none;text-align:center" href="${branch.mapUrl}" target="_blank">🗺 Directions</a>
             <a class="btn btn-sm btn-out" style="flex:1;text-decoration:none;text-align:center" href="tel:${branch.phone.replace(/\s+/g, '')}">📞 Call</a>
           </div>
@@ -906,11 +926,82 @@ const screens = {
           <a class="mini-link" href="tel:${item.phone.replace(/\s+/g, '')}">📞 Call</a>
         </div>`).join('')}</div>
     </div>
-    ${tabbar('profile')}`
+    ${tabbar('profile')}`,
+
+  chatbot: () => {
+    const msgs = STATE.chatMessages || [];
+    const suggestions = STATE.chatSuggestions.length ? STATE.chatSuggestions : [
+      'Engine oil kab change?', 'AC kam thanda', 'Battery check signs', 'Active coupons',
+      'Tyre pressure?', 'Service cost?', 'How to book?', 'Emergency help'
+    ];
+    return `<div class="chat-screen">
+      <div class="chat-head">
+        <div class="back" onclick="navBack() || nav('home')">←</div>
+        <div class="ch-avatar">🤖</div>
+        <div class="ch-info">
+          <div class="ch-name">CarBot AI</div>
+          <div class="ch-status">Online · Ready to help</div>
+        </div>
+        <button class="back" onclick="clearChat()" title="New chat">↻</button>
+      </div>
+      <div class="chat-body" id="chatBody">
+        ${msgs.length === 0 ? `
+          <div class="msg-row">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg bot">
+              Namaste! 👋 Main <b>CarBot</b> hu — VS Services ka AI assistant.
+              <br><br>Apni car ke baare me kuch bhi pucho:
+              <br>🔧 Service & maintenance
+              <br>🛢 Oil, brake, AC, battery
+              <br>💰 Cost estimates
+              <br>📅 Booking help
+              <br>🎟 Offers & coupons
+              <br><br>Chalo, kya help chahiye?
+            </div>
+          </div>` :
+          msgs.map(m => `
+            <div class="msg-row ${m.role === 'user' ? 'user-row' : ''}">
+              <div class="msg-avatar">${m.role === 'user' ? (initials(STATE.user?.name || 'U')) : '🤖'}</div>
+              <div>
+                <div class="msg ${m.role === 'user' ? 'user' : 'bot'}">${escapeHtml(m.content).replace(/\n/g, '<br>')}</div>
+                ${m.source && m.role === 'assistant' ? `<div class="bot-source">${m.source === 'gemini' ? '✨ AI' : m.source === 'local' ? '📚 KB' : 'Reply'}</div>` : ''}
+              </div>
+            </div>`).join('')
+        }
+        ${STATE.chatTyping ? `<div class="msg-row"><div class="msg-avatar">🤖</div><div class="typing"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>` : ''}
+      </div>
+      <div class="chat-suggestions">
+        ${suggestions.map(s => `<button class="chat-sugg" onclick="sendChatMessage('${s.replace(/'/g, "\\'")}', true)">${s}</button>`).join('')}
+      </div>
+      <div class="chat-input-bar">
+        <textarea id="chatInput" placeholder="Apni car ke baare me kuch pucho..." rows="1" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendChatMessage()}" oninput="autoResize(this)"></textarea>
+        <button class="chat-send" onclick="sendChatMessage()">➤</button>
+      </div>
+    </div>`;
+  }
 };
 
 function render() {
   app.innerHTML = (screens[STATE.current] || screens.splash)();
+  // Initialize map for branches screen
+  if (STATE.current === 'branches') {
+    setTimeout(() => initBranchMap(), 100);
+  }
+  // Bot FAB on main screens (not on chatbot itself, login, splash)
+  const showBot = ['home', 'accessories', 'bookings', 'profile', 'orders', 'wishlist', 'support'].includes(STATE.current);
+  if (showBot && !document.getElementById('botFab')) {
+    const fab = document.createElement('button');
+    fab.id = 'botFab';
+    fab.className = 'bot-fab';
+    fab.innerHTML = '🤖';
+    fab.title = 'CarBot AI Assistant';
+    fab.onclick = () => nav('chatbot');
+    document.body.appendChild(fab);
+  } else if (!showBot) {
+    document.getElementById('botFab')?.remove();
+  }
+  // Auto-scroll chat
+  if (STATE.current === 'chatbot') scrollChatBottom();
 }
 
 async function loadInitData() {
@@ -1355,6 +1446,283 @@ document.addEventListener('input', (e) => {
     if (v !== el.value) el.value = v;
   }
 }, true);
+
+// ========== AI Chatbot ==========
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(100, el.scrollHeight) + 'px';
+}
+
+function clearChat() {
+  if (!confirm('Clear chat history?')) return;
+  STATE.chatMessages = [];
+  localStorage.setItem('chatMessages', '[]');
+  render();
+}
+
+async function sendChatMessage(text, isSugg) {
+  let msg = text;
+  if (!msg) {
+    const input = document.getElementById('chatInput');
+    if (!input) return;
+    msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    input.style.height = 'auto';
+  }
+
+  STATE.chatMessages.push({ role: 'user', content: msg });
+  STATE.chatTyping = true;
+  render();
+  scrollChatBottom();
+
+  try {
+    const history = STATE.chatMessages.slice(-7, -1).map(m => ({ role: m.role, content: m.content }));
+    const r = await api('/chatbot', 'POST', { message: msg, history }, { silent: true });
+    STATE.chatTyping = false;
+    if (r.success && r.reply) {
+      STATE.chatMessages.push({ role: 'assistant', content: r.reply, source: r.source });
+    } else {
+      STATE.chatMessages.push({ role: 'assistant', content: 'Sorry, kuch error aaya. Phir try karo.', source: 'error' });
+    }
+  } catch (e) {
+    STATE.chatTyping = false;
+    STATE.chatMessages.push({ role: 'assistant', content: 'Network error. Internet check karo.', source: 'error' });
+  }
+
+  // Keep only last 50 messages
+  if (STATE.chatMessages.length > 50) STATE.chatMessages = STATE.chatMessages.slice(-50);
+  localStorage.setItem('chatMessages', JSON.stringify(STATE.chatMessages));
+  render();
+  scrollChatBottom();
+}
+
+function scrollChatBottom() {
+  setTimeout(() => {
+    const body = document.getElementById('chatBody');
+    if (body) body.scrollTop = body.scrollHeight;
+  }, 50);
+}
+
+async function loadChatSuggestions() {
+  try {
+    const r = await api('/chatbot/suggestions', 'GET', null, { silent: true });
+    if (r.success) STATE.chatSuggestions = r.suggestions || [];
+  } catch (e) {}
+}
+
+// ========== Map (Leaflet + OpenStreetMap - 100% free) ==========
+let _branchMap = null;
+let _branchMarkers = [];
+let _userMarker = null;
+let _pickerMap = null;
+let _pickerMarker = null;
+
+function makeVsIcon(emoji = '🔧', isUser = false) {
+  if (typeof L === 'undefined') return null;
+  return L.divIcon({
+    className: 'vs-marker-wrap',
+    html: `<div class="vs-marker ${isUser ? 'user' : ''}"><span class="vs-icon">${emoji}</span></div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -32]
+  });
+}
+
+function initBranchMap() {
+  if (typeof L === 'undefined') return;
+  const el = document.getElementById('branchMap');
+  if (!el) return;
+  if (_branchMap) { _branchMap.remove(); _branchMap = null; }
+
+  const branches = STATE.support?.branches || [];
+  const center = branches.length ? [branches[0].lat, branches[0].lng] : [23.2599, 77.4126];
+
+  _branchMap = L.map('branchMap', { zoomControl: true, attributionControl: true }).setView(center, 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19
+  }).addTo(_branchMap);
+
+  _branchMarkers = branches.map((b, i) => {
+    const m = L.marker([b.lat, b.lng], { icon: makeVsIcon('🔧') }).addTo(_branchMap);
+    m.bindPopup(`
+      <b>${b.name}</b>
+      <div class="lp-row">📍 ${b.address}</div>
+      <div class="lp-row">⏰ ${b.timings}</div>
+      <div class="lp-actions">
+        <a class="lp-btn" href="${b.mapUrl}" target="_blank">Directions</a>
+        <a class="lp-btn alt" href="tel:${b.phone.replace(/\s+/g, '')}">Call</a>
+      </div>`);
+    return m;
+  });
+
+  if (branches.length > 1) fitBranches();
+}
+
+function fitBranches() {
+  if (!_branchMap || !_branchMarkers.length) return;
+  const grp = L.featureGroup(_branchMarkers);
+  _branchMap.fitBounds(grp.getBounds().pad(0.3));
+}
+
+function focusBranch(idx) {
+  if (!_branchMap) return;
+  const b = (STATE.support?.branches || [])[idx];
+  if (!b) return;
+  _branchMap.setView([b.lat, b.lng], 16, { animate: true });
+  _branchMarkers[idx]?.openPopup();
+  document.getElementById('branchMap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function locateMe(targetMap) {
+  const map = targetMap || _branchMap || _pickerMap;
+  if (!map) return;
+  if (!navigator.geolocation) return toast('Location not supported');
+  toast('Locating...');
+  navigator.geolocation.getCurrentPosition((pos) => {
+    const { latitude, longitude } = pos.coords;
+    if (_userMarker) _userMarker.remove();
+    _userMarker = L.marker([latitude, longitude], { icon: makeVsIcon('👤', true) })
+      .addTo(map).bindPopup('You are here').openPopup();
+    map.setView([latitude, longitude], 14, { animate: true });
+    // distance to nearest branch (Haversine)
+    const branches = STATE.support?.branches || [];
+    if (branches.length) {
+      const distances = branches.map(b => ({ b, d: haversine(latitude, longitude, b.lat, b.lng) }));
+      distances.sort((a, b) => a.d - b.d);
+      const nearest = distances[0];
+      const distEl = document.getElementById('branchDistance');
+      if (distEl) {
+        distEl.innerHTML = `<div class="dist-card">
+          <div class="di-icon">🚗</div>
+          <div class="di-text">
+            <b>${nearest.d.toFixed(1)} km away</b>
+            Nearest: ${nearest.b.name}
+          </div>
+          <a class="btn btn-sm" style="text-decoration:none" href="https://www.google.com/maps/dir/${latitude},${longitude}/${nearest.b.lat},${nearest.b.lng}" target="_blank">Directions</a>
+        </div>`;
+      }
+    }
+    // For picker
+    if (targetMap && _pickerMarker) {
+      _pickerMarker.setLatLng([latitude, longitude]);
+      reverseGeocode(latitude, longitude);
+    }
+  }, (err) => {
+    toast('Location error: ' + (err.message || 'denied'));
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ========== Address Picker (booking flow) ==========
+function openMapPicker() {
+  const wrap = document.createElement('div');
+  wrap.id = 'mapPickerWrap';
+  wrap.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column';
+  wrap.innerHTML = `
+    <div class="topbar">
+      <span class="back" onclick="closeMapPicker()">&#8592;</span>
+      <span>Select Location</span>
+      <span style="flex:1"></span>
+    </div>
+    <div class="map-search">
+      <input id="mapSearch" placeholder="Search address or area..." onkeydown="if(event.key==='Enter')mapSearchGo()">
+    </div>
+    <div id="pickerMap" style="flex:1;width:100%"></div>
+    <div class="map-pin-info">
+      <div class="pi-text">
+        <div class="pi-addr" id="pickerAddr">Drag map to pick location</div>
+        <div class="pi-coords" id="pickerCoords">-</div>
+      </div>
+      <button class="btn map-btn" onclick="locateMe(_pickerMap)" style="background:var(--p);color:#fff;width:auto;padding:9px 12px">📍 Me</button>
+      <button class="btn" style="margin:0;width:auto;padding:9px 14px" onclick="confirmMapPick()">✓ Use</button>
+    </div>`;
+  document.body.appendChild(wrap);
+
+  if (typeof L === 'undefined') return;
+  const start = STATE.pickedLocation || (STATE.support?.branches?.[0] ? [STATE.support.branches[0].lat, STATE.support.branches[0].lng] : [23.2599, 77.4126]);
+  _pickerMap = L.map('pickerMap', { zoomControl: true, attributionControl: false }).setView(start, 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM', maxZoom: 19 }).addTo(_pickerMap);
+  _pickerMarker = L.marker(start, { draggable: true, icon: makeVsIcon('📍') }).addTo(_pickerMap);
+  _pickerMarker.on('dragend', (e) => {
+    const ll = e.target.getLatLng();
+    reverseGeocode(ll.lat, ll.lng);
+  });
+  _pickerMap.on('click', (e) => {
+    _pickerMarker.setLatLng(e.latlng);
+    reverseGeocode(e.latlng.lat, e.latlng.lng);
+  });
+  reverseGeocode(start[0] || start.lat, start[1] || start.lng);
+}
+
+function closeMapPicker() {
+  document.getElementById('mapPickerWrap')?.remove();
+  if (_pickerMap) { _pickerMap.remove(); _pickerMap = null; }
+  _pickerMarker = null;
+}
+
+async function reverseGeocode(lat, lng) {
+  document.getElementById('pickerCoords').textContent = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  document.getElementById('pickerAddr').textContent = 'Loading address...';
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+      headers: { 'Accept-Language': 'en' }
+    });
+    const data = await r.json();
+    document.getElementById('pickerAddr').textContent = data.display_name || `${lat}, ${lng}`;
+    STATE._pendingPick = {
+      lat, lng,
+      address: data.display_name || '',
+      city: data.address?.city || data.address?.town || data.address?.village || '',
+      pincode: data.address?.postcode || ''
+    };
+  } catch (e) {
+    document.getElementById('pickerAddr').textContent = `Pinned: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    STATE._pendingPick = { lat, lng, address: '', city: '', pincode: '' };
+  }
+}
+
+async function mapSearchGo() {
+  const q = document.getElementById('mapSearch').value.trim();
+  if (!q) return;
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`, {
+      headers: { 'Accept-Language': 'en' }
+    });
+    const arr = await r.json();
+    if (arr[0]) {
+      const { lat, lon } = arr[0];
+      _pickerMap.setView([+lat, +lon], 16);
+      _pickerMarker.setLatLng([+lat, +lon]);
+      reverseGeocode(+lat, +lon);
+    } else toast('Not found');
+  } catch (e) { toast('Search failed'); }
+}
+
+function confirmMapPick() {
+  const p = STATE._pendingPick;
+  if (!p) return closeMapPicker();
+  STATE.pickedLocation = [p.lat, p.lng];
+  // Fill into booking form
+  if (document.getElementById('bAddr')) document.getElementById('bAddr').value = p.address;
+  if (document.getElementById('bCity')) document.getElementById('bCity').value = p.city;
+  if (document.getElementById('bPin')) document.getElementById('bPin').value = p.pincode;
+  STATE.bookingForm = { ...STATE.bookingForm, addr: p.address, city: p.city, pin: p.pincode };
+  closeMapPicker();
+  toast('Location set');
+}
 
 // ========== Helpers for new screens ==========
 function copyCoupon(code) {
