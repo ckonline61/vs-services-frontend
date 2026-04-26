@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -199,6 +200,64 @@ input:checked+.slider::before{transform:translateX(18px)}
 .more-row:active{background:var(--surface2)}
 .more-row span{color:var(--muted);font-size:18px}
 
+/* Chat list & detail (admin) */
+.chat-row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow)}
+.chat-row:active{transform:scale(.99)}
+.chat-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;font-family:'Plus Jakarta Sans',sans-serif}
+.chat-row .chat-info{flex:1;min-width:0}
+.chat-row .chat-name{font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.chat-row .chat-time{font-size:10px;color:var(--muted);font-weight:500}
+.chat-row .chat-last{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px}
+.chat-row .chat-unread{background:var(--accent2);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px}
+
+.admin-chat-screen{display:flex;flex-direction:column;height:calc(100vh - 64px)}
+.admin-chat-body{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.adm-msg{max-width:80%;padding:10px 13px;border-radius:14px;font-size:13.5px;line-height:1.45;word-wrap:break-word}
+.adm-msg.cust{background:#fff;color:var(--text);align-self:flex-start;border:1px solid var(--border);border-bottom-left-radius:4px}
+.adm-msg.admin{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.adm-msg-time{font-size:10px;opacity:.7;margin-top:4px}
+
+.quick-reply-row{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:#fff;border-top:1px solid var(--border)}
+.quick-reply-row::-webkit-scrollbar{display:none}
+.qr-chip{flex-shrink:0;padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;font-size:11.5px;font-weight:600;color:var(--text);cursor:pointer;white-space:nowrap}
+.qr-chip:active{background:var(--navy);color:#fff}
+
+.admin-input-bar{display:flex;gap:6px;padding:10px 12px;background:#fff;border-top:1px solid var(--border);align-items:flex-end}
+.admin-input-bar textarea{flex:1;border:1.5px solid var(--border);border-radius:18px;padding:9px 13px;font-size:13.5px;resize:none;max-height:80px;min-height:36px;font-family:inherit}
+.admin-input-bar .send-btn{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;font-size:16px;cursor:pointer;flex-shrink:0}
+.admin-input-bar .rec-btn{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#FF4D6D,#FF8E53);color:#fff;border:none;font-size:16px;cursor:pointer;flex-shrink:0}
+.admin-input-bar .rec-btn.recording{animation:recPulseAdm 1s infinite;background:linear-gradient(135deg,#C62828,#FF1744)}
+@keyframes recPulseAdm{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+/* Voice bubble in admin */
+.adm-voice{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;background:rgba(15,42,71,.08)}
+.adm-msg.admin .adm-voice{background:rgba(255,255,255,.18)}
+.adm-voice button{background:var(--accent2);color:#fff;border:none;width:30px;height:30px;border-radius:50%;font-size:13px;cursor:pointer}
+.adm-voice .dur{font-size:11px;font-weight:600}
+
+/* GPS toggle card */
+.gps-card{padding:14px;background:linear-gradient(135deg,#E0F7FA,#B2EBF2);border-radius:12px;border:1px solid #B2EBF2;display:flex;align-items:center;gap:12px}
+.gps-card .gps-icon{font-size:28px}
+.gps-card .gps-info{flex:1}
+.gps-card .gps-info b{display:block;font-size:14px;color:#00838F}
+.gps-card .gps-info span{font-size:11px;color:#006064}
+
+/* Report */
+.report-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.report-stat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;box-shadow:var(--shadow)}
+.report-stat .v{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:var(--navy)}
+.report-stat .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;font-weight:700}
+.report-stat.hi .v{color:var(--accent2)}
+.report-stat.warn .v{color:var(--warn)}
+.report-stat.bad .v{color:var(--danger)}
+
+/* Barcode scanner */
+#barcodeView{width:100%;height:280px;background:#000;border-radius:12px;overflow:hidden;position:relative}
+#barcodeView video{width:100%;height:100%;object-fit:cover}
+#barcodeView canvas.drawingBuffer{position:absolute;top:0;left:0;display:none}
+.bc-scanline{position:absolute;left:5%;right:5%;height:2px;background:linear-gradient(90deg,transparent,#FF4D6D,transparent);top:50%;animation:scanmove 2s ease-in-out infinite}
+@keyframes scanmove{0%,100%{top:30%}50%{top:70%}}
+
 /* Map for admin */
 .admin-map{width:100%;height:340px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);position:relative}
 .admin-map.tall{height:480px}
@@ -325,10 +384,14 @@ input:checked+.slider::before{transform:translateX(18px)}
     <div id="tab-more" class="tab-pane hidden">
       <div class="card-section-title">Manage</div>
       <div class="card" style="padding:0">
+        <a onclick="navTab('chats')" class="more-row">💬 Customer Chats <span id="chatBadgeMore"></span><span>›</span></a>
         <a onclick="navTab('team')" class="more-row">👥 Team / Staff <span>›</span></a>
         <a onclick="navTab('customers')" class="more-row">👤 Customers <span>›</span></a>
         <a onclick="navTab('coupons')" class="more-row">🎟 Coupons <span>›</span></a>
         <a onclick="navTab('map')" class="more-row">🗺 Live Bookings Map <span>›</span></a>
+        <a onclick="navTab('gps')" class="more-row">📡 GPS / Staff Location <span>›</span></a>
+        <a onclick="navTab('barcode')" class="more-row">📷 Barcode Scanner <span>›</span></a>
+        <a onclick="navTab('report')" class="more-row">📊 Monthly Report <span>›</span></a>
       </div>
       <div class="card-section-title">Export</div>
       <div class="card" style="padding:0">
@@ -340,6 +403,68 @@ input:checked+.slider::before{transform:translateX(18px)}
       <div class="card">
         <h3>Last 7 Days Revenue</h3>
         <div id="revChart"></div>
+      </div>
+    </div>
+
+    <!-- CHATS LIST -->
+    <div id="tab-chats" class="tab-pane hidden">
+      <div id="chatsList" class="list"></div>
+    </div>
+
+    <!-- CHAT DETAIL -->
+    <div id="tab-chatDetail" class="tab-pane hidden">
+      <div class="admin-chat-screen">
+        <div class="admin-chat-body" id="adminChatBody"></div>
+        <div class="quick-reply-row" id="quickReplyRow"></div>
+        <div class="admin-input-bar">
+          <textarea id="adminMsgInput" placeholder="Type reply..." rows="1" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendAdminReply()}"></textarea>
+          <button class="rec-btn" id="admRecBtn" onclick="toggleAdmRec()" title="Voice note">🎤</button>
+          <button class="send-btn" onclick="sendAdminReply()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT -->
+    <div id="tab-report" class="tab-pane hidden">
+      <div class="card">
+        <input type="month" id="reportMonth" style="width:100%;padding:11px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px" onchange="loadReport(this.value)">
+        <div id="reportContent"></div>
+      </div>
+    </div>
+
+    <!-- BARCODE -->
+    <div id="tab-barcode" class="tab-pane hidden">
+      <div class="card">
+        <h3>📷 Scan Product Barcode</h3>
+        <div id="barcodeView">
+          <div class="bc-scanline"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn primary" id="bcStart" onclick="startBarcode()" style="flex:1">Start Camera</button>
+          <button class="btn outline" onclick="stopBarcode()" style="flex:1">Stop</button>
+        </div>
+        <div id="bcResult" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <!-- GPS / STAFF MAP -->
+    <div id="tab-gps" class="tab-pane hidden">
+      <div class="card">
+        <h3>📍 My Location Sharing</h3>
+        <div class="gps-card">
+          <div class="gps-icon">📍</div>
+          <div class="gps-info">
+            <b>Live Location <span id="gpsStatus">Off</span></b>
+            <span id="gpsLast">Not sharing yet</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="gpsToggle" onchange="toggleGPS(this.checked)"><span class="slider"></span></label>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px">Auto updates every 60s while toggle is on. Admin sirf last 1 hour ka data dekh sakte hain.</p>
+      </div>
+      <div class="card">
+        <h3>👥 Live Staff Locations</h3>
+        <div id="staffMap" class="admin-map"></div>
+        <button class="btn outline sm" onclick="loadStaffMap()" style="margin-top:10px">🔄 Refresh</button>
       </div>
     </div>
 
@@ -368,9 +493,9 @@ input:checked+.slider::before{transform:translateX(18px)}
   <div class="bottom-nav">
     <a onclick="navTab('dash')" id="nav-dash" class="active"><span class="icn">📊</span>Home</a>
     <a onclick="navTab('bookings')" id="nav-bookings"><span class="icn">📅</span>Bookings</a>
+    <a onclick="navTab('chats')" id="nav-chats" style="position:relative"><span class="icn">💬</span>Chats<span class="tab-badge" id="chatBadge" style="display:none;position:absolute;top:4px;right:14px;background:#FF4D6D;color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:2px 6px;border:2px solid #fff"></span></a>
     <a onclick="navTab('orders')" id="nav-orders"><span class="icn">📦</span>Orders</a>
     <a onclick="navTab('services')" id="nav-services"><span class="icn">🔧</span>Services</a>
-    <a onclick="navTab('products')" id="nav-products"><span class="icn">🛍</span>Shop</a>
     <a onclick="navTab('more')" id="nav-more"><span class="icn">⋯</span>More</a>
   </div>
 </div>
@@ -483,10 +608,18 @@ function enterApp(){
   document.getElementById('app').classList.remove('hidden');
   STATE.navStack=['dash'];
   navTab('dash',true);
+  // Background chat polling for unread badge
+  setInterval(async () => {
+    if (!TOKEN) return;
+    try {
+      const r = await req('/chat/all');
+      if (r.success) { STATE.chats = r.chats || []; updateChatBadge(); }
+    } catch(e){}
+  }, 30000);
 }
 
 // ============ Navigation ============
-const TAB_TITLES={dash:'Dashboard',bookings:'Bookings',orders:'Orders',services:'Services',products:'Products',team:'Team',customers:'Customers',coupons:'Coupons',more:'More',map:'Live Map'};
+const TAB_TITLES={dash:'Dashboard',bookings:'Bookings',orders:'Orders',services:'Services',products:'Products',team:'Team',customers:'Customers',coupons:'Coupons',more:'More',map:'Live Map',chats:'Customer Chats',chatDetail:'Chat',report:'Monthly Report',barcode:'Barcode Scanner',gps:'GPS Tracking'};
 
 function navTab(tab, fresh){
   if(!fresh && STATE.currentTab !== tab) STATE.navStack.push(tab);
@@ -550,8 +683,12 @@ function loadTab(tab){
   else if(tab==='team')loadStaff();
   else if(tab==='customers')loadCustomers();
   else if(tab==='coupons')loadCoupons();
-  else if(tab==='more')renderRevChart();
+  else if(tab==='more'){renderRevChart();updateChatBadge();}
   else if(tab==='map')setTimeout(loadLiveMap,150);
+  else if(tab==='chats')loadChats();
+  else if(tab==='report'){const m=new Date().toISOString().slice(0,7);document.getElementById('reportMonth').value=m;loadReport(m);}
+  else if(tab==='gps')setTimeout(loadStaffMap,150);
+  else if(tab==='barcode'){/* manual start */}
 }
 
 // ============ Dashboard ============
@@ -1253,6 +1390,279 @@ async function viewBookingOnMap(bookingId) {
     map.setView([lat, lng], 14);
     document.getElementById('dirLink').href = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
   }, 200);
+}
+
+// ============ CUSTOMER CHAT (admin side) ============
+let _chatPoller, _activeChatCustomer;
+const QUICK_REPLIES = [
+  '👋 Namaste! Kaise help karu?',
+  '✅ Aapki booking confirm hai',
+  '🚗 Driver aapki taraf nikal chuke hain',
+  '🔧 Service start kar diya hai',
+  '🎉 Service complete ho gayi',
+  'Thoda time lagega, please wait',
+  '📞 Aapko call karta hu',
+  'Address bhej do please',
+  'Pickup ka time confirm karo',
+  'Aapka problem note kar liya'
+];
+
+async function loadChats() {
+  const r = await req('/chat/all');
+  STATE.chats = r.chats || [];
+  const list = document.getElementById('chatsList');
+  if (!STATE.chats.length) {
+    list.innerHTML = emptyState('💬', 'No customer chats yet', 'Customer messages will appear here');
+    return;
+  }
+  list.innerHTML = STATE.chats.map(c => `
+    <div class="chat-row" onclick="openChat('${c.customerId}','${(c.customerName||'').replace(/'/g,'')}','${c.customerMobile||''}')">
+      <div class="chat-avatar">${(c.customerName||'?').slice(0,2).toUpperCase()}</div>
+      <div class="chat-info">
+        <div class="chat-name">${c.customerName} ${c.unread ? `<span class="chat-unread">${c.unread}</span>` : ''}<span class="chat-time" style="margin-left:auto">${new Date(c.lastTime).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span></div>
+        <div class="chat-last">${c.lastFromRole === 'customer' ? '' : '↪ '}${c.lastMessage}</div>
+      </div>
+    </div>`).join('');
+  updateChatBadge();
+}
+
+function updateChatBadge() {
+  const totalUnread = (STATE.chats || []).reduce((s,c) => s + (c.unread || 0), 0);
+  const badge = document.getElementById('chatBadge');
+  if (badge) {
+    badge.textContent = totalUnread > 9 ? '9+' : totalUnread;
+    badge.style.display = totalUnread > 0 ? 'flex' : 'none';
+  }
+  const moreBadge = document.getElementById('chatBadgeMore');
+  if (moreBadge) moreBadge.textContent = totalUnread > 0 ? `(${totalUnread} new)` : '';
+}
+
+async function openChat(customerId, name, mobile) {
+  _activeChatCustomer = { id: customerId, name, mobile };
+  navTab('chatDetail');
+  const r = await req('/chat/with/' + customerId);
+  STATE.chatMessages = r.messages || [];
+  renderChatDetail();
+  // Render quick replies
+  document.getElementById('quickReplyRow').innerHTML = QUICK_REPLIES.map(q =>
+    `<div class="qr-chip" onclick="useQuickReply('${q.replace(/'/g,"\\'")}')">${q}</div>`
+  ).join('');
+  // Start polling
+  if (_chatPoller) clearInterval(_chatPoller);
+  _chatPoller = setInterval(async () => {
+    if (STATE.currentTab !== 'chatDetail' || !_activeChatCustomer) return;
+    const last = STATE.chatMessages[STATE.chatMessages.length - 1];
+    const since = last ? new Date(last.createdAt).getTime() : 0;
+    const r = await req('/chat/with/' + customerId);
+    if (r.success && r.messages?.length > STATE.chatMessages.length) {
+      STATE.chatMessages = r.messages;
+      renderChatDetail();
+    }
+  }, 10000);
+  document.getElementById('pageTitle').textContent = name;
+}
+
+function renderChatDetail() {
+  const body = document.getElementById('adminChatBody');
+  if (!body) return;
+  body.innerHTML = STATE.chatMessages.map(m => `
+    <div class="adm-msg ${m.fromRole === 'customer' ? 'cust' : 'admin'}">
+      ${m.text ? `<div>${escapeHtmlAdm(m.text).replace(/\n/g,'<br>')}</div>` : ''}
+      ${m.voiceData ? `<div class="adm-voice">
+        <button onclick="playAdmVoice('${m._id}', this)">▶</button>
+        <span class="dur">${Math.round(m.voiceDuration||0)}s</span>
+        <audio id="av-${m._id}" src="${m.voiceData}" preload="metadata"></audio>
+      </div>` : ''}
+      <div class="adm-msg-time">${new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+function escapeHtmlAdm(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+
+function playAdmVoice(id, btn) {
+  const audio = document.getElementById('av-' + id);
+  if (audio.paused) {
+    document.querySelectorAll('.adm-voice audio').forEach(a => { a.pause(); a.currentTime = 0; });
+    document.querySelectorAll('.adm-voice button').forEach(b => b.textContent = '▶');
+    audio.play();
+    btn.textContent = '⏸';
+    audio.onended = () => btn.textContent = '▶';
+  } else {
+    audio.pause(); btn.textContent = '▶';
+  }
+}
+
+function useQuickReply(text) {
+  document.getElementById('adminMsgInput').value = text;
+}
+
+async function sendAdminReply() {
+  const input = document.getElementById('adminMsgInput');
+  const text = input.value.trim();
+  if (!text || !_activeChatCustomer) return;
+  input.value = '';
+  const r = await req('/chat/reply', 'POST', { customerId: _activeChatCustomer.id, text });
+  if (r.success) {
+    STATE.chatMessages.push(r.message);
+    renderChatDetail();
+  } else toast('Failed to send', 'error');
+}
+
+// ============ ADMIN VOICE RECORD ============
+let _admMediaRec = null, _admChunks = [], _admStart = 0;
+async function toggleAdmRec() {
+  if (_admMediaRec && _admMediaRec.state === 'recording') { _admMediaRec.stop(); return; }
+  if (!_activeChatCustomer) return toast('Open a chat first', 'warn');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    _admChunks = [];
+    _admMediaRec = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+    _admStart = Date.now();
+    _admMediaRec.ondataavailable = (e) => { if (e.data.size > 0) _admChunks.push(e.data); };
+    _admMediaRec.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(_admChunks, { type: 'audio/webm' });
+      const dur = (Date.now() - _admStart) / 1000;
+      if (dur < 1) return toast('Too short', 'warn');
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const r = await req('/chat/reply', 'POST', { customerId: _activeChatCustomer.id, voiceData: reader.result, voiceDuration: dur });
+        if (r.success) { STATE.chatMessages.push(r.message); renderChatDetail(); toast('Voice sent', 'success'); }
+      };
+      reader.readAsDataURL(blob);
+      document.getElementById('admRecBtn').classList.remove('recording');
+    };
+    _admMediaRec.start();
+    document.getElementById('admRecBtn').classList.add('recording');
+    toast('🔴 Recording...', 'info');
+    setTimeout(() => { if (_admMediaRec && _admMediaRec.state === 'recording') _admMediaRec.stop(); }, 30000);
+  } catch (e) { toast('Mic denied', 'error'); }
+}
+
+// ============ MONTHLY REPORT ============
+async function loadReport(month) {
+  const r = await req('/users/monthly-report' + (month ? '?month=' + month : ''));
+  if (!r.success) return toast(r.message, 'error');
+  const s = r.stats;
+  document.getElementById('reportContent').innerHTML = `
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px">📅 ${r.month}</div>
+    <div class="report-grid">
+      <div class="report-stat hi"><div class="v">${s.totalBookings}</div><div class="l">Bookings</div></div>
+      <div class="report-stat"><div class="v">${s.totalOrders}</div><div class="l">Orders</div></div>
+      <div class="report-stat hi"><div class="v">₹${(s.revenue||0).toLocaleString('en-IN')}</div><div class="l">Revenue</div></div>
+      <div class="report-stat"><div class="v">${s.newCustomers}</div><div class="l">New Customers</div></div>
+      <div class="report-stat hi"><div class="v">${s.completed}</div><div class="l">Completed</div></div>
+      <div class="report-stat bad"><div class="v">${s.cancelled}</div><div class="l">Cancelled</div></div>
+      <div class="report-stat"><div class="v">₹${s.avgOrderValue}</div><div class="l">Avg Booking</div></div>
+      <div class="report-stat"><div class="v">${s.totalBookings ? Math.round(s.completed/s.totalBookings*100) : 0}%</div><div class="l">Success Rate</div></div>
+    </div>
+    <h3 style="margin:18px 0 10px;font-size:14px;color:var(--navy)">🔥 Top Services</h3>
+    ${(r.topServices||[]).map(t => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${t.name}</span><b>${t.count}</b></div>`).join('') || '<div class="muted" style="padding:8px">No data</div>'}
+    <button class="btn primary full" style="margin-top:16px" onclick="exportReport()">📥 Export Report (CSV)</button>`;
+}
+
+function exportReport() {
+  const c = document.getElementById('reportContent').innerText;
+  const blob = new Blob([c], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `report_${Date.now()}.txt`;
+  a.click();
+  toast('Downloaded', 'success');
+}
+
+// ============ GPS TRACKING ============
+let _gpsTimer = null;
+function toggleGPS(on) {
+  if (on) {
+    if (!navigator.geolocation) return toast('GPS not supported', 'error');
+    document.getElementById('gpsStatus').textContent = 'On';
+    pingLocation();
+    _gpsTimer = setInterval(pingLocation, 60000);
+    toast('GPS sharing started', 'success');
+  } else {
+    if (_gpsTimer) clearInterval(_gpsTimer);
+    document.getElementById('gpsStatus').textContent = 'Off';
+    document.getElementById('gpsLast').textContent = 'Stopped';
+    toast('GPS sharing stopped');
+  }
+}
+
+function pingLocation() {
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const { latitude, longitude, accuracy } = pos.coords;
+    const r = await req('/users/staff-location', 'POST', { lat: latitude, lng: longitude, accuracy });
+    if (r.success) document.getElementById('gpsLast').textContent = `Last sent: ${new Date().toLocaleTimeString()}`;
+  }, (err) => {
+    document.getElementById('gpsLast').textContent = 'Error: ' + err.message;
+  }, { enableHighAccuracy: true, timeout: 30000 });
+}
+
+let _staffMap;
+async function loadStaffMap() {
+  const el = document.getElementById('staffMap');
+  if (!el || typeof L === 'undefined') return;
+  if (_staffMap) { _staffMap.remove(); _staffMap = null; }
+  _staffMap = L.map('staffMap', { zoomControl: true }).setView([23.2599, 77.4126], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OSM' }).addTo(_staffMap);
+  const r = await req('/users/staff-locations');
+  const staff = r.staff || [];
+  if (!staff.length) return toast('No live staff locations', 'info');
+  const markers = staff.map(s => {
+    const m = L.marker([s.lastLocation.lat, s.lastLocation.lng], { icon: makeAdminIcon('👤') }).addTo(_staffMap);
+    m.bindPopup(`<b>${s.name || 'Staff'}</b><br>📞 ${s.mobile}<br>${s.role}<br>🕒 ${new Date(s.lastLocation.updatedAt).toLocaleTimeString()}`);
+    return m;
+  });
+  if (markers.length > 1) _staffMap.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+  else _staffMap.setView([staff[0].lastLocation.lat, staff[0].lastLocation.lng], 14);
+}
+
+// ============ BARCODE SCANNER (Quagga2) ============
+let _bcRunning = false;
+function startBarcode() {
+  if (typeof Quagga === 'undefined') return toast('Scanner not loaded', 'error');
+  if (_bcRunning) return;
+  Quagga.init({
+    inputStream: {
+      name: 'Live', type: 'LiveStream', target: '#barcodeView',
+      constraints: { facingMode: 'environment', width: 640, height: 480 }
+    },
+    decoder: { readers: ['ean_reader', 'ean_8_reader', 'code_128_reader', 'code_39_reader', 'upc_reader', 'upc_e_reader'] },
+    locate: true
+  }, (err) => {
+    if (err) { toast('Camera error: ' + err.message, 'error'); return; }
+    Quagga.start();
+    _bcRunning = true;
+    toast('Camera started — point at barcode', 'info');
+  });
+  Quagga.onDetected(onBarcodeFound);
+}
+
+function stopBarcode() {
+  if (typeof Quagga === 'undefined') return;
+  if (_bcRunning) { Quagga.stop(); _bcRunning = false; toast('Stopped'); }
+}
+
+let _lastBcCode = null, _lastBcTime = 0;
+function onBarcodeFound(result) {
+  const code = result.codeResult?.code;
+  if (!code) return;
+  // Debounce
+  if (code === _lastBcCode && Date.now() - _lastBcTime < 2000) return;
+  _lastBcCode = code; _lastBcTime = Date.now();
+  if (navigator.vibrate) navigator.vibrate(60);
+  toast('Code: ' + code, 'success');
+  // Search products by name match
+  const matches = (STATE.products || []).filter(p => (p.name || '').toLowerCase().includes(code.toLowerCase()) || p._id === code);
+  document.getElementById('bcResult').innerHTML = `
+    <div class="card">
+      <h3>Scanned: <span style="color:var(--accent2)">${code}</span></h3>
+      ${matches.length ? matches.map(p => `<div class="item">
+        <div class="item-head"><div><div class="item-title">${p.name}</div><div class="item-sub">${p.category} · Stock: ${p.stock}</div></div><div class="item-amt">₹${p.price}</div></div>
+        <div class="item-actions"><button class="btn outline sm" onclick="openProductModal('${p._id}')">Edit</button></div>
+      </div>`).join('') : '<div class="muted" style="padding:8px">No matching product found in DB</div>'}
+    </div>`;
 }
 
 // ============ Init ============

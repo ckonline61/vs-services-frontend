@@ -88,7 +88,9 @@ const STATE = {
   tipOfDay: null,
   leaderboard: [],
   myRank: null,
-  birthdayShown: false
+  birthdayShown: false,
+  supportMessages: [],
+  supportLastSeen: 0
 };
 
 // Loyalty tier metadata
@@ -785,6 +787,15 @@ const screens = {
         ${booking.review ? `<div class="card"><div class="mini-title">Review</div><div>${'★'.repeat(booking.review.rating)}${'☆'.repeat(5 - booking.review.rating)}</div><div class="muted">${booking.review.comment || ''}</div></div>` : ''}
         ${booking.beforeAfterGallery?.length ? `<div class="card"><div class="mini-title">Before / After Gallery</div>${booking.beforeAfterGallery.map(item => `<div class="muted">${item.label}: ${item.url}</div>`).join('')}</div>` : ''}
         <div class="card">
+          <div class="mini-title">🎤 Voice Note for Staff</div>
+          <div class="muted" style="font-size:12px;margin-bottom:8px">Apni car ki problem describe karo voice me — staff sune se pehle.</div>
+          ${booking.voiceNote ? voiceBubble(booking.voiceNote, booking.voiceNoteDuration, 'bvn-' + booking._id) : '<div class="muted small">No voice note yet</div>'}
+          ${['booked','confirmed','assigned','pickup_scheduled','in_progress'].includes(booking.status) ? `
+            <button class="voice-rec-btn" id="bookingRecBtn" onclick="toggleVoiceRec('booking','${booking._id}')" style="margin-top:10px">
+              <span class="rec-dot"></span>${booking.voiceNote ? 'Re-record' : 'Record'} Voice Note
+            </button>` : ''}
+        </div>
+        <div class="card">
           <div class="mini-title">Actions</div>
           ${booking.paymentStatus !== 'paid' && booking.paymentMode === 'online' ? `<button class="btn" onclick="payNow('${booking._id}', ${booking.totalAmount})">Pay Now</button>` : ''}
           ${['booked', 'confirmed'].includes(booking.status) ? `<button class="btn btn-er" onclick="cancelBooking('${booking._id}')">Cancel Booking</button>` : ''}
@@ -903,6 +914,12 @@ const screens = {
         <div class="qlink" onclick="nav('offers')">
           <div class="qlink-icon offer">🎟</div>
           <div class="qlink-text"><div class="qlink-title">Offers & Coupons</div><div class="qlink-sub">${(STATE.coupons || []).length || 3} active offers</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('supportChat')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);color:#1565C0">💬</div>
+          <div class="qlink-text"><div class="qlink-title">Chat with Support</div><div class="qlink-sub">Voice note bhi bhej sakte ho</div></div>
+          <span class="qlink-pill" style="background:linear-gradient(135deg,#1565C0,#1B6FC2)">LIVE</span>
           <span class="qlink-arrow">›</span>
         </div>
         <div class="qlink" onclick="nav('chatbot')">
@@ -1152,6 +1169,46 @@ const screens = {
     </div>`;
   },
 
+  // ===== Customer Support Chat (admin <-> customer) =====
+  supportChat: () => {
+    const msgs = STATE.supportMessages || [];
+    return `<div class="chat-screen">
+      <div class="chat-head support">
+        <div class="back" onclick="navBack() || nav('home')">←</div>
+        <div class="ch-avatar">💬</div>
+        <div class="ch-info">
+          <div class="ch-name">VS Support Team</div>
+          <div class="ch-status">Usually replies within 1 hour</div>
+        </div>
+      </div>
+      <div class="chat-body" id="supportBody">
+        ${msgs.length === 0 ? `
+          <div class="msg-row">
+            <div class="msg-avatar">💬</div>
+            <div class="msg bot">
+              Namaste! 👋 Hum VS Services ka support team hain.<br><br>
+              Booking-related koi issue, doubt, ya feedback ho — yahan message karo. Voice note bhi bhej sakte ho 🎤
+            </div>
+          </div>` :
+          msgs.map(m => `
+            <div class="msg-row ${m.fromRole === 'customer' ? 'user-row' : ''}">
+              <div class="msg-avatar">${m.fromRole === 'customer' ? initials(STATE.user?.name || 'U') : '💬'}</div>
+              <div>
+                ${m.text ? `<div class="msg ${m.fromRole === 'customer' ? 'user' : 'bot'}">${escapeHtml(m.text).replace(/\n/g,'<br>')}</div>` : ''}
+                ${m.voiceData ? voiceBubble(m.voiceData, m.voiceDuration, m._id || 'v' + Math.random()) : ''}
+                <div class="bot-source">${new Date(m.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+              </div>
+            </div>`).join('')
+        }
+      </div>
+      <div class="chat-input-bar">
+        <textarea id="supportInput" placeholder="Type message..." rows="1" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendSupportMsg()}" oninput="autoResize(this)"></textarea>
+        <button class="chat-send" id="supportRecBtn" onclick="toggleVoiceRec('support')" style="background:linear-gradient(135deg,#FF4D6D,#FF8E53)">🎤</button>
+        <button class="chat-send" onclick="sendSupportMsg()">➤</button>
+      </div>
+    </div>`;
+  },
+
   // ===== NEW ENGAGEMENT SCREENS =====
 
   leaderboard: () => {
@@ -1252,6 +1309,14 @@ function render() {
   // Initialize map for branches screen
   if (STATE.current === 'branches') {
     setTimeout(() => initBranchMap(), 100);
+  }
+  // Load support messages on enter
+  if (STATE.current === 'supportChat' && STATE.token && !STATE._supportLoaded) {
+    STATE._supportLoaded = true;
+    loadSupportMessages();
+    startSupportPolling();
+  } else if (STATE.current !== 'supportChat') {
+    STATE._supportLoaded = false;
   }
   // Lazy load images
   setupLazyImages();
@@ -1851,6 +1916,130 @@ async function shareBooking(bookingId) {
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
   }
   haptic('light');
+}
+
+// ===== Voice recording (MediaRecorder) =====
+let _mediaRec = null;
+let _recChunks = [];
+let _recStart = 0;
+let _recContext = null; // 'support' or 'booking:<id>'
+
+function voiceBubble(dataUrl, dur, id) {
+  const seconds = Math.round(dur || 0);
+  const bars = 12;
+  return `<div class="voice-bubble">
+    <button class="vb-play" onclick="playVoice('${id}', this)">▶</button>
+    <div class="vb-bars">${[...Array(bars)].map((_,i) => `<div class="vb-bar" style="height:${8 + Math.sin(i)*8 + Math.random()*8}px"></div>`).join('')}</div>
+    <span class="vb-dur">${seconds}s</span>
+    <audio id="${id}" src="${dataUrl}" preload="metadata" style="display:none"></audio>
+  </div>`;
+}
+
+function playVoice(id, btn) {
+  const audio = document.getElementById(id);
+  if (!audio) return;
+  if (audio.paused) {
+    document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; });
+    document.querySelectorAll('.vb-play').forEach(b => b.textContent = '▶');
+    audio.play();
+    btn.textContent = '⏸';
+    audio.onended = () => btn.textContent = '▶';
+  } else {
+    audio.pause();
+    btn.textContent = '▶';
+  }
+}
+
+async function toggleVoiceRec(context, bookingId) {
+  if (_mediaRec && _mediaRec.state === 'recording') {
+    _mediaRec.stop();
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    _recChunks = [];
+    _mediaRec = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm' });
+    _recContext = context === 'booking' ? 'booking:' + bookingId : 'support';
+    _recStart = Date.now();
+    _mediaRec.ondataavailable = (e) => { if (e.data.size > 0) _recChunks.push(e.data); };
+    _mediaRec.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(_recChunks, { type: 'audio/webm' });
+      const duration = (Date.now() - _recStart) / 1000;
+      if (duration < 1) return toast('Too short', 'warn');
+      if (blob.size > 250000) return toast('Too long (max ~30s)', 'warn');
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const dataUrl = reader.result;
+        if (_recContext === 'support') {
+          const r = await api('/chat/my', 'POST', { voiceData: dataUrl, voiceDuration: duration });
+          if (r.success) { STATE.supportMessages.push(r.message); render(); haptic('success'); }
+          else toast(r.message || 'Failed', 'error');
+        } else if (_recContext.startsWith('booking:')) {
+          const id = _recContext.split(':')[1];
+          const r = await api(`/bookings/${id}/voice-note`, 'POST', { voiceData: dataUrl, duration });
+          if (r.success) { toast('Voice note attached', 'success'); haptic('success'); render(); }
+          else toast(r.message || 'Failed', 'error');
+        }
+      };
+      reader.readAsDataURL(blob);
+      const btn = document.getElementById('supportRecBtn') || document.getElementById('bookingRecBtn');
+      if (btn) btn.classList.remove('recording');
+    };
+    _mediaRec.start();
+    haptic('medium');
+    const btn = document.getElementById('supportRecBtn') || document.getElementById('bookingRecBtn');
+    if (btn) btn.classList.add('recording');
+    toast('🔴 Recording... tap again to stop (max 30s)', 'info');
+    // Auto-stop at 30s
+    setTimeout(() => { if (_mediaRec && _mediaRec.state === 'recording') _mediaRec.stop(); }, 30000);
+  } catch (e) {
+    toast('Mic permission denied', 'error');
+  }
+}
+
+// ===== Support chat =====
+async function loadSupportMessages() {
+  const r = await api('/chat/my', 'GET', null, { silent: true });
+  if (r.success) {
+    STATE.supportMessages = r.messages || [];
+    render();
+    setTimeout(() => { const el = document.getElementById('supportBody'); if (el) el.scrollTop = el.scrollHeight; }, 50);
+  }
+}
+
+async function sendSupportMsg() {
+  const input = document.getElementById('supportInput');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  const r = await api('/chat/my', 'POST', { text }, { silent: true });
+  if (r.success) {
+    STATE.supportMessages.push(r.message);
+    render();
+    setTimeout(() => { const el = document.getElementById('supportBody'); if (el) el.scrollTop = el.scrollHeight; }, 50);
+  } else toast('Failed to send', 'error');
+}
+
+// Poll for new support messages every 15s while on support screen
+let _supportPoller;
+function startSupportPolling() {
+  if (_supportPoller) clearInterval(_supportPoller);
+  _supportPoller = setInterval(async () => {
+    if (STATE.current !== 'supportChat' || !STATE.token) return;
+    const last = STATE.supportMessages[STATE.supportMessages.length - 1];
+    const since = last ? new Date(last.createdAt).getTime() : 0;
+    const r = await api(`/chat/my?since=${since}`, 'GET', null, { silent: true });
+    if (r.success && r.messages?.length) {
+      STATE.supportMessages.push(...r.messages);
+      render();
+      setTimeout(() => { const el = document.getElementById('supportBody'); if (el) el.scrollTop = el.scrollHeight; }, 50);
+      haptic('notify');
+    }
+  }, 15000);
 }
 
 // ===== Smart "Book Again" =====
