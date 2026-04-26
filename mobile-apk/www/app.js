@@ -84,8 +84,99 @@ const STATE = {
   notifUnread: 0,
   chatMessages: JSON.parse(localStorage.getItem('chatMessages') || '[]'),
   chatSuggestions: [],
-  chatTyping: false
+  chatTyping: false,
+  tipOfDay: null,
+  leaderboard: [],
+  myRank: null,
+  birthdayShown: false
 };
+
+// Loyalty tier metadata
+const TIER_META = {
+  bronze:   { icon: '🥉', label: 'Bronze',   next: 'silver',   needed: 5,  color: '#A0522D' },
+  silver:   { icon: '🥈', label: 'Silver',   next: 'gold',     needed: 10, color: '#9E9E9E' },
+  gold:     { icon: '🥇', label: 'Gold',     next: 'platinum', needed: 20, color: '#FFA500' },
+  platinum: { icon: '💎', label: 'Platinum', next: null,       needed: 0,  color: '#A8B5C9' }
+};
+
+// ========== Haptic feedback (Vibration API) ==========
+function haptic(pattern = 'light') {
+  if (!navigator.vibrate) return;
+  const PATTERNS = {
+    light: 10,
+    medium: [25],
+    heavy: [40],
+    success: [15, 30, 30],
+    error: [80, 40, 80],
+    notify: [10, 50, 10]
+  };
+  navigator.vibrate(PATTERNS[pattern] || pattern);
+}
+
+// ========== Native share ==========
+async function nativeShare(title, text, url) {
+  if (navigator.share) {
+    try {
+      await navigator.share({ title, text, url });
+      return true;
+    } catch (e) { return false; }
+  }
+  return false;
+}
+
+// ========== Lazy image observer ==========
+let _imgObserver;
+function setupLazyImages() {
+  if (!('IntersectionObserver' in window)) return;
+  if (_imgObserver) _imgObserver.disconnect();
+  _imgObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const img = e.target;
+        if (img.dataset.src) {
+          img.src = img.dataset.src;
+          img.onload = () => img.classList.add('loaded');
+          _imgObserver.unobserve(img);
+        }
+      }
+    });
+  }, { rootMargin: '100px' });
+  document.querySelectorAll('img.lazy[data-src]').forEach(img => _imgObserver.observe(img));
+}
+
+// ========== Skeleton ==========
+function skeletonList(n = 3) {
+  let s = '<div class="sk-list">';
+  for (let i = 0; i < n; i++) {
+    s += `<div class="sk-card">
+      <div class="sk-thumb"></div>
+      <div class="sk-lines">
+        <div class="sk-line w70"></div>
+        <div class="sk-line w90"></div>
+        <div class="sk-line w40"></div>
+      </div>
+    </div>`;
+  }
+  return s + '</div>';
+}
+
+// ========== Bottom sheet ==========
+function bottomSheet(title, html, onClose) {
+  const wrap = document.createElement('div');
+  wrap.className = 'bsheet-wrap';
+  wrap.id = 'bsheetWrap';
+  wrap.innerHTML = `<div class="bsheet" onclick="event.stopPropagation()">
+    <div class="bsheet-handle"></div>
+    <div class="bsheet-head"><span>${title}</span><button class="bsheet-close" onclick="closeBottomSheet()">×</button></div>
+    ${html}
+  </div>`;
+  wrap.onclick = () => { closeBottomSheet(); if (onClose) onClose(); };
+  document.body.appendChild(wrap);
+  haptic('light');
+}
+function closeBottomSheet() {
+  document.getElementById('bsheetWrap')?.remove();
+}
 
 const t = (key) => I18N[STATE.lang]?.[key] || I18N.en[key] || key;
 
@@ -110,12 +201,14 @@ async function api(path, method = 'GET', body, opts = {}) {
   }
 }
 
-function toast(msg) {
+function toast(msg, type = 'info') {
   const tNode = document.createElement('div');
-  tNode.className = 'toast';
-  tNode.textContent = msg;
+  tNode.className = 'toast ' + type;
+  const icons = { success: '✓', error: '!', warn: '⚠', info: 'ⓘ' };
+  tNode.innerHTML = `<span style="margin-right:8px;font-weight:800">${icons[type] || ''}</span>${msg}`;
   document.body.appendChild(tNode);
-  setTimeout(() => tNode.remove(), 2500);
+  haptic(type === 'error' ? 'error' : type === 'success' ? 'success' : 'light');
+  setTimeout(() => tNode.remove(), 2800);
 }
 
 function save() {
@@ -293,6 +386,39 @@ function historyList() {
     </div>`).join('') : `<div class="empty small">No service history yet</div>`}`;
 }
 
+// ===== Engagement helpers =====
+function isBirthdayToday() {
+  if (!STATE.user?.birthday) return false;
+  const b = new Date(STATE.user.birthday);
+  const t = new Date();
+  return b.getDate() === t.getDate() && b.getMonth() === t.getMonth();
+}
+
+function bdayBanner() {
+  const code = `BDAY${(STATE.user?.referralCode || 'YOU').slice(-4)}`;
+  return `<div class="bday-banner">
+    <h3>🎂 Happy Birthday ${STATE.user?.name?.split(' ')[0] || ''}!</h3>
+    <p>Aapke special day par 20% off — saari services valid till midnight.</p>
+    <div class="bday-code" onclick="copyCoupon('BDAY20')">BDAY20</div>
+  </div>`;
+}
+
+function tierProgress(user) {
+  const tier = user?.loyaltyTier || 'bronze';
+  const meta = TIER_META[tier];
+  const count = user?.serviceCount || 0;
+  if (!meta || !meta.next) return '';
+  const remaining = Math.max(0, meta.needed - count);
+  const pct = Math.min(100, (count / meta.needed) * 100);
+  return `<div style="margin-top:8px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--l)">
+      <span>Next: ${TIER_META[meta.next].label}</span>
+      <span>${remaining} more service${remaining === 1 ? '' : 's'}</span>
+    </div>
+    <div class="tier-progress"><div class="tier-progress-bar" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
 const screens = {
   splash: () => `<div class="splash-wrap">
     <img class="brand-logo" src="assets/vs-services-logo.png" alt="VS Services">
@@ -325,24 +451,37 @@ const screens = {
       </div>
     </div>`,
 
-  home: () => `
+  home: () => {
+    const isBirthday = isBirthdayToday();
+    return `
     ${topbar(t('appName'))}
     <div class="screen">
+      ${isBirthday ? bdayBanner() : ''}
       <div class="hero">
         <div class="hero-greeting">${greetingText()}${STATE.user?.name ? ',' : ''}</div>
-        <div class="hero-title">${STATE.user?.name ? STATE.user.name.split(' ')[0] : 'Welcome!'}</div>
-        <div class="hero-sub">Aapki car ki complete care — booking, parts, reminders, rewards — sab ek jagah.</div>
+        <div class="hero-title">${STATE.user?.name ? STATE.user.name.split(' ')[0] : 'Welcome!'}${isBirthday ? ' 🎂' : ''}</div>
+        ${STATE.user?.loyaltyTier ? `<div style="margin-top:6px;position:relative;z-index:2"><span class="tier-badge tier-${STATE.user.loyaltyTier}"><span class="tier-icon">${TIER_META[STATE.user.loyaltyTier]?.icon}</span>${TIER_META[STATE.user.loyaltyTier]?.label} Member</span></div>` : ''}
+        <div class="hero-sub" style="margin-top:8px">Aapki car ki complete care — booking, parts, reminders, rewards — sab ek jagah.</div>
         <div class="hero-cta">
           <span class="chip-cta primary" onclick="nav('booking')">🔧 Book Service</span>
           <span class="chip-cta" onclick="nav('${STATE.token ? 'profile' : 'login'}')">${STATE.token ? '👤 Profile' : '🔑 Login'}</span>
           <span class="chip-cta" onclick="window.location.href='tel:8839533202'">📞 Call Us</span>
         </div>
         <div class="hero-stats">
-          <div class="hero-stat"><b>${STATE.bookings.length}</b><span>BOOKINGS</span></div>
+          <div class="hero-stat"><b>${STATE.user?.serviceCount || STATE.bookings.length}</b><span>SERVICES</span></div>
           <div class="hero-stat"><b>${(STATE.rewards?.walletPoints || STATE.user?.walletPoints || 0)}</b><span>POINTS</span></div>
-          <div class="hero-stat"><b>${STATE.user?.cars?.length || 0}</b><span>MY CARS</span></div>
+          <div class="hero-stat"><b>${STATE.user?.streakDays || 0}🔥</b><span>STREAK</span></div>
         </div>
       </div>
+      ${STATE.user?.streakDays > 1 ? `<div class="streak-card" onclick="nav('rewards')">
+        <div class="streak-flame">🔥</div>
+        <div class="streak-info"><b>${STATE.user.streakDays}-day streak!</b><span>Keep visiting daily for bonus points</span></div>
+      </div>` : ''}
+      ${STATE.tipOfDay ? `<div class="tip-card" onclick="nav('support')">
+        <span class="tip-label">💡 Tip of the day</span>
+        <div class="tip-title">${STATE.tipOfDay.title}</div>
+        <div class="tip-body">${STATE.tipOfDay.body}</div>
+      </div>` : ''}
       <div class="section">${t('quick')}</div>
       <div class="grid quick-grid">
         <div class="action" onclick="nav('booking')"><div class="ic-wrap">🔧</div><div class="t">Book Service</div></div>
@@ -387,7 +526,8 @@ const screens = {
         <button class="btn btn-out" onclick="nav('support')">Open Support Hub</button>
       </div>
     </div>
-    ${tabbar('home')}`,
+    ${tabbar('home')}`;
+  },
 
   accessories: () => {
     const search = (STATE.productSearch || '').toLowerCase();
@@ -585,16 +725,33 @@ const screens = {
   bookings: () => `
     ${topbar('My Bookings')}
     <div class="screen">
-      ${STATE.bookings.length ? STATE.bookings.map(b => `
-        <div class="bk" onclick="nav('bookingDetail',{id:'${b._id}'})">
-          <div class="info">
+      ${STATE.bookings.length ? STATE.bookings.map(b => {
+        const isCompleted = b.status === 'completed';
+        const isPickup = ['pickup_drop', 'home_service'].includes(b.serviceMode) && b.assignedStaff;
+        return `
+        <div class="bk">
+          <div class="info" onclick="nav('bookingDetail',{id:'${b._id}'})">
             <div class="bid">${b.bookingId}</div>
             <div class="name">${b.serviceId?.name || 'Service'}</div>
             <div class="sub">📅 ${new Date(b.bookingDate).toDateString()} • ${b.timeSlot || '-'}</div>
             <div class="sub">💰 ${money(b.totalAmount)} • ${humanMode(b.serviceMode)}</div>
+            <div style="margin-top:6px">${bookingStatusBadge(b.status)}</div>
           </div>
-          ${bookingStatusBadge(b.status)}
-        </div>`).join('') : emptyState('🗓️', 'No bookings yet', 'Book your first service to see it here')}
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;border-top:1px solid var(--b);padding-top:10px">
+            <button class="btn btn-sm btn-out" onclick="event.stopPropagation();shareBooking('${b._id}')" style="flex:1;min-width:80px">📤 Share</button>
+            ${isCompleted ? `<button class="btn btn-sm" onclick="event.stopPropagation();bookAgain('${b._id}')" style="flex:1;min-width:80px">🔄 Book Again</button>` : ''}
+            ${isCompleted && isPickup ? `<button class="btn btn-sm btn-out" onclick="event.stopPropagation();rateDriverModal('${b._id}')" style="flex:1;min-width:80px">⭐ Rate Driver</button>` : ''}
+          </div>
+        </div>`;
+      }).join('') : `<div class="empty-pro">
+        <div class="ep-icon">🗓️</div>
+        <div class="ep-title">No bookings yet</div>
+        <div class="ep-msg">Apni car ki pehli service book karo, sab kuch yahan dikhega.</div>
+        <div class="ep-cta-row">
+          <button class="ep-cta" onclick="nav('booking')">Book Now</button>
+          <button class="ep-cta-secondary" onclick="nav('packages')">View Packages</button>
+        </div>
+      </div>`}
       <div class="section">${t('history')}</div>
       <div class="card">${historyList()}</div>
     </div>
@@ -752,6 +909,21 @@ const screens = {
           <div class="qlink-icon" style="background:linear-gradient(135deg,#F3E5F5,#E1BEE7);color:#7B1FA2">🤖</div>
           <div class="qlink-text"><div class="qlink-title">CarBot AI Assistant</div><div class="qlink-sub">Car ke baare me kuch bhi pucho</div></div>
           <span class="qlink-pill" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0)">NEW</span>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="openLeaderboard()">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#FFF8E1,#FFE082);color:#F57C00">🏆</div>
+          <div class="qlink-text"><div class="qlink-title">Leaderboard</div><div class="qlink-sub">Top referrers ko dekho</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('gallery')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#E0F2F1,#B2DFDB);color:#00695C">📸</div>
+          <div class="qlink-text"><div class="qlink-title">Service Gallery</div><div class="qlink-sub">Pichli services ke before/after photos</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="setBirthday()">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD0);color:#C2185B">🎂</div>
+          <div class="qlink-text"><div class="qlink-title">Birthday ${STATE.user?.birthday ? '✓' : 'Set Birthday'}</div><div class="qlink-sub">${STATE.user?.birthday ? 'Birthday me 20% off automatic' : 'Set karne par birthday me special offer milega'}</div></div>
           <span class="qlink-arrow">›</span>
         </div>
         <div class="qlink" onclick="nav('refer')">
@@ -978,8 +1150,102 @@ const screens = {
         <button class="chat-send" onclick="sendChatMessage()">➤</button>
       </div>
     </div>`;
+  },
+
+  // ===== NEW ENGAGEMENT SCREENS =====
+
+  leaderboard: () => {
+    const lb = STATE.leaderboard || [];
+    const my = STATE.myRank;
+    return `
+      ${topbar('Top Referrers', { screen: 'profile' })}
+      <div class="screen">
+        ${my ? `<div class="card" style="background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;text-align:center">
+          <div style="font-size:11px;opacity:.75;letter-spacing:1px">YOUR RANK</div>
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;margin:6px 0">#${my.rank}</div>
+          <div style="opacity:.85;font-size:13px">${my.referrals} referrals · ${my.services} services</div>
+          <span class="tier-badge tier-${my.tier}" style="margin-top:8px">${TIER_META[my.tier]?.icon} ${TIER_META[my.tier]?.label}</span>
+        </div>` : ''}
+        <div class="section">🏆 Top 20</div>
+        ${lb.length ? lb.map(u => `
+          <div class="lb-row ${my && my.rank === u.rank ? 'me' : ''}">
+            <div class="lb-rank ${u.rank === 1 ? 'gold' : u.rank === 2 ? 'silver' : u.rank === 3 ? 'bronze' : ''}">${u.rank <= 3 ? (['🥇','🥈','🥉'][u.rank-1]) : u.rank}</div>
+            <div class="lb-info">
+              <div class="lb-name">${u.name}</div>
+              <div class="lb-stat">${TIER_META[u.tier]?.icon} ${u.services} services</div>
+            </div>
+            <div class="lb-points">${u.referrals}<span style="font-size:10px;color:var(--l);font-weight:600;margin-left:2px">refs</span></div>
+          </div>`).join('') : `<div class="empty-pro"><div class="ep-icon">🏆</div><div class="ep-title">No referrals yet</div><div class="ep-msg">Be the first! Share your referral code and earn ₹100 per friend.</div><button class="ep-cta" onclick="nav('refer')">Share My Code</button></div>`}
+      </div>
+      ${tabbar('profile')}`;
+  },
+
+  gallery: () => {
+    const completed = STATE.bookings.filter(b => b.status === 'completed' && (b.gallery?.length || b.beforeAfterGallery?.length));
+    const allPics = completed.flatMap(b =>
+      [...(b.beforeAfterGallery || []), ...(b.gallery || [])].map(url => ({ url, bookingId: b.bookingId, date: b.bookingDate }))
+    );
+    return `
+      ${topbar('Service Gallery', { screen: 'profile' })}
+      <div class="screen">
+        ${allPics.length ? `
+          <div class="card">
+            <div style="font-size:13px;color:var(--l);margin-bottom:8px">${allPics.length} photo${allPics.length === 1 ? '' : 's'} from ${completed.length} service${completed.length === 1 ? '' : 's'}</div>
+          </div>
+          <div class="gallery-grid">
+            ${allPics.map((p, i) => `<div class="gallery-item" onclick="viewGalleryPic(${i})"><img class="lazy" data-src="${p.url}" alt=""></div>`).join('')}
+          </div>` :
+          `<div class="empty-pro"><div class="ep-icon">📸</div><div class="ep-title">No service photos yet</div><div class="ep-msg">Service complete hone par before/after photos yahan dikhenge.</div><button class="ep-cta" onclick="nav('booking')">Book a Service</button></div>`}
+      </div>
+      ${tabbar('profile')}`;
   }
 };
+
+let _galleryUrls = [];
+function viewGalleryPic(idx) {
+  const completed = STATE.bookings.filter(b => b.status === 'completed' && (b.gallery?.length || b.beforeAfterGallery?.length));
+  _galleryUrls = completed.flatMap(b => [...(b.beforeAfterGallery || []), ...(b.gallery || [])].map(u => u));
+  const ov = document.createElement('div');
+  ov.className = 'gallery-overlay';
+  ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
+  ov.innerHTML = `
+    <button class="go-close" onclick="this.parentElement.remove()">×</button>
+    <img src="${_galleryUrls[idx]}">
+    <div style="color:#fff;margin-top:14px;font-size:13px">${idx + 1} / ${_galleryUrls.length}</div>`;
+  document.body.appendChild(ov);
+  haptic('light');
+}
+
+function rateDriverModal(bookingId) {
+  bottomSheet('Rate your driver',
+    `<div style="text-align:center;color:var(--l);font-size:13px;margin-bottom:6px">Aapka pickup/drop kaisa raha?</div>
+    <div class="star-rating" id="starRating">
+      ${[1,2,3,4,5].map(i => `<span class="star" data-rating="${i}" onclick="setRating(${i})">★</span>`).join('')}
+    </div>
+    <textarea id="rateComment" placeholder="Comments (optional)" style="width:100%;padding:12px;border:1px solid var(--b);border-radius:10px;font-size:13px;min-height:60px;margin-bottom:12px"></textarea>
+    <button class="btn btn-gradient" onclick="submitRating('${bookingId}')">Submit Rating</button>`);
+  STATE._currentRating = 0;
+}
+
+function setRating(r) {
+  STATE._currentRating = r;
+  document.querySelectorAll('#starRating .star').forEach((s, i) => {
+    s.classList.toggle('active', i < r);
+  });
+  haptic('light');
+}
+
+async function submitRating(bookingId) {
+  if (!STATE._currentRating) return toast('Please select stars', 'warn');
+  const comment = document.getElementById('rateComment').value.trim();
+  const r = await api('/users/rate-driver', 'POST', { bookingId, rating: STATE._currentRating, comment });
+  if (r.success) {
+    toast(r.message || 'Thanks for rating!', 'success');
+    closeBottomSheet();
+  } else {
+    toast(r.message || 'Failed', 'error');
+  }
+}
 
 function render() {
   app.innerHTML = (screens[STATE.current] || screens.splash)();
@@ -987,8 +1253,10 @@ function render() {
   if (STATE.current === 'branches') {
     setTimeout(() => initBranchMap(), 100);
   }
+  // Lazy load images
+  setupLazyImages();
   // Bot FAB on main screens (not on chatbot itself, login, splash)
-  const showBot = ['home', 'accessories', 'bookings', 'profile', 'orders', 'wishlist', 'support'].includes(STATE.current);
+  const showBot = ['home', 'accessories', 'bookings', 'profile', 'orders', 'wishlist', 'support', 'leaderboard', 'gallery', 'offers'].includes(STATE.current);
   if (showBot && !document.getElementById('botFab')) {
     const fab = document.createElement('button');
     fab.id = 'botFab';
@@ -1020,6 +1288,12 @@ async function loadInitData() {
     if (c.success) STATE.coupons = c.coupons || [];
   } catch (e) {}
 
+  // Daily tip
+  try {
+    const tip = await api('/support/tip-of-day', 'GET', null, { silent: true });
+    if (tip.success) STATE.tipOfDay = tip.tip;
+  } catch (e) {}
+
   if (STATE.token) {
     const [me, bookings, orders, history, reminders, rewards, wishlist, recs, notif] = await Promise.all([
       api('/users/me'),
@@ -1034,6 +1308,17 @@ async function loadInitData() {
     ]);
     STATE.notifications = notif?.notifications || [];
     STATE.notifUnread = notif?.unread || 0;
+    // Touch streak (silent) — once per session
+    const lastStreak = sessionStorage.getItem('streakTouched');
+    const today = new Date().toDateString();
+    if (lastStreak !== today) {
+      api('/users/streak', 'POST', null, { silent: true }).then(s => {
+        if (s.success) {
+          if (s.bonus) toast(`🔥 ${s.streakDays}-day streak! +${s.bonus} bonus points!`, 'success');
+          sessionStorage.setItem('streakTouched', today);
+        }
+      });
+    }
     if (me.success) {
       STATE.user = me.user;
       if (me.user?.themePreference && !localStorage.getItem('theme')) {
@@ -1513,6 +1798,78 @@ async function loadChatSuggestions() {
     const r = await api('/chatbot/suggestions', 'GET', null, { silent: true });
     if (r.success) STATE.chatSuggestions = r.suggestions || [];
   } catch (e) {}
+}
+
+// ===== Leaderboard =====
+async function openLeaderboard() {
+  if (!STATE.token) return toast('Login first to see your rank', 'warn');
+  nav('leaderboard');
+  const r = await api('/users/leaderboard', 'GET', null, { silent: true });
+  if (r.success) {
+    STATE.leaderboard = r.leaderboard || [];
+    STATE.myRank = r.myRank;
+    render();
+  }
+}
+
+// ===== Set birthday =====
+function setBirthday() {
+  if (!STATE.token) return toast('Login first to set birthday', 'warn');
+  const today = new Date().toISOString().slice(0, 10);
+  bottomSheet('Set Your Birthday',
+    `<div style="color:var(--l);font-size:13px;margin-bottom:12px">Birthday me 20% discount + ₹100 wallet bonus milega.</div>
+    <input type="date" id="bdayInput" value="${STATE.user?.birthday ? STATE.user.birthday.slice(0,10) : ''}" max="${today}" style="width:100%;padding:12px;border:1.5px solid var(--b);border-radius:10px;margin-bottom:12px">
+    <button class="btn btn-gradient" onclick="saveBirthday()">Save</button>`);
+}
+
+async function saveBirthday() {
+  const val = document.getElementById('bdayInput').value;
+  if (!val) return toast('Pick a date', 'warn');
+  const r = await api('/users/birthday', 'POST', { birthday: val });
+  if (r.success) {
+    STATE.user.birthday = r.birthday;
+    save();
+    closeBottomSheet();
+    toast('🎂 Birthday saved! Get ready for discount on your special day', 'success');
+    render();
+  }
+}
+
+// ===== Share booking via WhatsApp / Native =====
+async function shareBooking(bookingId) {
+  const b = STATE.bookings.find(x => x._id === bookingId);
+  if (!b) return;
+  const text = `My VS Services car booking confirmed!\n\n` +
+    `🆔 ${b.bookingId}\n` +
+    `🔧 ${b.serviceId?.name || 'Service'}\n` +
+    `🚗 ${b.car?.carNumber || ''}\n` +
+    `📅 ${new Date(b.bookingDate).toDateString()} ${b.timeSlot || ''}\n` +
+    `💰 ₹${b.totalAmount}\n\n` +
+    `Track at https://vs-services-api.onrender.com`;
+  const ok = await nativeShare('VS Services Booking', text);
+  if (!ok) {
+    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+  }
+  haptic('light');
+}
+
+// ===== Smart "Book Again" =====
+function bookAgain(bookingId) {
+  const b = STATE.bookings.find(x => x._id === bookingId);
+  if (!b) return;
+  STATE.bookingForm = {
+    serviceId: b.serviceId?._id || b.serviceId,
+    brand: b.car?.brand,
+    model: b.car?.model,
+    carNumber: b.car?.carNumber,
+    fuelType: b.car?.fuelType,
+    year: b.car?.year,
+    rcNumber: b.car?.rcNumber,
+    mode: b.serviceMode || 'at_garage',
+    pay: b.paymentMode === 'online' ? 'online' : 'pay_on_service'
+  };
+  toast('Last booking details loaded', 'success');
+  nav('booking');
 }
 
 // ========== Map (Leaflet + OpenStreetMap - 100% free) ==========
