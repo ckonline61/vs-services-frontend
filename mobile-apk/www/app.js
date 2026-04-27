@@ -252,15 +252,34 @@ function humanMode(mode) {
   }[mode] || mode;
 }
 
+function _captureScroll() {
+  // .screen is the scrollable container inside each rendered screen
+  const el = document.querySelector('.screen, .chat-body, #adminChatBody');
+  return el ? el.scrollTop : 0;
+}
+
+function _restoreScroll(top) {
+  // Wait for the new render to paint, then restore
+  setTimeout(() => {
+    const el = document.querySelector('.screen, .chat-body, #adminChatBody');
+    if (el) el.scrollTop = top || 0;
+  }, 30);
+}
+
 function nav(screen, data) {
   if (STATE.current && STATE.current !== screen && STATE.current !== 'splash') {
-    STATE.navStack.push({ screen: STATE.current, data: STATE.data });
+    STATE.navStack.push({
+      screen: STATE.current,
+      data: STATE.data,
+      scrollTop: _captureScroll()
+    });
     if (STATE.navStack.length > 30) STATE.navStack.shift();
   }
   STATE.current = screen;
   STATE.data = data || {};
   try { history.pushState({ screen }, '', '#' + screen); } catch (e) {}
   render();
+  _restoreScroll(0); // forward navigation = top
 }
 
 function navBack() {
@@ -269,6 +288,7 @@ function navBack() {
     STATE.current = prev.screen;
     STATE.data = prev.data || {};
     render();
+    _restoreScroll(prev.scrollTop || 0); // restore where user was
     return true;
   }
   // top-level tabs: jump to home if not already
@@ -276,6 +296,7 @@ function navBack() {
     STATE.current = 'home';
     STATE.data = {};
     render();
+    _restoreScroll(0);
     return true;
   }
   return false; // allow app to exit

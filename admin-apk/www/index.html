@@ -258,8 +258,10 @@ input:checked+.slider::before{transform:translateX(18px)}
 .bc-scanline{position:absolute;left:5%;right:5%;height:2px;background:linear-gradient(90deg,transparent,#FF4D6D,transparent);top:50%;animation:scanmove 2s ease-in-out infinite}
 @keyframes scanmove{0%,100%{top:30%}50%{top:70%}}
 
-/* Map for admin */
-.admin-map{width:100%;height:340px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);position:relative}
+/* Map for admin - isolated stacking context */
+.admin-map{width:100%;height:340px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow);position:relative;isolation:isolate;z-index:0;contain:layout paint}
+.leaflet-container{z-index:0 !important}
+.leaflet-pane,.leaflet-top,.leaflet-bottom,.leaflet-control{z-index:1 !important}
 .admin-map.tall{height:480px}
 .map-action-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .map-action-row .btn{flex:1;min-width:120px}
@@ -621,7 +623,26 @@ function enterApp(){
 // ============ Navigation ============
 const TAB_TITLES={dash:'Dashboard',bookings:'Bookings',orders:'Orders',services:'Services',products:'Products',team:'Team',customers:'Customers',coupons:'Coupons',more:'More',map:'Live Map',chats:'Customer Chats',chatDetail:'Chat',report:'Monthly Report',barcode:'Barcode Scanner',gps:'GPS Tracking'};
 
+// Per-tab scroll memory
+const TAB_SCROLL = {};
+function captureTabScroll(tab) {
+  const el = document.getElementById('tab-' + tab);
+  if (el) {
+    const main = document.querySelector('.main');
+    TAB_SCROLL[tab] = main ? main.scrollTop : window.scrollY;
+  }
+}
+function restoreTabScroll(tab) {
+  setTimeout(() => {
+    const main = document.querySelector('.main');
+    if (main) main.scrollTop = TAB_SCROLL[tab] || 0;
+    else window.scrollTo(0, TAB_SCROLL[tab] || 0);
+  }, 30);
+}
+
 function navTab(tab, fresh){
+  // Save previous tab's scroll
+  if (STATE.currentTab && STATE.currentTab !== tab) captureTabScroll(STATE.currentTab);
   if(!fresh && STATE.currentTab !== tab) STATE.navStack.push(tab);
   if(STATE.navStack.length>30) STATE.navStack.shift();
   STATE.currentTab=tab;
@@ -632,12 +653,16 @@ function navTab(tab, fresh){
   document.getElementById('pageTitle').textContent=TAB_TITLES[tab]||'';
   try{history.pushState({tab},'','#'+tab)}catch(e){}
   loadTab(tab);
+  // Forward navigation = top, except returning to a remembered tab
+  if (TAB_SCROLL[tab]) restoreTabScroll(tab);
+  else window.scrollTo(0, 0);
 }
 
 function adminBack(){
   const modal=document.querySelector('.modal-bg');
   if(modal){modal.remove();return true;}
   if(STATE.navStack.length>1){
+    captureTabScroll(STATE.currentTab);
     STATE.navStack.pop();
     const prev=STATE.navStack[STATE.navStack.length-1];
     STATE.currentTab=prev;
@@ -647,6 +672,7 @@ function adminBack(){
     document.getElementById('nav-'+prev)?.classList.add('active');
     document.getElementById('pageTitle').textContent=TAB_TITLES[prev]||'';
     loadTab(prev);
+    restoreTabScroll(prev);
     return true;
   }
   return false;
