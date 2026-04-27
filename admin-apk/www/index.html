@@ -1387,15 +1387,26 @@ function fitAllMarkers() {
 }
 
 function locateAdminMe() {
-  if (!_adminMap || !navigator.geolocation) return toast('Location not supported','error');
-  toast('Locating...');
+  if (!_adminMap) return toast('Open the map first', 'error');
+  if (!navigator.geolocation) return toast('Geolocation not available in WebView','error');
+  toast('Locating... please grant GPS if prompted', 'info');
   navigator.geolocation.getCurrentPosition((pos) => {
-    const { latitude, longitude } = pos.coords;
+    const { latitude, longitude, accuracy } = pos.coords;
     if (_adminUserMarker) _adminUserMarker.remove();
     _adminUserMarker = L.marker([latitude, longitude], { icon: makeAdminIcon('👤', 'urgent') })
-      .addTo(_adminMap).bindPopup('You are here').openPopup();
-    _adminMap.setView([latitude, longitude], 13, { animate: true });
-  }, (err) => toast('Location error','error'), { enableHighAccuracy: true, timeout: 10000 });
+      .addTo(_adminMap).bindPopup(`You are here<br>±${Math.round(accuracy)}m`).openPopup();
+    // Add accuracy circle
+    L.circle([latitude, longitude], { radius: accuracy, color: '#FF4D6D', fillOpacity: 0.10, weight: 1 }).addTo(_adminMap);
+    _adminMap.setView([latitude, longitude], 15, { animate: true });
+    toast('📍 Location found', 'success');
+  }, (err) => {
+    const msgs = {
+      1: 'Permission denied. Settings → Apps → VS Admin → Permissions → enable Location',
+      2: 'Position unavailable. Turn on GPS / try outdoors.',
+      3: 'GPS timeout. Move to open area and retry.'
+    };
+    toast(msgs[err.code] || 'Location error: ' + err.message, 'error');
+  }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
 }
 
 // View single booking on a popup map
@@ -1651,10 +1662,11 @@ function pingLocation() {
   navigator.geolocation.getCurrentPosition(async (pos) => {
     const { latitude, longitude, accuracy } = pos.coords;
     const r = await req('/users/staff-location', 'POST', { lat: latitude, lng: longitude, accuracy });
-    if (r.success) document.getElementById('gpsLast').textContent = `Last sent: ${new Date().toLocaleTimeString()}`;
+    if (r.success) document.getElementById('gpsLast').textContent = `📡 Last sent: ${new Date().toLocaleTimeString()} · ±${Math.round(accuracy)}m`;
   }, (err) => {
-    document.getElementById('gpsLast').textContent = 'Error: ' + err.message;
-  }, { enableHighAccuracy: true, timeout: 30000 });
+    const msgs = { 1: 'Permission denied', 2: 'GPS unavailable', 3: 'Timeout' };
+    document.getElementById('gpsLast').textContent = '⚠️ ' + (msgs[err.code] || err.message);
+  }, { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 });
 }
 
 let _staffMap;
