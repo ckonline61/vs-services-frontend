@@ -14,6 +14,8 @@
     "@capacitor/android": "^8.3.1",
     "@capacitor/app": "latest",
     "@capacitor/cli": "^8.3.1",
-    "@capacitor/core": "^8.3.1"
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/local-notifications": "latest",
+    "@capacitor/haptics": "latest"
   }
 }
