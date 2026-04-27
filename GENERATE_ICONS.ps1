@@ -1,15 +1,38 @@
 # =====================================================================
-# VS Services - Generate Android App Icons from car logo
+# VS Services - Generate Android App Icons from logo
 # Run from project root:  powershell -ExecutionPolicy Bypass -File GENERATE_ICONS.ps1
+#
+# IMPORTANT: place your logo at:
+#   mobile-apk\www\assets\vs-services-logo.png
+# This script uses that one file for BOTH apps.
+# Best results: square image (1080x1080+), with logo centered.
+# If your logo already has its own background (like the new VS SERVICES one),
+# the script uses it as-is. Otherwise it adds a navy bg.
 # =====================================================================
 
 Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName System.Drawing.Imaging
 
 $source = Join-Path $PSScriptRoot "mobile-apk\www\assets\vs-services-logo.png"
 if (-not (Test-Path $source)) {
     Write-Host "Source logo not found: $source" -ForegroundColor Red
+    Write-Host "Save your VS SERVICES logo image as: $source" -ForegroundColor Yellow
     exit 1
 }
+
+# Detect: does the source already have a colored (non-transparent) background?
+$logoForDetection = [System.Drawing.Image]::FromFile($source)
+$detectBmp = New-Object System.Drawing.Bitmap($logoForDetection)
+# Check corners — if alpha > 200 on all 4, treat as having own background
+$pxTL = $detectBmp.GetPixel(2, 2)
+$pxTR = $detectBmp.GetPixel($detectBmp.Width - 3, 2)
+$pxBL = $detectBmp.GetPixel(2, $detectBmp.Height - 3)
+$pxBR = $detectBmp.GetPixel($detectBmp.Width - 3, $detectBmp.Height - 3)
+$hasOwnBg = ($pxTL.A -gt 200) -and ($pxTR.A -gt 200) -and ($pxBL.A -gt 200) -and ($pxBR.A -gt 200)
+$detectBmp.Dispose()
+$logoForDetection.Dispose()
+
+Write-Host "Source has own background: $hasOwnBg" -ForegroundColor Cyan
 
 $targets = @(
     @{ app = "mobile-apk"; bg = [System.Drawing.Color]::FromArgb(255,10,25,51) },   # navy
@@ -52,12 +75,18 @@ foreach ($t in $targets) {
         $g = [System.Drawing.Graphics]::FromImage($bmp)
         $g.SmoothingMode = 'AntiAlias'
         $g.InterpolationMode = 'HighQualityBicubic'
-        $g.Clear($t.bg)
+        $g.PixelOffsetMode = 'HighQuality'
 
-        # Logo at 80% of canvas, centered
-        $logoSize = [int]($d.size * 0.80)
-        $offset = [int](($d.size - $logoSize) / 2)
-        $g.DrawImage($logo, $offset, $offset, $logoSize, $logoSize)
+        if ($hasOwnBg) {
+            # Use the logo image as-is (it has its own bg)
+            $g.DrawImage($logo, 0, 0, $d.size, $d.size)
+        } else {
+            $g.Clear($t.bg)
+            # Logo at 80% of canvas, centered
+            $logoSize = [int]($d.size * 0.80)
+            $offset = [int](($d.size - $logoSize) / 2)
+            $g.DrawImage($logo, $offset, $offset, $logoSize, $logoSize)
+        }
         $g.Dispose()
 
         $bmp.Save((Join-Path $folder "ic_launcher.png"), [System.Drawing.Imaging.ImageFormat]::Png)
@@ -66,7 +95,7 @@ foreach ($t in $targets) {
         Write-Host "  $($d.name) -> $($d.size)x$($d.size)"
     }
 
-    # ---- Adaptive icon foreground (transparent, larger logo) ----
+    # ---- Adaptive icon foreground (transparent center, larger logo with safe-zone) ----
     foreach ($d in $fgDensities) {
         $folder = Join-Path $resPath $d.name
         if (-not (Test-Path $folder)) { New-Item -ItemType Directory -Path $folder | Out-Null }
@@ -75,10 +104,11 @@ foreach ($t in $targets) {
         $g = [System.Drawing.Graphics]::FromImage($bmp)
         $g.SmoothingMode = 'AntiAlias'
         $g.InterpolationMode = 'HighQualityBicubic'
+        $g.PixelOffsetMode = 'HighQuality'
         $g.Clear([System.Drawing.Color]::Transparent)
 
-        # foreground logo at ~55% of canvas (safe zone)
-        $logoSize = [int]($d.size * 0.55)
+        # foreground logo at ~66% of canvas (safe zone for masked icons)
+        $logoSize = [int]($d.size * 0.66)
         $offset = [int](($d.size - $logoSize) / 2)
         $g.DrawImage($logo, $offset, $offset, $logoSize, $logoSize)
         $g.Dispose()
@@ -116,4 +146,6 @@ foreach ($t in $targets) {
     Write-Host "  Adaptive icon configured ($hex)" -ForegroundColor Green
 }
 
-Write-Host "`nDone! Now run BUILD_APK.bat / BUILD_ADMIN_APK.bat to rebuild." -ForegroundColor Green
+Write-Host "`nAll done! Now rebuild the APK:" -ForegroundColor Green
+Write-Host "  cd mobile-apk\android && gradlew.bat assembleDebug" -ForegroundColor White
+Write-Host "  cd admin-apk\android && gradlew.bat assembleDebug" -ForegroundColor White

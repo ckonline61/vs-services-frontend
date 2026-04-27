@@ -316,17 +316,23 @@ input:checked+.slider::before{transform:translateX(18px)}
   <div class="topbar">
     <div class="brand">VS Admin</div>
     <div class="page-title" id="pageTitle">Dashboard</div>
-    <button class="top-action" onclick="doLogout()" title="Logout">⏻</button>
+    <button class="top-action" onclick="doLogout()" title="Logout" aria-label="Logout">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
   </div>
 
   <div class="main">
     <!-- DASHBOARD -->
     <div id="tab-dash" class="tab-pane">
       <div class="stats-grid">
-        <div class="stat gradient"><div class="lbl">Total Bookings</div><div class="val" id="s-bookings">0</div></div>
-        <div class="stat warn"><div class="lbl">Pending</div><div class="val" id="s-pending">0</div></div>
-        <div class="stat"><div class="lbl">Total Orders</div><div class="val" id="s-orders">0</div></div>
-        <div class="stat"><div class="lbl">Revenue</div><div class="val" id="s-revenue">₹0</div></div>
+        <div class="stat gradient" onclick="goBookingsFilter('all')" style="cursor:pointer"><div class="lbl">Total Bookings</div><div class="val" id="s-bookings">0</div></div>
+        <div class="stat warn" onclick="goBookingsFilter('pending')" style="cursor:pointer"><div class="lbl">Pending</div><div class="val" id="s-pending">0</div></div>
+        <div class="stat" onclick="navTab('orders')" style="cursor:pointer"><div class="lbl">Total Orders</div><div class="val" id="s-orders">0</div></div>
+        <div class="stat" onclick="navTab('report')" style="cursor:pointer"><div class="lbl">Revenue</div><div class="val" id="s-revenue">₹0</div></div>
       </div>
       <div class="card-section-title">Recent Bookings</div>
       <div id="recentList" class="list"></div>
@@ -773,10 +779,18 @@ async function loadBookings(){
   renderBookings();
 }
 
+function goBookingsFilter(filter){
+  // 'pending' = group of statuses: booked, confirmed, assigned, in_progress, pickup_scheduled
+  STATE.bookingFilter = filter === 'pending' ? '__pending__' : filter;
+  navTab('bookings');
+}
+
 function renderBookingFilters(){
   const counts={all:STATE.bookings.length};
   BOOKING_STATUSES.forEach(s=>counts[s]=STATE.bookings.filter(b=>b.status===s).length);
-  const filters=[['all','All']].concat(BOOKING_STATUSES.map(s=>[s,s.replace(/_/g,' ')]));
+  const pendingStatuses=['booked','confirmed','assigned','in_progress','pickup_scheduled'];
+  counts['__pending__']=STATE.bookings.filter(b=>pendingStatuses.includes(b.status)).length;
+  const filters=[['all','All'],['__pending__','⏳ Pending']].concat(BOOKING_STATUSES.map(s=>[s,s.replace(/_/g,' ')]));
   document.getElementById('bkSubtabs').innerHTML=filters.map(([k,l])=>`
     <div class="subtab ${STATE.bookingFilter===k?'active':''}" onclick="STATE.bookingFilter='${k}';renderBookings();renderBookingFilters()">${l} <span style="opacity:.7">(${counts[k]||0})</span></div>`).join('');
 }
@@ -786,7 +800,10 @@ function filterBookings(){STATE.bookingSearch=document.getElementById('bkSearch'
 function renderBookings(){
   const list=document.getElementById('bookingsList');
   let items=STATE.bookings;
-  if(STATE.bookingFilter!=='all') items=items.filter(x=>x.status===STATE.bookingFilter);
+  if(STATE.bookingFilter==='__pending__'){
+    const pendingStatuses=['booked','confirmed','assigned','in_progress','pickup_scheduled'];
+    items=items.filter(x=>pendingStatuses.includes(x.status));
+  } else if(STATE.bookingFilter!=='all') items=items.filter(x=>x.status===STATE.bookingFilter);
   if(STATE.bookingSearch){
     const q=STATE.bookingSearch;
     items=items.filter(x=>(x.bookingId||'').toLowerCase().includes(q)||(x.userId?.name||'').toLowerCase().includes(q)||(x.userId?.mobile||'').includes(q));

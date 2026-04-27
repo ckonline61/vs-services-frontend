@@ -1451,6 +1451,8 @@ async function registerGuest() {
   STATE.user = response.user;
   save();
   await loadInitData();
+  // Start push polling after login
+  requestMobileNotifPermission().then(g => { if (g) startMobilePushPolling(); });
   nav('home');
 }
 
@@ -1817,6 +1819,80 @@ document.addEventListener('input', (e) => {
     if (v !== el.value) el.value = v;
   }
 }, true);
+
+// ========== Push Notifications (Local, Free) ==========
+const _LN = window.Capacitor?.Plugins?.LocalNotifications;
+let _notifPoller = null;
+let _lastNotifId = localStorage.getItem('lastNotifId') || '';
+
+async function requestMobileNotifPermission() {
+  if (_LN) {
+    try { const p = await _LN.requestPermissions(); return p.display === 'granted'; } catch(e){}
+  }
+  if ('Notification' in window) {
+    if (Notification.permission === 'default') return (await Notification.requestPermission()) === 'granted';
+    return Notification.permission === 'granted';
+  }
+  return false;
+}
+
+function fireMobileNotif(title, body, link) {
+  if (_LN) {
+    try {
+      _LN.schedule({
+        notifications: [{
+          id: Date.now() % 2147483647,
+          title, body,
+          smallIcon: 'ic_launcher',
+          extra: { link },
+          schedule: { at: new Date(Date.now() + 100) }
+        }]
+      });
+    } catch(e){}
+  } else if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body });
+  }
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+}
+
+async function pollMobileNotifications() {
+  if (!STATE.token) return;
+  try {
+    const r = await api('/notifications', 'GET', null, { silent: true });
+    if (!r.success) return;
+    const all = r.notifications || [];
+    STATE.notifications = all;
+    STATE.notifUnread = r.unread || 0;
+
+    // Find notifications newer than last seen
+    const newOnes = all.filter(n => !n.isRead && (!_lastNotifId || n._id > _lastNotifId));
+    if (newOnes.length && _lastNotifId) {
+      // Show first new notification natively
+      const n = newOnes[0];
+      fireMobileNotif(n.title, n.body, n.link);
+    }
+    if (all.length) _lastNotifId = all[0]._id;
+    localStorage.setItem('lastNotifId', _lastNotifId);
+
+    // Update bell badge if visible
+    if (STATE.current === 'home' || STATE.current === 'profile') render();
+  } catch(e){}
+}
+
+function startMobilePushPolling() {
+  if (_notifPoller) clearInterval(_notifPoller);
+  setTimeout(pollMobileNotifications, 2000);
+  _notifPoller = setInterval(pollMobileNotifications, 30000);
+}
+
+if (_LN) {
+  _LN.addListener('localNotificationActionPerformed', (event) => {
+    const link = event.notification?.extra?.link;
+    if (link === 'offers') nav('offers');
+    else if (link?.startsWith('booking:')) nav('bookings');
+    else nav('notifications');
+  });
+}
 
 // ========== AI Chatbot ==========
 function escapeHtml(s) {
@@ -2337,4 +2413,14 @@ async function openNotifications() {
   STATE.data = {};
   try { history.replaceState({ screen: 'home' }, '', '#home'); } catch (e) {}
   render();
+  // Start push polling — request permission first if logged in
+  if (STATE.token) {
+    requestMobileNotifPermission().then(granted => {
+      if (granted) startMobilePushPolling();
+    });
+  }
 })();
+
+// Also start push when user logs in mid-session
+const _origRegisterGuest = window.registerGuest;
+// (functions are top-level — we'll wrap them after they're defined if needed)
