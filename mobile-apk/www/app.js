@@ -1867,16 +1867,34 @@ async function pollMobileNotifications() {
     // Find notifications newer than last seen
     const newOnes = all.filter(n => !n.isRead && (!_lastNotifId || n._id > _lastNotifId));
     if (newOnes.length && _lastNotifId) {
-      // Show first new notification natively
       const n = newOnes[0];
       fireMobileNotif(n.title, n.body, n.link);
     }
     if (all.length) _lastNotifId = all[0]._id;
     localStorage.setItem('lastNotifId', _lastNotifId);
 
-    // Update bell badge if visible
-    if (STATE.current === 'home' || STATE.current === 'profile') render();
+    // Update only the bell badge in topbar without full re-render (avoids screen flicker)
+    updateBellBadge();
   } catch(e){}
+}
+
+function updateBellBadge() {
+  const dot = document.querySelector('.tb-icon-btn .tb-dot');
+  const btn = document.querySelector('.tb-icon-btn');
+  if (!btn) return;
+  const count = STATE.notifUnread || 0;
+  if (count > 0) {
+    if (dot) {
+      dot.textContent = count > 9 ? '9+' : count;
+    } else {
+      const span = document.createElement('span');
+      span.className = 'tb-dot';
+      span.textContent = count > 9 ? '9+' : count;
+      btn.appendChild(span);
+    }
+  } else if (dot) {
+    dot.remove();
+  }
 }
 
 function startMobilePushPolling() {

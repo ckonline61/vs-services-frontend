@@ -559,8 +559,9 @@ function toast(msg, type='success'){
   document.body.appendChild(t);setTimeout(()=>t.remove(),2800);
 }
 
-async function req(path, method='GET', body){
-  _inflight++; if(_inflight===1) showLoader();
+async function req(path, method='GET', body, opts={}){
+  const showSpin = opts.silent !== true;
+  if(showSpin){ _inflight++; if(_inflight===1) showLoader(); }
   try{
     const res=await fetch(API+path,{
       method,
@@ -569,7 +570,7 @@ async function req(path, method='GET', body){
     });
     return await res.json();
   }catch(e){return{success:false,message:'Network error: '+e.message}}
-  finally{_inflight=Math.max(0,_inflight-1);if(_inflight===0)hideLoader();}
+  finally{ if(showSpin){ _inflight=Math.max(0,_inflight-1);if(_inflight===0)hideLoader(); } }
 }
 
 function fmtMoney(n){return '₹' + (n||0).toLocaleString('en-IN');}
@@ -631,11 +632,11 @@ function enterApp(){
       console.warn('[notify] permission denied — notifications disabled');
     }
   });
-  // Background chat polling for unread badge
+  // Background chat polling for unread badge (silent — no spinner)
   setInterval(async () => {
     if (!TOKEN) return;
     try {
-      const r = await req('/chat/all');
+      const r = await req('/chat/all', 'GET', null, { silent: true });
       if (r.success) { STATE.chats = r.chats || []; updateChatBadge(); }
     } catch(e){}
   }, 30000);
@@ -1520,9 +1521,7 @@ async function openChat(customerId, name, mobile) {
   if (_chatPoller) clearInterval(_chatPoller);
   _chatPoller = setInterval(async () => {
     if (STATE.currentTab !== 'chatDetail' || !_activeChatCustomer) return;
-    const last = STATE.chatMessages[STATE.chatMessages.length - 1];
-    const since = last ? new Date(last.createdAt).getTime() : 0;
-    const r = await req('/chat/with/' + customerId);
+    const r = await req('/chat/with/' + customerId, 'GET', null, { silent: true });
     if (r.success && r.messages?.length > STATE.chatMessages.length) {
       STATE.chatMessages = r.messages;
       renderChatDetail();
@@ -1661,7 +1660,7 @@ function toggleGPS(on) {
 function pingLocation() {
   navigator.geolocation.getCurrentPosition(async (pos) => {
     const { latitude, longitude, accuracy } = pos.coords;
-    const r = await req('/users/staff-location', 'POST', { lat: latitude, lng: longitude, accuracy });
+    const r = await req('/users/staff-location', 'POST', { lat: latitude, lng: longitude, accuracy }, { silent: true });
     if (r.success) document.getElementById('gpsLast').textContent = `📡 Last sent: ${new Date().toLocaleTimeString()} · ±${Math.round(accuracy)}m`;
   }, (err) => {
     const msgs = { 1: 'Permission denied', 2: 'GPS unavailable', 3: 'Timeout' };
@@ -1836,7 +1835,7 @@ async function fireNativeNotification(title, body, extra = {}) {
 async function pollAdminFeed() {
   if (!TOKEN) return;
   try {
-    const r = await req(`/users/admin-feed?since=${_lastFeedTs}`);
+    const r = await req(`/users/admin-feed?since=${_lastFeedTs}`, 'GET', null, { silent: true });
     if (!r.success) return;
     let count = 0;
     let firstNotif = null;
