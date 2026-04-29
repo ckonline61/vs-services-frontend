@@ -439,6 +439,39 @@ const TIER_META = {
   platinum: { icon: '💎', label: 'Platinum', next: null,       needed: 0,  color: '#A8B5C9' }
 };
 
+const CAR_CATALOG = {
+  'Maruti Suzuki': ['Alto 800','Alto K10','S-Presso','Celerio','Wagon R','Ignis','Swift','Baleno','Dzire','Fronx','Brezza','Ertiga','XL6','Ciaz','Jimny','Grand Vitara','Eeco','Omni','Ritz','A-Star','Zen Estilo','SX4','S-Cross','Vitara Brezza'],
+  Hyundai: ['Santro','Eon','Grand i10','Grand i10 Nios','i10','i20','i20 N Line','Aura','Xcent','Verna','Venue','Venue N Line','Creta','Alcazar','Tucson','Elantra','Kona Electric','Exter','Accent','Getz','Sonata'],
+  Tata: ['Nano','Tiago','Tigor','Altroz','Punch','Nexon','Nexon EV','Harrier','Safari','Curvv','Curvv EV','Indica','Indigo','Zest','Bolt','Hexa','Aria','Sumo','Vista','Manza'],
+  Mahindra: ['Bolero','Bolero Neo','Scorpio','Scorpio N','XUV300','XUV400','XUV500','XUV700','Thar','Thar Roxx','Marazzo','KUV100','TUV300','Quanto','Xylo','Verito','Alturas G4','BE 6','XEV 9e'],
+  Honda: ['City','City iVTEC','City iDTEC','City ZX','Amaze','Jazz','Brio','Civic','Accord','Accord Hybrid','WR-V','BR-V','CR-V','Mobilio','Elevate'],
+  Toyota: ['Glanza','Urban Cruiser','Urban Cruiser Hyryder','Innova','Innova Crysta','Innova Hycross','Fortuner','Camry','Corolla Altis','Etios','Etios Liva','Yaris','Vellfire','Hilux','Land Cruiser','Qualis'],
+  Kia: ['Sonet','Seltos','Carens','Carnival','EV6','EV9','Syros'],
+  Renault: ['Kwid','Triber','Kiger','Duster','Lodgy','Captur','Scala','Fluence','Pulse'],
+  Nissan: ['Magnite','Micra','Sunny','Terrano','Kicks','Evalia','Teana','X-Trail'],
+  Skoda: ['Kushaq','Slavia','Rapid','Octavia','Superb','Kodiaq','Fabia','Yeti','Laura'],
+  Volkswagen: ['Polo','Vento','Virtus','Taigun','Tiguan','Jetta','Ameo','Passat','Beetle'],
+  MG: ['Hector','Hector Plus','Astor','Gloster','ZS EV','Comet EV','Windsor EV'],
+  Jeep: ['Compass','Meridian','Wrangler','Grand Cherokee','Renegade'],
+  Ford: ['Figo','Aspire','Freestyle','EcoSport','Endeavour','Fiesta','Classic','Ikon','Mondeo'],
+  Chevrolet: ['Beat','Spark','Sail','Enjoy','Tavera','Cruze','Optra','Aveo','Captiva'],
+  Fiat: ['Punto','Linea','Avventura','Urban Cross','Palio','Uno'],
+  Datsun: ['Redi-Go','Go','Go Plus'],
+  Citroen: ['C3','eC3','C3 Aircross','C5 Aircross','Basalt'],
+  Isuzu: ['D-Max','V-Cross','MU-X','S-Cab'],
+  'Mercedes-Benz': ['A-Class','B-Class','C-Class','E-Class','S-Class','CLA','GLA','GLB','GLC','GLE','GLS','G-Class','AMG GT'],
+  BMW: ['1 Series','2 Series','3 Series','3 Series GT','5 Series','5 Series GT','6 Series','6 Series GT','7 Series','X1','X3','X4','X5','X6','X7','Z4','M3','M5'],
+  Audi: ['A3','A4','A6','A8','Q2','Q3','Q5','Q7','Q8','TT','RS5','e-tron'],
+  Volvo: ['S60','S90','V40','XC40','XC60','XC90','C40 Recharge','EX40'],
+  'Land Rover': ['Discovery Sport','Discovery','Defender','Range Rover Evoque','Range Rover Velar','Range Rover Sport','Range Rover'],
+  Jaguar: ['XE','XF','XJ','F-Pace','E-Pace','F-Type','I-Pace'],
+  Lexus: ['ES','NX','RX','LS','LX','LM'],
+  Porsche: ['Macan','Cayenne','Panamera','911','718','Taycan'],
+  Mini: ['Cooper','Cooper S','Countryman','Clubman','Convertible'],
+  Force: ['Gurkha','Trax','Traveller'],
+  Mitsubishi: ['Pajero','Pajero Sport','Outlander','Lancer','Cedia','Montero']
+};
+
 // ========== Haptic feedback (Vibration API) ==========
 function haptic(pattern = 'light') {
   if (!navigator.vibrate) return;
@@ -516,6 +549,68 @@ function bottomSheet(title, html, onClose) {
 }
 function closeBottomSheet() {
   document.getElementById('bsheetWrap')?.remove();
+}
+
+function vehicleInitials(brand, model = '') {
+  return String(brand || 'VS').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'VS';
+}
+
+function vehicleSummary(brand, model) {
+  return [brand, model].filter(Boolean).join(' ');
+}
+
+function applyVehicleSelection(target, brand, model) {
+  if (target === 'profile') {
+    if ($('carBrand')) $('carBrand').value = brand;
+    if ($('carModel')) $('carModel').value = model;
+  } else {
+    STATE.bookingForm.brand = brand;
+    STATE.bookingForm.model = model;
+    render();
+  }
+  closeBottomSheet();
+  toast('Vehicle selected', 'success');
+}
+
+function openVehiclePicker(target = 'booking', selectedBrand = '') {
+  document.getElementById('bsheetWrap')?.remove();
+  const brands = Object.keys(CAR_CATALOG);
+  if (!selectedBrand) {
+    bottomSheet('Select Your Vehicle', `
+      <div class="vehicle-search-wrap">
+        <input id="vehicleBrandSearch" placeholder="Search brand..." oninput="filterVehicleBrands('${target}')">
+      </div>
+      <div id="vehicleBrandGrid" class="vehicle-brand-grid">
+        ${brands.map(brand => `<button class="vehicle-brand-tile" onclick="openVehiclePicker('${target}','${brand.replace(/'/g, "\\'")}')">
+          <span class="vehicle-logo">${vehicleInitials(brand)}</span>
+          <b>${brand}</b>
+        </button>`).join('')}
+      </div>
+    `);
+    return;
+  }
+  const models = CAR_CATALOG[selectedBrand] || [];
+  bottomSheet('Select Model', `
+    <div class="vehicle-sheet-kicker">${selectedBrand}</div>
+    <button class="vehicle-back" onclick="openVehiclePicker('${target}')">Back to brands</button>
+    <div class="vehicle-model-grid">
+      ${models.map(model => `<button class="vehicle-model-tile" onclick="applyVehicleSelection('${target}','${selectedBrand.replace(/'/g, "\\'")}','${model.replace(/'/g, "\\'")}')">
+        <span class="vehicle-car-art">${vehicleInitials(selectedBrand, model)}</span>
+        <b>${model}</b>
+      </button>`).join('')}
+    </div>
+  `);
+}
+
+function filterVehicleBrands(target = 'booking') {
+  const q = ($('vehicleBrandSearch')?.value || '').toLowerCase().trim();
+  const grid = $('vehicleBrandGrid');
+  if (!grid) return;
+  const brands = Object.keys(CAR_CATALOG).filter(brand => !q || brand.toLowerCase().includes(q));
+  grid.innerHTML = brands.map(brand => `<button class="vehicle-brand-tile" onclick="openVehiclePicker('${target}','${brand.replace(/'/g, "\\'")}')">
+    <span class="vehicle-logo">${vehicleInitials(brand)}</span>
+    <b>${brand}</b>
+  </button>`).join('') || '<div class="empty small">No brand found</div>';
 }
 
 const t = (key) => I18N[STATE.lang]?.[key] || I18N.en[key] || key;
@@ -735,16 +830,16 @@ function topbar(title, back) {
 
 function tabbar(active) {
   const tabs = [
-    ['home', '🏠', 'home'],
-    flag('showAccessoriesShop') ? ['accessories', '🛒', 'shop'] : null,
-    ['bookings', '📅', 'bookings'],
-    ['profile', '👤', 'profile'],
-    ['more', '☰', 'more']
+    ['home', 'Home', 'H'],
+    ['support', 'Help', '?'],
+    flag('showAccessoriesShop') ? ['accessories', 'GoStore', '+'] : null,
+    ['profile', 'My Vehicles', 'V'],
+    ['more', 'Account', 'A']
   ].filter(Boolean);
   const cartBadge = STATE.cart.length;
-  return `<div class="tabbar">${tabs.map(([k, icon, key]) => `
+  return `<div class="tabbar gm-tabbar">${tabs.map(([k, label, icon]) => `
     <a class="${active === k ? 'active' : ''}" onclick="nav('${k}')">
-      <span class="ic">${icon}</span>${t(key)}
+      <span class="ic">${icon}</span>${label}
       ${k === 'accessories' && cartBadge ? `<span class="tab-badge">${cartBadge}</span>` : ''}
     </a>`).join('')}</div>`;
 }
@@ -1055,6 +1150,21 @@ const screens = {
         <div class="action" onclick="nav('bookings')"><div class="ic-wrap">📅</div><div class="t">Track Booking</div></div>
         <div class="action" onclick="nav('support')"><div class="ic-wrap">🛟</div><div class="t">Support</div></div>
       </div>
+      <div class="gm-membership" onclick="nav('packages')">
+        <div><span>Miles</span><b>VS Care Membership</b><small>Save on service, inspection and roadside help</small></div>
+        <strong>></strong>
+      </div>
+      <div class="section gm-section-head">Value Added Services</div>
+      <div class="gm-service-grid">
+        <div class="gm-promo-card red" onclick="nav('packages')"><b>Service Plans</b><span>Periodic care packages</span></div>
+        <div class="gm-promo-card blue" onclick="nav('support')"><b>Protect+</b><span>Inspection and support</span></div>
+        <div class="gm-promo-card purple" onclick="nav('emergency')"><b>Top Assist</b><span>Roadside emergency help</span></div>
+        <div class="gm-promo-card peach" onclick="nav('booking')"><b>GoShine</b><span>Cleaning and detailing</span></div>
+      </div>
+      <div class="gm-parts-strip">
+        <div><b>Original Spare Parts</b><span>Genuine parts support with service approval</span></div>
+        <button onclick="nav('accessories')">Explore</button>
+      </div>
       ${flag('showRecommendations') && STATE.recommendations.length ? `<div class="rec-card">
         <div class="rec-title">🤖 Recommended for You</div>
         ${STATE.recommendations.slice(0, 3).map(rec => `
@@ -1264,11 +1374,13 @@ const screens = {
         ${list.map(service => `<div class="card selectable ${selected === service._id ? 'selected' : ''}" onclick="STATE.bookingForm.serviceId='${service._id}';render()">
           <b>${service.name}</b><div class="muted">${service.description}</div><div class="price">${money(service.basePrice)}</div></div>`).join('')}
         <div class="label">Car Profile</div>
-        <div class="card">
-          <div class="row">
-            <input id="cBrand" placeholder="Brand" value="${STATE.bookingForm.brand || STATE.user?.cars?.[0]?.brand || ''}">
-            <input id="cModel" placeholder="Model" value="${STATE.bookingForm.model || STATE.user?.cars?.[0]?.model || ''}">
-          </div>
+        <div class="card vehicle-card">
+          <button class="vehicle-select-card" onclick="openVehiclePicker('booking')">
+            <span class="vehicle-car-art">${vehicleInitials(STATE.bookingForm.brand || STATE.user?.cars?.[0]?.brand, STATE.bookingForm.model || STATE.user?.cars?.[0]?.model)}</span>
+            <span><b>${vehicleSummary(STATE.bookingForm.brand || STATE.user?.cars?.[0]?.brand, STATE.bookingForm.model || STATE.user?.cars?.[0]?.model) || 'Select your vehicle'}</b><em>Tap to choose brand and model</em></span>
+          </button>
+          <input id="cBrand" type="hidden" value="${STATE.bookingForm.brand || STATE.user?.cars?.[0]?.brand || ''}">
+          <input id="cModel" type="hidden" value="${STATE.bookingForm.model || STATE.user?.cars?.[0]?.model || ''}">
           <div class="row">
             <input id="cNumber" placeholder="Car Number" value="${STATE.bookingForm.carNumber || STATE.user?.cars?.[0]?.carNumber || ''}">
             <select id="cFuel">
@@ -1434,7 +1546,8 @@ const screens = {
         <div class="mini-title">WhatsApp</div>
         <a class="btn" href="https://wa.me/${cleanPhone(cfgVal('whatsappNumber', '918839533202'))}?text=${encodeURIComponent(cfgVal('supportWhatsappText', 'Hi I need car service help'))}">Chat on WhatsApp</a>
       </div>
-    </div>`,
+    </div>
+    ${tabbar('support')}`,
 
   profile: () => `
     ${topbar('Profile')}
@@ -1471,8 +1584,12 @@ const screens = {
           <div><b>${car.brand || ''} ${car.model || ''}</b><div class="muted">${car.carNumber} • ${car.fuelType || '-'}</div><div class="muted">RC: ${car.rcNumber || '-'} ${car.insuranceExpiry ? `• Insurance: ${new Date(car.insuranceExpiry).toDateString()}` : ''}</div></div>
           <button class="chip small" onclick="removeCar('${car._id}')">Remove</button>
         </div>`).join('')}
-        <input id="carBrand" placeholder="Brand">
-        <input id="carModel" placeholder="Model">
+        <button class="vehicle-select-card" onclick="openVehiclePicker('profile')">
+          <span class="vehicle-car-art">VS</span>
+          <span><b>Select your vehicle</b><em>Choose brand and model from catalog</em></span>
+        </button>
+        <input id="carBrand" placeholder="Brand" readonly>
+        <input id="carModel" placeholder="Model" readonly>
         <div class="row">
           <input id="carNumber" placeholder="Car Number">
           <select id="carFuel"><option>Petrol</option><option>Diesel</option><option>CNG</option><option>Electric</option><option>Hybrid</option></select>
