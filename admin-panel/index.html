@@ -41,6 +41,16 @@ input,select,textarea{width:100%;padding:9px;border:1px solid var(--border);bord
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100}
 .modal{background:#fff;padding:24px;border-radius:12px;width:520px;max-width:92%}
 .muted{color:var(--light);font-size:12px}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.flag-item{border:1px solid var(--border);border-radius:10px;padding:14px;background:#fff;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.flag-title{font-weight:700;margin-bottom:4px}
+.toggle{position:relative;width:50px;height:28px;flex:0 0 auto}
+.toggle input{opacity:0;width:0;height:0;margin:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#C8D4DE;border-radius:999px;transition:.2s}
+.slider:before{content:"";position:absolute;height:22px;width:22px;left:3px;top:3px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle input:checked + .slider{background:var(--primary)}
+.toggle input:checked + .slider:before{transform:translateX(22px)}
+.value-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -65,6 +75,7 @@ input,select,textarea{width:100%;padding:9px;border:1px solid var(--border);bord
     <a onclick="show('team')" data-tab="team">Team</a>
     <a onclick="show('services')" data-tab="services">Services</a>
     <a onclick="show('products')" data-tab="products">Products</a>
+    <a onclick="show('config')" data-tab="config">App Settings</a>
     <a onclick="logout()" style="margin-top:40px">Logout</a>
   </div>
 
@@ -135,6 +146,20 @@ input,select,textarea{width:100%;padding:9px;border:1px solid var(--border);bord
         </table>
       </div>
     </div>
+
+    <div id="config" class="tab hidden">
+      <div class="topbar"><h2>Customer App Settings</h2><button class="btn btn-secondary" onclick="loadConfig()">Refresh</button></div>
+      <div class="card">
+        <h3>Show / Hide Features</h3>
+        <p class="muted" style="margin:6px 0 16px">Toggle OFF karne par customer mobile app me related field ya option hide ho jayega.</p>
+        <div id="flagsGrid" class="settings-grid"></div>
+      </div>
+      <div class="card">
+        <h3>App Text Values</h3>
+        <p class="muted" style="margin:6px 0 16px">Helpline, WhatsApp, maintenance banner jaise text yahan se update honge.</p>
+        <div id="valuesList"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -151,6 +176,21 @@ async function req(path, method='GET', body) {
     body: body ? JSON.stringify(body) : undefined
   });
   return res.json();
+}
+
+async function uploadAsset(file, type) {
+  if (!file) return null;
+  const data = new FormData();
+  data.append('file', file);
+  data.append('type', type);
+  const res = await fetch(API + '/products/upload-asset', {
+    method: 'POST',
+    headers: TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {},
+    body: data
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message || 'Upload failed');
+  return json.url;
 }
 
 async function login() {
@@ -184,6 +224,7 @@ function show(tab) {
   if (tab === 'team') loadStaff();
   if (tab === 'services') loadServices();
   if (tab === 'products') loadProducts();
+  if (tab === 'config') loadConfig();
 }
 
 async function showDashboard() {
@@ -407,22 +448,91 @@ function openProductModal() {
           <input id="p-discount" type="number" placeholder="Discount Price">
         </div>
         <input id="p-stock" type="number" placeholder="Stock">
-        <button class="btn" onclick="saveProduct()">Save</button>
+        <label>Product Image</label>
+        <input id="p-image" type="file" accept="image/*">
+        <label>Product Audio</label>
+        <input id="p-audio" type="file" accept="audio/*">
+        <button id="p-save" class="btn" onclick="saveProduct()">Save</button>
       </div>
     </div>`;
 }
 
 async function saveProduct() {
-  await req('/products', 'POST', {
+  const saveBtn = document.getElementById('p-save');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+  }
+  try {
+    const imageUrl = await uploadAsset(document.getElementById('p-image').files[0], 'image');
+    const audioUrl = await uploadAsset(document.getElementById('p-audio').files[0], 'audio');
+    const payload = {
     name: document.getElementById('p-name').value,
     category: document.getElementById('p-cat').value,
     description: document.getElementById('p-desc').value,
     price: +document.getElementById('p-price').value,
     discountPrice: +document.getElementById('p-discount').value || undefined,
     stock: +document.getElementById('p-stock').value
-  });
-  document.querySelector('.modal-bg').remove();
-  loadProducts();
+    };
+    if (imageUrl) payload.images = [imageUrl];
+    if (audioUrl) payload.audioUrl = audioUrl;
+    const r = await req('/products', 'POST', payload);
+    if (!r.success) throw new Error(r.message || 'Product save failed');
+    document.querySelector('.modal-bg').remove();
+    loadProducts();
+  } catch (error) {
+    alert(error.message || 'Product save failed');
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save';
+    }
+  }
+}
+
+async function loadConfig() {
+  const r = await req('/config/admin');
+  if (!r.success) {
+    alert(r.message || 'Unable to load app settings');
+    return;
+  }
+  document.getElementById('flagsGrid').innerHTML = (r.flags || []).map(flag => `
+    <div class="flag-item">
+      <div>
+        <div class="flag-title">${flag.label}</div>
+        <div class="muted">${flag.desc || flag.key}</div>
+      </div>
+      <label class="toggle" title="${flag.key}">
+        <input type="checkbox" ${flag.enabled ? 'checked' : ''} onchange="toggleConfigFlag('${flag.key}', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+  `).join('');
+
+  document.getElementById('valuesList').innerHTML = (r.values || []).map(item => `
+    <div class="value-row">
+      <div>
+        <label class="flag-title" for="value-${item.key}">${item.label}</label>
+        <div class="muted">${item.desc || item.key}</div>
+        <input id="value-${item.key}" value="${String(item.value || '').replace(/"/g, '&quot;')}">
+      </div>
+      <button class="btn btn-sm" onclick="saveConfigValue('${item.key}')">Save</button>
+    </div>
+  `).join('');
+}
+
+async function toggleConfigFlag(key, enabled) {
+  const r = await req('/config/flag/' + key, 'PUT', { enabled });
+  if (!r.success) {
+    alert(r.message || 'Setting update failed');
+    loadConfig();
+  }
+}
+
+async function saveConfigValue(key) {
+  const value = document.getElementById('value-' + key).value;
+  const r = await req('/config/value/' + key, 'PUT', { value });
+  if (r.success) alert('Saved');
+  else alert(r.message || 'Value update failed');
 }
 
 if (TOKEN) showDashboard();
