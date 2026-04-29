@@ -11,12 +11,9 @@ const I18N = {
   en: {
     appName: 'VS SERVICES',
     tagline: 'Check . Service . Drive Safe',
-    home: 'Home',
-    shop: 'Shop',
-    bookings: 'Bookings',
-    profile: 'Profile',
+    home: 'Home', shop: 'Shop', bookings: 'Bookings', profile: 'Profile', more: 'More',
     login: 'Demo / Guest Login',
-    welcome: 'Car care made simple',
+    welcome: 'Complete car care — booking, parts, reminders, rewards — all in one place.',
     quick: 'Quick Actions',
     services: 'Services',
     support: 'Support Hub',
@@ -28,29 +25,216 @@ const I18N = {
     tips: 'Car Care Tips',
     faq: 'FAQ',
     branches: 'Nearby Garage',
-    emergency: 'Emergency Help'
+    emergency: 'Emergency Help',
+    greetMorning: 'Good morning',
+    greetAfternoon: 'Good afternoon',
+    greetEvening: 'Good evening',
+    welcomeUser: 'Welcome!',
+    bookService: 'Book Service',
+    callUs: 'Call Us',
+    shopParts: 'Shop Parts',
+    myOrders: 'My Orders',
+    wishlist: 'Wishlist',
+    trackBooking: 'Track Booking',
+    statBookings: 'SERVICES',
+    statPoints: 'POINTS',
+    statStreak: 'STREAK',
+    confirm: 'Confirm Booking',
+    cancel: 'Cancel',
+    save: 'Save',
+    submit: 'Submit',
+    selectService: 'Select Service',
+    carProfile: 'Car Profile',
+    serviceMode: 'Service Mode',
+    atGarage: 'At Garage',
+    homeService: 'Home Service',
+    pickupDrop: 'Pickup & Drop',
+    payment: 'Payment',
+    couponCode: 'Coupon code',
+    addCart: 'Add to Cart',
+    placeOrder: 'Place Order',
+    cart: 'Cart',
+    cartEmpty: 'Cart is empty',
+    delivery: 'Delivery',
+    free: 'FREE',
+    total: 'Total',
+    address: 'Address',
+    city: 'City',
+    pincode: 'Pincode',
+    name: 'Name',
+    mobile: 'Mobile Number',
+    email: 'Email',
+    continue: 'Continue',
+    skip: 'Skip for now',
+    yourName: 'Your Name',
+    bookings_lc: 'Bookings',
+    notifications: 'Notifications',
+    chatSupport: 'Chat with Support',
+    aiAssistant: 'AI Assistant',
+    leaderboard: 'Leaderboard',
+    serviceGallery: 'Service Gallery',
+    setBirthday: 'Set Birthday',
+    offers: 'Offers & Coupons',
+    referEarn: 'Refer & Earn',
+    packages: 'Service Packages',
+    findBranch: 'Find a Branch',
+    supportHub: 'Support Hub',
+    logout: 'Logout',
+    pickOnMap: 'Pick Location on Map',
+    voiceNote: 'Voice Note for Staff',
+    record: 'Record',
+    rerecord: 'Re-record',
+    nextDue: 'Next Service Due',
+    bookAgain: 'Book Again',
+    rateDriver: 'Rate Driver',
+    share: 'Share',
+    invoice: 'Invoice',
+    payNow: 'Pay Now',
+    cancelBooking: 'Cancel Booking',
+    submitReview: 'Submit Review',
+    feedback: 'Write your feedback',
+    seeAllOffers: 'active offers',
+    referralCode: 'YOUR REFERRAL CODE',
+    earnInfo: 'Earn ₹100 per friend',
+    referDesc: 'Invite friends. Both get ₹100 wallet credit on their first service.',
+    silver: 'Silver Care',
+    gold: 'Gold Care',
+    mostPopular: 'Most Popular',
+    bookThisPackage: 'Book This Package',
+    directions: 'Directions',
+    call: 'Call',
+    showOnMap: 'Show on Map',
+    distanceAway: 'km away',
+    nearest: 'Nearest',
+    roadsideAssistance: '24x7 Roadside Assistance',
+    callNow: 'Call Now',
+    whatsapp: 'WhatsApp',
+    youAreHere: 'You are here',
+    addCar: 'Add Car',
+    brand: 'Brand',
+    model: 'Model',
+    carNumber: 'Car Number',
+    fuel: 'Fuel',
+    year: 'Year',
+    rcNumber: 'RC Number',
+    addReminder: 'Add Reminder',
+    reminderTitle: 'Reminder title',
+    reminderNote: 'Reminder note',
+    advancedApi: 'Advanced: change API URL'
   },
   hi: {
     appName: 'VS SERVICES',
-    tagline: 'Check . Service . Drive Safe',
-    home: 'Home',
-    shop: 'Shop',
-    bookings: 'Bookings',
-    profile: 'Profile',
-    login: 'Demo / Guest Login',
-    welcome: 'Car care simple bana diya',
-    quick: 'Quick Actions',
-    services: 'Services',
-    support: 'Support Hub',
-    estimate: 'Estimate',
-    book: 'Book',
-    rewards: 'Rewards',
-    history: 'Service History',
-    reminders: 'Reminders',
-    tips: 'Car Care Tips',
-    faq: 'FAQ',
-    branches: 'Nearby Garage',
-    emergency: 'Emergency Help'
+    tagline: 'जाँच · सर्विस · सुरक्षित ड्राइव',
+    home: 'होम', shop: 'शॉप', bookings: 'बुकिंग', profile: 'प्रोफाइल', more: 'More',
+    login: 'डेमो / गेस्ट लॉगिन',
+    welcome: 'आपकी कार की पूरी देखभाल — बुकिंग, पार्ट्स, रिमाइंडर, रिवॉर्ड — एक जगह।',
+    quick: 'त्वरित विकल्प',
+    services: 'सेवाएँ',
+    support: 'सपोर्ट',
+    estimate: 'अनुमान',
+    book: 'बुक करें',
+    rewards: 'इनाम',
+    history: 'सर्विस इतिहास',
+    reminders: 'रिमाइंडर',
+    tips: 'कार केयर टिप्स',
+    faq: 'सामान्य प्रश्न',
+    branches: 'नज़दीकी गैरेज',
+    emergency: 'आपातकालीन सहायता',
+    greetMorning: 'सुप्रभात',
+    greetAfternoon: 'नमस्ते',
+    greetEvening: 'शुभ संध्या',
+    welcomeUser: 'स्वागत है!',
+    bookService: 'सर्विस बुक करें',
+    callUs: 'कॉल करें',
+    shopParts: 'पार्ट्स खरीदें',
+    myOrders: 'मेरे ऑर्डर',
+    wishlist: 'पसंदीदा',
+    trackBooking: 'बुकिंग ट्रैक करें',
+    statBookings: 'सर्विस',
+    statPoints: 'पॉइंट्स',
+    statStreak: 'स्ट्रीक',
+    confirm: 'बुकिंग पक्की करें',
+    cancel: 'रद्द करें',
+    save: 'सेव करें',
+    submit: 'सबमिट',
+    selectService: 'सर्विस चुनें',
+    carProfile: 'कार की जानकारी',
+    serviceMode: 'सर्विस मोड',
+    atGarage: 'गैरेज पर',
+    homeService: 'घर पर सर्विस',
+    pickupDrop: 'पिकअप & ड्रॉप',
+    payment: 'भुगतान',
+    couponCode: 'कूपन कोड',
+    addCart: 'कार्ट में डालें',
+    placeOrder: 'ऑर्डर करें',
+    cart: 'कार्ट',
+    cartEmpty: 'कार्ट खाली है',
+    delivery: 'डिलीवरी',
+    free: 'मुफ़्त',
+    total: 'कुल',
+    address: 'पता',
+    city: 'शहर',
+    pincode: 'पिनकोड',
+    name: 'नाम',
+    mobile: 'मोबाइल नंबर',
+    email: 'ईमेल',
+    continue: 'आगे बढ़ें',
+    skip: 'अभी छोड़ें',
+    yourName: 'आपका नाम',
+    bookings_lc: 'बुकिंग्स',
+    notifications: 'सूचनाएँ',
+    chatSupport: 'सपोर्ट से चैट करें',
+    aiAssistant: 'AI सहायक',
+    leaderboard: 'लीडरबोर्ड',
+    serviceGallery: 'सर्विस गैलरी',
+    setBirthday: 'जन्मदिन सेट करें',
+    offers: 'ऑफ़र & कूपन',
+    referEarn: 'दोस्त को बुलाओ - कमाओ',
+    packages: 'सर्विस पैकेज',
+    findBranch: 'गैरेज ढूँढें',
+    supportHub: 'सपोर्ट हब',
+    logout: 'लॉग आउट',
+    pickOnMap: 'मैप पर लोकेशन चुनें',
+    voiceNote: 'स्टाफ के लिए वॉइस नोट',
+    record: 'रिकॉर्ड करें',
+    rerecord: 'फिर से रिकॉर्ड',
+    nextDue: 'अगली सर्विस कब',
+    bookAgain: 'फिर से बुक करें',
+    rateDriver: 'ड्राइवर को रेट करें',
+    share: 'शेयर',
+    invoice: 'इनवॉइस',
+    payNow: 'अभी भुगतान करें',
+    cancelBooking: 'बुकिंग रद्द करें',
+    submitReview: 'समीक्षा सबमिट',
+    feedback: 'अपनी राय लिखें',
+    seeAllOffers: 'चालू ऑफ़र',
+    referralCode: 'आपका रेफरल कोड',
+    earnInfo: 'हर दोस्त पर ₹100 कमाओ',
+    referDesc: 'दोस्तों को बुलाओ। पहली सर्विस पर दोनों को ₹100 वॉलेट क्रेडिट।',
+    silver: 'सिल्वर केयर',
+    gold: 'गोल्ड केयर',
+    mostPopular: 'सबसे लोकप्रिय',
+    bookThisPackage: 'यह पैकेज बुक करें',
+    directions: 'दिशा',
+    call: 'कॉल',
+    showOnMap: 'मैप पर दिखाएँ',
+    distanceAway: 'किमी दूर',
+    nearest: 'सबसे नज़दीक',
+    roadsideAssistance: '24x7 रोडसाइड सहायता',
+    callNow: 'अभी कॉल करें',
+    whatsapp: 'व्हाट्सऐप',
+    youAreHere: 'आप यहाँ हैं',
+    addCar: 'कार जोड़ें',
+    brand: 'ब्रांड',
+    model: 'मॉडल',
+    carNumber: 'कार नंबर',
+    fuel: 'फ्यूल',
+    year: 'साल',
+    rcNumber: 'RC नंबर',
+    addReminder: 'रिमाइंडर जोड़ें',
+    reminderTitle: 'रिमाइंडर का शीर्षक',
+    reminderNote: 'रिमाइंडर नोट',
+    advancedApi: 'एडवांस्ड: API URL बदलें'
   }
 };
 
@@ -90,8 +274,162 @@ const STATE = {
   myRank: null,
   birthdayShown: false,
   supportMessages: [],
-  supportLastSeen: 0
+  supportLastSeen: 0,
+  flags: JSON.parse(localStorage.getItem('appFlags') || '{}'),
+  cfgValues: JSON.parse(localStorage.getItem('appCfgValues') || '{}'),
+  uiTextDefaults: JSON.parse(localStorage.getItem('uiTextDefaults') || '[]')
 };
+
+// Helper — check if a feature is enabled (defaults to true if no config yet)
+function flag(key) {
+  return STATE.flags?.[key] !== false;  // undefined or true → on; false → off
+}
+function cfgVal(key, fallback = '') {
+  return Object.prototype.hasOwnProperty.call(STATE.cfgValues || {}, key) ? STATE.cfgValues[key] : fallback;
+}
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[ch]));
+}
+function cfgText(key, fallback = '') {
+  return escapeHtml(cfgVal(key, fallback)).replace(/\n/g, '<br>');
+}
+function makeUiTextKey(text) {
+  return 'uiText.' + String(text)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 80);
+}
+function applyUiTextOverrides(root = app) {
+  if (!root || !STATE.uiTextDefaults?.length) return;
+  const pairs = STATE.uiTextDefaults
+    .map(item => ({ from: String(item.default || ''), to: cfgVal(item.key, item.default || '') }))
+    .filter(item => item.from && item.to !== item.from)
+    .sort((a, b) => b.from.length - a.from.length);
+  if (!pairs.length) return;
+  const replaceText = (value) => {
+    let next = value;
+    pairs.forEach(({ from, to }) => {
+      if (next.includes(from)) next = next.split(from).join(to);
+    });
+    return next;
+  };
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent || ['SCRIPT', 'STYLE', 'TEXTAREA'].includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
+      return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  const textNodes = [];
+  while (walker.nextNode()) textNodes.push(walker.currentNode);
+  textNodes.forEach(node => {
+    const next = replaceText(node.nodeValue);
+    if (next !== node.nodeValue) node.nodeValue = next;
+  });
+  root.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el => {
+    ['placeholder', 'title', 'aria-label'].forEach(attr => {
+      const val = el.getAttribute(attr);
+      if (!val) return;
+      const next = replaceText(val);
+      if (next !== val) el.setAttribute(attr, next);
+    });
+  });
+}
+function getCareTips() {
+  const remote = [
+    { title: cfgVal('careTip1Title'), body: cfgVal('careTip1Body') },
+    { title: cfgVal('careTip2Title'), body: cfgVal('careTip2Body') }
+  ].filter(tip => tip.title || tip.body);
+  return remote.length ? remote : (STATE.support.tips || []);
+}
+
+let _lastConfigFetch = 0;
+function normalizeConfigState() {
+  const mode = STATE.bookingForm.mode;
+  if (mode === 'home_service' && !flag('showHomeService')) STATE.bookingForm.mode = 'at_garage';
+  if (mode === 'pickup_drop' && !flag('showPickupDrop')) STATE.bookingForm.mode = 'at_garage';
+  if (STATE.bookingForm.pay === 'online' && !flag('showOnlinePayment')) STATE.bookingForm.pay = 'pay_on_service';
+  if (STATE.payMode === 'online' && !flag('showOnlinePayment')) STATE.payMode = 'cod';
+  if (!flag('showAccessoriesShop') && ['accessories', 'cart', 'productDetail'].includes(STATE.current)) {
+    STATE.current = 'home';
+    STATE.data = {};
+  }
+  if (!flag('showWishlist') && STATE.current === 'wishlist') {
+    STATE.current = 'home';
+    STATE.data = {};
+  }
+  if (!flag('showRewards') && STATE.current === 'rewards') {
+    STATE.current = 'home';
+    STATE.data = {};
+  }
+  if (!flag('showLeaderboard') && STATE.current === 'leaderboard') {
+    STATE.current = 'profile';
+    STATE.data = {};
+  }
+  if (!flag('showGallery') && STATE.current === 'gallery') {
+    STATE.current = 'profile';
+    STATE.data = {};
+  }
+  if (!flag('showChatbot') && STATE.current === 'chatbot') {
+    STATE.current = 'home';
+    STATE.data = {};
+  }
+  if (!flag('showSupportChat') && STATE.current === 'supportChat') {
+    STATE.current = 'profile';
+    STATE.data = {};
+  }
+  if (!flag('showOffers') && STATE.current === 'offers') {
+    STATE.current = 'home';
+    STATE.data = {};
+  }
+  if (!flag('showPackages') && STATE.current === 'packages') {
+    STATE.current = 'home';
+    STATE.data = {};
+  }
+  if (!flag('showBranches') && STATE.current === 'branches') {
+    STATE.current = 'home';
+    STATE.data = {};
+  }
+  if (!flag('showEmergency') && STATE.current === 'emergency') {
+    STATE.current = 'home';
+    STATE.data = {};
+  }
+}
+
+async function refreshAppConfig(options = {}) {
+  const { force = false, rerender = false } = options;
+  if (!force && Date.now() - _lastConfigFetch < 5000) return false;
+  _lastConfigFetch = Date.now();
+  try {
+    const cfg = await api('/config', 'GET', null, { silent: true });
+    if (!cfg.success) return false;
+    const nextFlags = cfg.flags || {};
+    const nextValues = cfg.values || {};
+    const nextTextDefaults = cfg.textDefaults || STATE.uiTextDefaults || [];
+    const changed =
+      JSON.stringify(STATE.flags || {}) !== JSON.stringify(nextFlags) ||
+      JSON.stringify(STATE.cfgValues || {}) !== JSON.stringify(nextValues) ||
+      JSON.stringify(STATE.uiTextDefaults || []) !== JSON.stringify(nextTextDefaults);
+    STATE.flags = nextFlags;
+    STATE.cfgValues = nextValues;
+    STATE.uiTextDefaults = nextTextDefaults;
+    localStorage.setItem('appFlags', JSON.stringify(STATE.flags));
+    localStorage.setItem('appCfgValues', JSON.stringify(STATE.cfgValues));
+    localStorage.setItem('uiTextDefaults', JSON.stringify(STATE.uiTextDefaults));
+    normalizeConfigState();
+    if (changed && rerender) render();
+    return changed;
+  } catch (e) {
+    return false;
+  }
+}
 
 // Loyalty tier metadata
 const TIER_META = {
@@ -244,6 +582,30 @@ function money(value) {
   return `Rs ${Number(value || 0).toLocaleString('en-IN')}`;
 }
 
+function quoteLabel() {
+  return 'Price on call/chat';
+}
+
+function productImage(product, big = false) {
+  const src = (product?.images || []).find(Boolean) || fallbackProductImage(product);
+  if (!src) return `<div class="img ${big ? 'big' : ''}">AUTO</div>`;
+  return `<img class="product-img ${big ? 'big' : ''}" src="${src}" alt="${product?.name || 'Product'}" loading="lazy">`;
+}
+
+function fallbackProductImage(product) {
+  const pics = [
+    'https://images.unsplash.com/photo-1600661653561-629509216228?auto=format&fit=crop&w=700&q=70',
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=700&q=70',
+    'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=700&q=70',
+    'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=700&q=70',
+    'https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=700&q=70',
+    'https://images.unsplash.com/photo-1609521263047-f8f205293f24?auto=format&fit=crop&w=700&q=70'
+  ];
+  const key = String(product?._id || product?.name || 'vs');
+  const idx = [...key].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % pics.length;
+  return pics[idx];
+}
+
 function humanMode(mode) {
   return {
     at_garage: 'At Garage',
@@ -266,7 +628,44 @@ function _restoreScroll(top) {
   }, 30);
 }
 
+function renderKeepingScroll(updateFn) {
+  const top = _captureScroll();
+  if (typeof updateFn === 'function') updateFn();
+  render();
+  _restoreScroll(top);
+}
+
+function setBookingMode(mode) {
+  renderKeepingScroll(() => {
+    STATE.bookingForm.mode = mode;
+  });
+}
+
+function setBookingPay(mode) {
+  renderKeepingScroll(() => {
+    STATE.bookingForm.pay = mode;
+  });
+}
+
+function setProductCategory(category) {
+  renderKeepingScroll(() => {
+    STATE.productCategory = category || '';
+  });
+}
+
 function nav(screen, data) {
+  refreshAppConfig({ rerender: false });
+  if (!flag('showAccessoriesShop') && ['accessories', 'cart', 'productDetail'].includes(screen)) screen = 'home';
+  if (!flag('showWishlist') && screen === 'wishlist') screen = 'home';
+  if (!flag('showRewards') && screen === 'rewards') screen = 'home';
+  if (!flag('showLeaderboard') && screen === 'leaderboard') screen = 'profile';
+  if (!flag('showGallery') && screen === 'gallery') screen = 'profile';
+  if (!flag('showChatbot') && screen === 'chatbot') screen = 'home';
+  if (!flag('showSupportChat') && screen === 'supportChat') screen = 'profile';
+  if (!flag('showOffers') && screen === 'offers') screen = 'home';
+  if (!flag('showPackages') && screen === 'packages') screen = 'home';
+  if (!flag('showBranches') && screen === 'branches') screen = 'home';
+  if (!flag('showEmergency') && screen === 'emergency') screen = 'home';
   if (STATE.current && STATE.current !== screen && STATE.current !== 'splash') {
     STATE.navStack.push({
       screen: STATE.current,
@@ -330,23 +729,147 @@ function topbar(title, back) {
     <span class="tb-title">${title}</span>
     <span style="flex:1"></span>
     ${STATE.token ? `<button class="tb-icon-btn" onclick="openNotifications()" aria-label="Notifications">🔔${STATE.notifUnread ? `<span class="tb-dot">${STATE.notifUnread > 9 ? '9+' : STATE.notifUnread}</span>` : ''}</button>` : ''}
-    <button class="lang-toggle" onclick="toggleLang()">${STATE.lang.toUpperCase()}</button>
+    ${flag('showLanguageToggle') ? `<button class="lang-toggle" onclick="toggleLang()">${STATE.lang.toUpperCase()}</button>` : ''}
   </div>`;
 }
 
 function tabbar(active) {
   const tabs = [
     ['home', '🏠', 'home'],
-    ['accessories', '🛒', 'shop'],
+    flag('showAccessoriesShop') ? ['accessories', '🛒', 'shop'] : null,
     ['bookings', '📅', 'bookings'],
-    ['profile', '👤', 'profile']
-  ];
+    ['profile', '👤', 'profile'],
+    ['more', '☰', 'more']
+  ].filter(Boolean);
   const cartBadge = STATE.cart.length;
   return `<div class="tabbar">${tabs.map(([k, icon, key]) => `
     <a class="${active === k ? 'active' : ''}" onclick="nav('${k}')">
       <span class="ic">${icon}</span>${t(key)}
       ${k === 'accessories' && cartBadge ? `<span class="tab-badge">${cartBadge}</span>` : ''}
     </a>`).join('')}</div>`;
+}
+
+function cleanPhone(phone) {
+  return String(phone || '').replace(/[^\d+]/g, '');
+}
+
+function mapsSearchUrl(query, lat, lng) {
+  const q = encodeURIComponent(query || 'nearby tow service');
+  if (lat && lng) return `https://www.google.com/maps/search/${q}/@${lat},${lng},14z`;
+  return `https://www.google.com/maps/search/${q}`;
+}
+
+function openNearbyService(type = 'tow') {
+  const query = type === 'emergency'
+    ? cfgVal('emergencySearchQuery', 'nearby emergency roadside assistance')
+    : cfgVal('towSearchQuery', 'nearby tow service');
+  const openUrl = (lat, lng) => window.open(mapsSearchUrl(query, lat, lng), '_blank');
+  if (!navigator.geolocation) return openUrl();
+  toast('Location check ho rahi hai...');
+  navigator.geolocation.getCurrentPosition(
+    pos => openUrl(pos.coords.latitude, pos.coords.longitude),
+    () => openUrl(),
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+  );
+}
+
+function sosCard() {
+  const towName = cfgVal('towServiceName', 'Nearby Tow Service');
+  const towPhone = cfgVal('towServicePhone', cfgVal('helplinePhone', '+91 8839533202'));
+  const govName = cfgVal('govEmergencyName', 'Government Emergency Helpline');
+  const govPhone = cfgVal('govEmergencyPhone', '112');
+  const wa = cfgVal('whatsappNumber', '918839533202');
+  return `<div class="sos-home-card">
+    <div class="sos-head">
+      <span class="sos-badge">SOS</span>
+      <span class="sos-sub">Roadside emergency help</span>
+    </div>
+    <div class="sos-title">Tow service aur emergency helpline</div>
+    <div class="sos-copy">Location ke hisab se nearby tow ya emergency services search karo, ya direct call karo.</div>
+    <div class="sos-grid">
+      <a class="sos-action danger" href="tel:${cleanPhone(govPhone)}"><b>${govName}</b><span>${govPhone}</span></a>
+      <a class="sos-action" href="tel:${cleanPhone(towPhone)}"><b>${towName}</b><span>${towPhone}</span></a>
+    </div>
+    <div class="sos-row">
+      <button class="sos-btn" onclick="openNearbyService('tow')">Nearby Tow</button>
+      <button class="sos-btn" onclick="openNearbyService('emergency')">Nearby Emergency</button>
+      <a class="sos-btn whatsapp" href="https://wa.me/${cleanPhone(wa)}?text=SOS:%20mujhe%20roadside%20help%20chahiye">WhatsApp</a>
+    </div>
+  </div>`;
+}
+
+function moreLinks() {
+  return `<div class="card-section-title" style="font-size:11px;font-weight:700;color:var(--l);text-transform:uppercase;letter-spacing:1px;margin:18px 14px 8px">More</div>
+      <div class="qlink-card">
+        <div class="qlink" onclick="openNotifications()">
+          <div class="qlink-icon notif">🔔</div>
+          <div class="qlink-text"><div class="qlink-title">Notifications</div><div class="qlink-sub">Booking & order updates</div></div>
+          ${STATE.notifUnread ? `<span class="qlink-pill">${STATE.notifUnread}</span>` : ''}
+          <span class="qlink-arrow">›</span>
+        </div>
+        ${flag('showOffers') ? `<div class="qlink" onclick="nav('offers')">
+          <div class="qlink-icon offer">🎟</div>
+          <div class="qlink-text"><div class="qlink-title">Offers & Coupons</div><div class="qlink-sub">${(STATE.coupons || []).length || 3} active offers</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        ${flag('showSupportChat') ? `<div class="qlink" onclick="nav('supportChat')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);color:#1565C0">💬</div>
+          <div class="qlink-text"><div class="qlink-title">Chat with Support</div><div class="qlink-sub">Voice note bhi bhej sakte ho</div></div>
+          <span class="qlink-pill" style="background:linear-gradient(135deg,#1565C0,#1B6FC2)">LIVE</span>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        ${flag('showChatbot') ? `<div class="qlink" onclick="nav('chatbot')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#F3E5F5,#E1BEE7);color:#7B1FA2">🤖</div>
+          <div class="qlink-text"><div class="qlink-title">CarBot AI Assistant</div><div class="qlink-sub">Car ke baare me kuch bhi pucho</div></div>
+          <span class="qlink-pill" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0)">NEW</span>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        ${flag('showLeaderboard') ? `<div class="qlink" onclick="openLeaderboard()">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#FFF8E1,#FFE082);color:#F57C00">🏆</div>
+          <div class="qlink-text"><div class="qlink-title">Leaderboard</div><div class="qlink-sub">Top referrers ko dekho</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        ${flag('showGallery') ? `<div class="qlink" onclick="nav('gallery')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#E0F2F1,#B2DFDB);color:#00695C">📸</div>
+          <div class="qlink-text"><div class="qlink-title">Service Gallery</div><div class="qlink-sub">Pichli services ke before/after photos</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        <div class="qlink" onclick="setBirthday()">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD0);color:#C2185B">🎂</div>
+          <div class="qlink-text"><div class="qlink-title">Birthday ${STATE.user?.birthday ? '✓' : 'Set Birthday'}</div><div class="qlink-sub">${STATE.user?.birthday ? 'Birthday me 20% off automatic' : 'Set karne par birthday me special offer milega'}</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        ${flag('showRefer') ? `<div class="qlink" onclick="nav('refer')">
+          <div class="qlink-icon refer">🎁</div>
+          <div class="qlink-text"><div class="qlink-title">Refer & Earn Rs 100</div><div class="qlink-sub">Friends ko bulao, dono ko benefit</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        ${flag('showPackages') ? `<div class="qlink" onclick="nav('packages')">
+          <div class="qlink-icon pkg">📦</div>
+          <div class="qlink-text"><div class="qlink-title">Service Packages</div><div class="qlink-sub">Silver & Gold care plans</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        ${flag('showBranches') ? `<div class="qlink" onclick="nav('branches')">
+          <div class="qlink-icon branch">📍</div>
+          <div class="qlink-text"><div class="qlink-title">Find a Branch</div><div class="qlink-sub">${(STATE.support?.branches || []).length} branches</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        ${flag('showEmergency') ? `<div class="qlink" onclick="nav('emergency')">
+          <div class="qlink-icon sos">🚨</div>
+          <div class="qlink-text"><div class="qlink-title">Emergency Help</div><div class="qlink-sub">24x7 roadside assistance</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>` : ''}
+        <div class="qlink" onclick="nav('support')">
+          <div class="qlink-icon support">🛟</div>
+          <div class="qlink-text"><div class="qlink-title">Support Hub</div><div class="qlink-sub">FAQ, tips, packages</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="logout()" style="color:var(--er)">
+          <div class="qlink-icon logout">⏻</div>
+          <div class="qlink-text"><div class="qlink-title">Logout</div><div class="qlink-sub">Sign out of this account</div></div>
+          <span class="qlink-arrow">›</span>
+        </div>
+      </div>`;
 }
 
 function bookingStatusBadge(status) {
@@ -371,6 +894,7 @@ function emptyState(icon, title, desc) {
 }
 
 function rewardCard() {
+  if (!flag('showRewards')) return '';
   const rewards = STATE.rewards || {
     walletPoints: STATE.user?.walletPoints || 0,
     walletBalance: STATE.user?.walletBalance || 0,
@@ -381,7 +905,7 @@ function rewardCard() {
     <div class="mini-grid">
       <div class="mini-stat"><b>${rewards.walletPoints || 0}</b><span>POINTS</span></div>
       <div class="mini-stat"><b>${money(rewards.walletBalance || 0)}</b><span>WALLET</span></div>
-      <div class="mini-stat"><b>${rewards.referralCode || '-'}</b><span>REFERRAL</span></div>
+      ${flag('showRefer') ? `<div class="mini-stat"><b>${rewards.referralCode || '-'}</b><span>REFERRAL</span></div>` : ''}
     </div>
   </div>`;
 }
@@ -445,7 +969,7 @@ function tierProgress(user) {
 const screens = {
   splash: () => `<div class="splash-wrap">
     <img class="brand-logo" src="assets/vs-services-logo.png" alt="VS Services">
-    <div class="tag">${t('tagline')}</div>
+    <div class="tag">${cfgText('homeTagline', t('tagline'))}</div>
     <div class="loader"></div>
   </div>`,
 
@@ -455,21 +979,13 @@ const screens = {
       <div class="login-top">
         ${logo()}
         <div class="login-title">Welcome to VS SERVICES</div>
-        <div class="sub">Guest login free hai • No OTP • No password<br>Sirf naam aur mobile daalo, ho gaya.</div>
       </div>
-      <div class="login-form">
+        <div class="login-form">
         <label class="label">Your Name</label>
         <input id="setupName" placeholder="e.g. Vinod Kumar" value="${STATE.user?.name || ''}">
-        <label class="label">Mobile Number</label>
-        <input id="setupMobile" placeholder="10-digit mobile" maxlength="10" inputmode="numeric" value="${STATE.user?.mobile || ''}">
-        <button class="btn btn-gradient" onclick="registerGuest()">Continue &rarr;</button>
+        <button class="btn btn-out" onclick="googleLogin()">Continue with Google</button>
         <div class="divider"><span>OR</span></div>
-        <button class="btn btn-out" onclick="demoLogin()">⚡ One-Tap Demo Login</button>
-        <button class="btn btn-ghost" onclick="nav('home')">Skip for now</button>
-        <details class="adv-api">
-          <summary>Advanced: change API URL</summary>
-          <input id="apiUrlInput" placeholder="https://..." value="${STATE.apiUrl}">
-        </details>
+        <button class="btn btn-out" onclick="nav('home')">Skip for now</button>
         <div class="login-foot">Problem? Call <a href="tel:8839533202">8839533202</a> or <a href="https://wa.me/918839533202">WhatsApp</a></div>
       </div>
     </div>`,
@@ -481,40 +997,65 @@ const screens = {
     <div class="screen">
       ${isBirthday ? bdayBanner() : ''}
       <div class="hero">
-        <div class="hero-greeting">${greetingText()}${STATE.user?.name ? ',' : ''}</div>
-        <div class="hero-title">${STATE.user?.name ? STATE.user.name.split(' ')[0] : 'Welcome!'}${isBirthday ? ' 🎂' : ''}</div>
+        <div class="hero-title">${STATE.user?.name ? STATE.user.name.split(' ')[0] : cfgText('homeHeroTitleGuest', 'Welcome!')}${isBirthday ? ' 🎂' : ''}</div>
         ${STATE.user?.loyaltyTier ? `<div style="margin-top:6px;position:relative;z-index:2"><span class="tier-badge tier-${STATE.user.loyaltyTier}"><span class="tier-icon">${TIER_META[STATE.user.loyaltyTier]?.icon}</span>${TIER_META[STATE.user.loyaltyTier]?.label} Member</span></div>` : ''}
-        <div class="hero-sub" style="margin-top:8px">Aapki car ki complete care — booking, parts, reminders, rewards — sab ek jagah.</div>
+        <div class="hero-sub" style="margin-top:8px">
+          ${cfgText('homeHeroSubtitle', 'Trusted car care with fair pricing.\\nSirf zaroori service, sahi daam par.\\nExtra repair ya parts replacement se pehle aapki approval zaroori.')}
+        </div>
         <div class="hero-cta">
           <span class="chip-cta primary" onclick="nav('booking')">🔧 Book Service</span>
           <span class="chip-cta" onclick="nav('${STATE.token ? 'profile' : 'login'}')">${STATE.token ? '👤 Profile' : '🔑 Login'}</span>
           <span class="chip-cta" onclick="window.location.href='tel:8839533202'">📞 Call Us</span>
         </div>
+        <div class="trust-badges">
+          <span>Fair Pricing</span>
+          <span>No Forced Repairs</span>
+          <span>Approval Before Extra Work</span>
+        </div>
         <div class="hero-stats">
           <div class="hero-stat"><b>${STATE.user?.serviceCount || STATE.bookings.length}</b><span>SERVICES</span></div>
           <div class="hero-stat"><b>${(STATE.rewards?.walletPoints || STATE.user?.walletPoints || 0)}</b><span>POINTS</span></div>
-          <div class="hero-stat"><b>${STATE.user?.streakDays || 0}🔥</b><span>STREAK</span></div>
+          ${flag('showStreak') ? `<div class="hero-stat"><b>${STATE.user?.streakDays || 0}🔥</b><span>STREAK</span></div>` : ''}
         </div>
       </div>
-      ${STATE.user?.streakDays > 1 ? `<div class="streak-card" onclick="nav('rewards')">
+      ${flag('showStreak') && STATE.user?.streakDays > 1 ? `<div class="streak-card" onclick="nav('profile')">
         <div class="streak-flame">🔥</div>
         <div class="streak-info"><b>${STATE.user.streakDays}-day streak!</b><span>Keep visiting daily for bonus points</span></div>
       </div>` : ''}
-      ${STATE.tipOfDay ? `<div class="tip-card" onclick="nav('support')">
+      <div class="trust-panel">
+        <div class="trust-panel-kicker">${cfgText('trustKicker', 'Why customers trust VS Services')}</div>
+        <div class="trust-panel-title">${cfgText('trustTitle', 'Pehle inspection, phir approval')}</div>
+        <div class="trust-panel-sub">${cfgText('trustSubtitle', 'Bina aapki permission ke extra kaam nahi.')}</div>
+        <div class="trust-points">
+          <div class="trust-point">
+            <div class="trust-icon">S</div>
+            <div><b>No unnecessary work</b><span>Jo kaam zaroori hoga, wahi suggest hoga.</span></div>
+          </div>
+          <div class="trust-point">
+            <div class="trust-icon">₹</div>
+            <div><b>Fair estimate first</b><span>Service se pehle clear estimate milega.</span></div>
+          </div>
+          <div class="trust-point">
+            <div class="trust-icon">Q</div>
+            <div><b>Quality service</b><span>Genuine parts aur trained mechanic support.</span></div>
+          </div>
+        </div>
+      </div>
+      ${flag('showDailyTip') && (cfgVal('tipOfDayTitle') || STATE.tipOfDay) ? `<div class="tip-card" onclick="nav('support')">
         <span class="tip-label">💡 Tip of the day</span>
-        <div class="tip-title">${STATE.tipOfDay.title}</div>
-        <div class="tip-body">${STATE.tipOfDay.body}</div>
+        <div class="tip-title">${cfgText('tipOfDayTitle', STATE.tipOfDay?.title || '')}</div>
+        <div class="tip-body">${cfgText('tipOfDayBody', STATE.tipOfDay?.body || '')}</div>
       </div>` : ''}
       <div class="section">${t('quick')}</div>
       <div class="grid quick-grid">
         <div class="action" onclick="nav('booking')"><div class="ic-wrap">🔧</div><div class="t">Book Service</div></div>
-        <div class="action" onclick="nav('accessories')"><div class="ic-wrap">🛒</div><div class="t">Shop Parts</div></div>
+        ${flag('showAccessoriesShop') ? `<div class="action" onclick="nav('accessories')"><div class="ic-wrap">🛒</div><div class="t">Shop Parts</div></div>` : ''}
         <div class="action" onclick="nav('orders')"><div class="ic-wrap">📦</div><div class="t">My Orders</div></div>
-        <div class="action" onclick="nav('wishlist')"><div class="ic-wrap">❤️</div><div class="t">Wishlist</div></div>
+        ${flag('showWishlist') ? `<div class="action" onclick="nav('wishlist')"><div class="ic-wrap">❤️</div><div class="t">Wishlist</div></div>` : ''}
         <div class="action" onclick="nav('bookings')"><div class="ic-wrap">📅</div><div class="t">Track Booking</div></div>
         <div class="action" onclick="nav('support')"><div class="ic-wrap">🛟</div><div class="t">Support</div></div>
       </div>
-      ${STATE.recommendations.length ? `<div class="rec-card">
+      ${flag('showRecommendations') && STATE.recommendations.length ? `<div class="rec-card">
         <div class="rec-title">🤖 Recommended for You</div>
         ${STATE.recommendations.slice(0, 3).map(rec => `
           <div class="rec-item" onclick="${rec.serviceId ? `nav('booking',{serviceId:'${rec.serviceId}'})` : 'nav(\'support\')'}">
@@ -525,6 +1066,7 @@ const screens = {
           </div>`).join('')}
       </div>` : ''}
       ${rewardCard()}
+      ${flag('showEmergency') ? sosCard() : ''}
       <div class="section">${t('services')}</div>
       ${STATE.services.map(service => {
         const icon = ({checkup:'🩺',repair:'🔧',denting_painting:'🎨',service:'⚙️'})[service.category] || '🔧';
@@ -544,9 +1086,16 @@ const screens = {
           </div>
         </div>`}).join('')}
       <div class="section">${t('tips')}</div>
-      <div class="card stack-list">
-        ${STATE.support.tips.slice(0, 2).map(tip => `<div><b>${tip.title}</b><div class="muted">${tip.body}</div></div>`).join('')}
-        <button class="btn btn-out" onclick="nav('support')">Open Support Hub</button>
+      <div class="care-tip-panel" onclick="nav('support')">
+        <div class="care-tip-head">
+          <span class="care-tip-badge">SMART TIP</span>
+          <span class="care-tip-icon">💡</span>
+        </div>
+        ${getCareTips().slice(0, 2).map((tip, index) => `<div class="care-tip-item ${index === 0 ? 'featured' : ''}">
+          <div class="care-tip-title">${tip.title}</div>
+          <div class="care-tip-body">${tip.body}</div>
+        </div>`).join('')}
+        <div class="care-tip-cta">Open Support Hub →</div>
       </div>
     </div>
     ${tabbar('home')}`;
@@ -568,22 +1117,22 @@ const screens = {
       <button class="chip small" onclick="nav('wishlist')">❤ ${STATE.wishlist.length}</button>
     </div>
     <div class="cat-chips">
-      <div class="chip ${!cat ? 'active' : ''}" onclick="STATE.productCategory='';render()">All</div>
-      ${categories.map(c => `<div class="chip ${cat === c ? 'active' : ''}" onclick="STATE.productCategory='${c}';render()">${c}</div>`).join('')}
+      <div class="chip ${!cat ? 'active' : ''}" onclick="setProductCategory('')">All</div>
+      ${categories.map(c => `<div class="chip ${cat === c ? 'active' : ''}" onclick="setProductCategory('${c}')">${c}</div>`).join('')}
     </div>
     <div class="screen">
       <div class="pgrid">
         ${filtered.length ? filtered.map(p => `
           <div class="pcard" onclick="nav('product',{id:'${p._id}'})">
             <button class="wish-heart ${isWished(p._id) ? 'on' : ''}" onclick="event.stopPropagation();toggleWish('${p._id}')">${isWished(p._id) ? '♥' : '♡'}</button>
-            <div class="img">AUTO</div>
+            ${productImage(p)}
             <div class="pname">${p.name}</div>
             <div class="muted">${p.category}</div>
-            <div><span class="price">${money(p.discountPrice || p.price)}</span>${p.discountPrice ? `<span class="strike">${money(p.price)}</span>` : ''}</div>
+            <div class="quote-price">${quoteLabel()}</div>
           </div>`).join('') : `<div class="empty">No products match</div>`}
       </div>
     </div>
-    ${STATE.cart.length ? `<div class="fab" onclick="nav('cart')">Cart (${STATE.cart.length})</div>` : ''}
+    ${STATE.cart.length ? `<div class="fab cart-fab-left" onclick="nav('cart')">Cart (${STATE.cart.length})</div>` : ''}
     ${tabbar('accessories')}`;
   },
 
@@ -593,10 +1142,10 @@ const screens = {
       ${STATE.wishlist.length ? `<div class="pgrid">${STATE.wishlist.map(p => `
         <div class="pcard" onclick="nav('product',{id:'${p._id}'})">
           <button class="wish-heart on" onclick="event.stopPropagation();toggleWish('${p._id}')">♥</button>
-          <div class="img">AUTO</div>
+          ${productImage(p)}
           <div class="pname">${p.name}</div>
           <div class="muted">${p.category || ''}</div>
-          <div><span class="price">${money(p.discountPrice || p.price)}</span></div>
+          <div class="quote-price">${quoteLabel()}</div>
         </div>`).join('')}</div>` : emptyState('💝', 'Wishlist khali hai', 'Shop me jake dil wala icon tap karo')}
     </div>
     ${tabbar('accessories')}`,
@@ -624,14 +1173,18 @@ const screens = {
       ${topbar(p.name, { screen: 'accessories' })}
       <div class="screen">
         <div class="card">
-          <div class="img big">AUTO</div>
+          ${productImage(p, true)}
           <h2>${p.name}</h2>
           <div class="muted">${p.description || ''}</div>
-          <div class="price big">${money(p.discountPrice || p.price)}</div>
+          <div class="quote-box">
+            <b>${quoteLabel()}</b>
+            <span>Price confirm karne ke liye chat ya call karein. Checkout me shop se bataya gaya amount manually fill kar sakte hain.</span>
+          </div>
           <div class="muted">Stock: ${p.stock}</div>
           <label class="label inline">Need this part with service?</label>
           <textarea id="partsReqText" placeholder="Example: Include this with my next service booking"></textarea>
-          <button class="btn" onclick="addCart('${p._id}')">Add to Cart</button>
+          <button id="addCartBtn-${p._id}" class="btn" onclick="addCart('${p._id}')">${STATE.cart.some(item => item.productId === p._id) ? 'Added to Cart' : 'Add to Cart'}</button>
+          ${STATE.cart.some(item => item.productId === p._id) ? `<button class="btn btn-out" onclick="nav('cart')">View Cart</button>` : ''}
           <button class="btn btn-out" onclick="toggleWish('${p._id}')">${isWished(p._id) ? '♥ Remove from Wishlist' : '♡ Add to Wishlist'}</button>
           <button class="btn btn-out" onclick="savePartsDraft('${p.name}')">Save as Spare Parts Request</button>
         </div>
@@ -639,7 +1192,6 @@ const screens = {
   },
 
   cart: () => {
-    const total = STATE.cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const itemCount = STATE.cart.reduce((s, i) => s + i.quantity, 0);
     return `
       ${topbar('Cart' + (itemCount ? ` (${itemCount})` : ''), { screen: 'accessories' })}
@@ -649,7 +1201,7 @@ const screens = {
             <div class="cart-thumb">🛍</div>
             <div class="cart-info">
               <div class="cart-name">${item.name}</div>
-              <div class="cart-price">${money(item.price)}</div>
+              <div class="cart-price">${quoteLabel()}</div>
             </div>
             <div class="cart-qty">
               <button onclick="changeQty('${item.productId}',-1)">−</button>
@@ -658,9 +1210,11 @@ const screens = {
             </div>
           </div>`).join('') : `<div class="empty-pro"><div class="ep-icon">🛒</div><div class="ep-title">Cart khali hai</div><div class="ep-msg">Shop me jake apne pasand ke products add karo.</div><button class="ep-cta" onclick="nav('accessories')">Browse Shop</button></div>`}
         ${STATE.cart.length ? `<div class="cart-summary">
-          <div class="kv"><span>Items (${itemCount})</span><span>${money(total)}</span></div>
-          <div class="kv"><span>Delivery</span><span style="color:var(--accent2);font-weight:600">FREE</span></div>
-          <div class="kv" style="border:none;padding-top:10px;font-size:16px"><span style="font-weight:700">Total</span><span style="font-weight:800;color:var(--p);font-family:'Plus Jakarta Sans',sans-serif">${money(total)}</span></div>
+          <div class="kv"><span>Items</span><span>${itemCount}</span></div>
+          <div class="quote-box compact">
+            <b>Amount shop se confirm hoga</b>
+            <span>Jo amount call/chat par bataya gaya ho use niche fill karein. Blank chhodne par delivery/garage par pay kar sakte hain.</span>
+          </div>
           <div style="margin-top:14px">
             <label class="label" style="margin:6px 0">Delivery Address</label>
             <input id="addr" placeholder="Address line" value="${STATE.user?.addresses?.[0]?.line1 || ''}">
@@ -668,13 +1222,17 @@ const screens = {
               <input id="city" placeholder="City" value="${STATE.user?.addresses?.[0]?.city || ''}">
               <input id="pin" placeholder="Pincode" maxlength="6" inputmode="numeric" value="${STATE.user?.addresses?.[0]?.pincode || ''}">
             </div>
+            ${flag('showMapPicker') ? `<button class="btn btn-out" style="margin-top:8px" onclick="openMapPicker('cart')">Pick Location on Map</button>` : ''}
+            <div id="cartLocationHint" class="muted" style="margin-top:6px">${STATE.cartLocation?.address ? `Selected: ${STATE.cartLocation.address}` : ''}</div>
           </div>
+          <label class="label" style="margin:14px 0 6px">Amount Told by Shop (optional)</label>
+          <input id="manualOrderAmount" type="number" min="0" inputmode="numeric" placeholder="e.g. 1200">
           <label class="label" style="margin:14px 0 6px">Payment Mode</label>
           <div class="row" style="padding:0">
             <div class="chip ${STATE.payMode === 'cod' ? 'active' : ''}" onclick="STATE.payMode='cod';render()">💵 Cash/UPI on Delivery</div>
-            <div class="chip ${STATE.payMode === 'online' ? 'active' : ''}" onclick="STATE.payMode='online';render()">💳 Online (demo)</div>
+            ${flag('showOnlinePayment') ? `<div class="chip ${STATE.payMode === 'online' ? 'active' : ''}" onclick="STATE.payMode='online';render()">💳 Payment</div>` : ''}
           </div>
-          <button class="btn btn-gradient" onclick="placeOrder()">Place Order • ${money(total)}</button>
+          <button class="btn btn-gradient" onclick="placeOrder()">Place Order</button>
         </div>` : '' }
       </div>
       ${tabbar('accessories')}`;
@@ -683,6 +1241,22 @@ const screens = {
   booking: () => {
     const selected = STATE.data.serviceId || STATE.bookingForm.serviceId;
     const list = STATE.services;
+    const serviceModes = [
+      ['at_garage', 'At Garage'],
+      ...(flag('showHomeService') ? [['home_service', 'Home Service']] : []),
+      ...(flag('showPickupDrop') ? [['pickup_drop', 'Pickup & Drop']] : [])
+    ];
+    if (!serviceModes.some(([mode]) => mode === (STATE.bookingForm.mode || 'at_garage'))) {
+      STATE.bookingForm.mode = 'at_garage';
+    }
+    const paymentModes = [
+      ['pay_on_service', 'Cash / UPI / Pay at garage'],
+      ...(flag('showOnlinePayment') ? [['online', 'Demo online payment']] : [])
+    ];
+    if ((STATE.bookingForm.pay || 'pay_on_service') === 'online' && !flag('showOnlinePayment')) {
+      STATE.bookingForm.pay = 'pay_on_service';
+    }
+    const showBookingExtras = flag('showCouponInput') || flag('showPartsRequest') || flag('showInspectionPhotos');
     return `
       ${topbar('Book Service', { screen: 'home' })}
       <div class="screen">
@@ -708,11 +1282,11 @@ const screens = {
         </div>
         <div class="label">Service Mode</div>
         <div class="row">
-          ${[['at_garage', 'At Garage'], ['home_service', 'Home Service'], ['pickup_drop', 'Pickup & Drop']].map(([mode, label]) => `<div class="chip ${(STATE.bookingForm.mode || 'at_garage') === mode ? 'active' : ''}" onclick="STATE.bookingForm.mode='${mode}';render()">${label}</div>`).join('')}
+          ${serviceModes.map(([mode, label]) => `<div class="chip ${(STATE.bookingForm.mode || 'at_garage') === mode ? 'active' : ''}" onclick="setBookingMode('${mode}')">${label}</div>`).join('')}
         </div>
         ${['home_service', 'pickup_drop'].includes(STATE.bookingForm.mode || 'at_garage') ? `
           <div class="card">
-            <button class="btn btn-out" style="margin-bottom:10px" onclick="openMapPicker()">📍 Pick Location on Map</button>
+            ${flag('showMapPicker') ? `<button class="btn btn-out" style="margin-bottom:10px" onclick="openMapPicker()">📍 Pick Location on Map</button>` : ''}
             <input id="bAddr" placeholder="Address line" value="${STATE.bookingForm.addr || ''}">
             <div class="row">
               <input id="bCity" placeholder="City" value="${STATE.bookingForm.city || ''}">
@@ -724,12 +1298,14 @@ const screens = {
             <input id="bDate" type="date" value="${STATE.bookingForm.date || ''}">
             <select id="bSlot">${['10:00 AM', '12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM'].map(slot => `<option ${((STATE.bookingForm.slot || '10:00 AM') === slot) ? 'selected' : ''}>${slot}</option>`).join('')}</select>
           </div>
-          <input id="couponCode" placeholder="Coupon code (WELCOME10)" value="${STATE.bookingForm.couponCode || ''}">
-          <input id="partsEstimate" type="number" placeholder="Estimated parts cost (optional)" value="${STATE.bookingForm.partsEstimate || ''}">
-          <textarea id="sparePartsRequest" placeholder="Spare parts request">${STATE.bookingForm.sparePartsRequest || localStorage.getItem('sparePartsDraft') || ''}</textarea>
-          <textarea id="inspectionPhotos" placeholder="Photo URLs comma separated">${STATE.bookingForm.inspectionPhotos || ''}</textarea>
+          ${showBookingExtras ? `
+            ${flag('showCouponInput') ? `<input id="couponCode" placeholder="Coupon code (WELCOME10)" value="${STATE.bookingForm.couponCode || ''}">` : ''}
+            ${flag('showPartsRequest') ? `<input id="partsEstimate" type="number" placeholder="Estimated parts cost (optional)" value="${STATE.bookingForm.partsEstimate || ''}">
+            <textarea id="sparePartsRequest" placeholder="Spare parts request">${STATE.bookingForm.sparePartsRequest || localStorage.getItem('sparePartsDraft') || ''}</textarea>` : ''}
+            ${flag('showInspectionPhotos') ? `<textarea id="inspectionPhotos" placeholder="Photo URLs comma separated">${STATE.bookingForm.inspectionPhotos || ''}</textarea>` : ''}
+          ` : ''}
           <div class="row">
-            ${[['pay_on_service', 'Cash / UPI / Pay at garage'], ['online', 'Demo online payment']].map(([mode, label]) => `<div class="chip ${(STATE.bookingForm.pay || 'pay_on_service') === mode ? 'active' : ''}" onclick="STATE.bookingForm.pay='${mode}';render()">${label}</div>`).join('')}
+            ${paymentModes.map(([mode, label]) => `<div class="chip ${(STATE.bookingForm.pay || 'pay_on_service') === mode ? 'active' : ''}" onclick="setBookingPay('${mode}')">${label}</div>`).join('')}
           </div>
           <button class="btn btn-out" onclick="calculateEstimate()">Calculate Estimate</button>
           ${STATE.bookingForm.estimate ? `
@@ -775,8 +1351,8 @@ const screens = {
           <button class="ep-cta-secondary" onclick="nav('packages')">View Packages</button>
         </div>
       </div>`}
-      <div class="section">${t('history')}</div>
-      <div class="card">${historyList()}</div>
+      ${flag('showHistory') ? `<div class="section">${t('history')}</div>
+      <div class="card">${historyList()}</div>` : ''}
     </div>
     ${tabbar('bookings')}`,
 
@@ -807,7 +1383,7 @@ const screens = {
         </div>` : ''}
         ${booking.review ? `<div class="card"><div class="mini-title">Review</div><div>${'★'.repeat(booking.review.rating)}${'☆'.repeat(5 - booking.review.rating)}</div><div class="muted">${booking.review.comment || ''}</div></div>` : ''}
         ${booking.beforeAfterGallery?.length ? `<div class="card"><div class="mini-title">Before / After Gallery</div>${booking.beforeAfterGallery.map(item => `<div class="muted">${item.label}: ${item.url}</div>`).join('')}</div>` : ''}
-        <div class="card">
+        ${flag('showVoiceNotes') ? `<div class="card">
           <div class="mini-title">🎤 Voice Note for Staff</div>
           <div class="muted" style="font-size:12px;margin-bottom:8px">Apni car ki problem describe karo voice me — staff sune se pehle.</div>
           ${booking.voiceNote ? voiceBubble(booking.voiceNote, booking.voiceNoteDuration, 'bvn-' + booking._id) : '<div class="muted small">No voice note yet</div>'}
@@ -815,7 +1391,7 @@ const screens = {
             <button class="voice-rec-btn" id="bookingRecBtn" onclick="toggleVoiceRec('booking','${booking._id}')" style="margin-top:10px">
               <span class="rec-dot"></span>${booking.voiceNote ? 'Re-record' : 'Record'} Voice Note
             </button>` : ''}
-        </div>
+        </div>` : ''}
         <div class="card">
           <div class="mini-title">Actions</div>
           ${booking.paymentStatus !== 'paid' && booking.paymentMode === 'online' ? `<button class="btn" onclick="payNow('${booking._id}', ${booking.totalAmount})">Pay Now</button>` : ''}
@@ -830,32 +1406,33 @@ const screens = {
   },
 
   support: () => `
-    ${topbar(t('support'), { screen: 'home' })}
+    ${topbar(cfgVal('supportHubTitle', t('support')), { screen: 'home' })}
     <div class="screen">
-      <div class="section">${t('branches')}</div>
+      <div class="card"><div class="mini-title">${cfgText('supportHubTitle', t('support'))}</div><div class="muted">${cfgText('supportHubSubtitle', 'FAQ, tips, branches aur emergency help ek jagah.')}</div></div>
+      ${flag('showBranches') ? `<div class="section">${t('branches')}</div>
       <div class="card stack-list">${STATE.support.branches.map(branch => `<div>
         <b>${branch.name}</b>
         <div class="muted">${branch.address}</div>
         <a href="${branch.mapUrl}" target="_blank" class="mini-link">Open Map</a>
-      </div>`).join('')}</div>
-      <div class="section">${t('emergency')}</div>
+      </div>`).join('')}</div>` : ''}
+      ${flag('showEmergency') ? `<div class="section">${t('emergency')}</div>
       <div class="grid quick-grid">${STATE.support.emergency.map(item => `<div class="action">
         <div class="ic">SOS</div>
         <div class="t">${item.title}</div>
         <a href="tel:${item.phone.replace(/\s+/g, '')}" class="mini-link">${item.eta}</a>
-      </div>`).join('')}</div>
-      <div class="section">${t('tips')}</div>
-      <div class="card stack-list">${STATE.support.tips.map(tip => `<div><b>${tip.title}</b><div class="muted">${tip.body}</div></div>`).join('')}</div>
+      </div>`).join('')}</div>` : ''}
+      ${flag('showDailyTip') ? `<div class="section">${t('tips')}</div>
+      <div class="card stack-list">${getCareTips().map(tip => `<div><b>${tip.title}</b><div class="muted">${tip.body}</div></div>`).join('')}</div>` : ''}
       <div class="section">${t('faq')}</div>
       <div class="card stack-list">${STATE.support.faq.map(item => `<div><b>${item.q}</b><div class="muted">${item.a}</div></div>`).join('')}</div>
-      <div class="section">Packages & Coupons</div>
+      ${flag('showPackages') || flag('showOffers') ? `<div class="section">Packages & Coupons</div>
       <div class="card stack-list">
-        ${STATE.support.packages.map(item => `<div><b>${item.name} - ${money(item.price)}</b><div class="muted">${item.benefits.join(', ')}</div></div>`).join('')}
-        ${STATE.support.coupons.map(item => `<div><b>${item.code}</b><div class="muted">${item.description} • ${item.value}</div></div>`).join('')}
-      </div>
+        ${flag('showPackages') ? STATE.support.packages.map(item => `<div><b>${item.name} - ${money(item.price)}</b><div class="muted">${item.benefits.join(', ')}</div></div>`).join('') : ''}
+        ${flag('showOffers') ? STATE.support.coupons.map(item => `<div><b>${item.code}</b><div class="muted">${item.description} • ${item.value}</div></div>`).join('') : ''}
+      </div>` : ''}
       <div class="card">
         <div class="mini-title">WhatsApp</div>
-        <a class="btn" href="https://wa.me/918839533202?text=Hi%20I%20need%20car%20service%20help">Chat on WhatsApp</a>
+        <a class="btn" href="https://wa.me/${cleanPhone(cfgVal('whatsappNumber', '918839533202'))}?text=${encodeURIComponent(cfgVal('supportWhatsappText', 'Hi I need car service help'))}">Chat on WhatsApp</a>
       </div>
     </div>`,
 
@@ -870,11 +1447,12 @@ const screens = {
       <div class="card">
         <div class="mini-title">Profile & Settings</div>
         <input id="pName" placeholder="Name" value="${STATE.user?.name || ''}">
+        <input id="pMobile" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" value="${STATE.user?.mobile || ''}">
         <input id="pEmail" placeholder="Email" value="${STATE.user?.email || ''}">
         <div class="row">
-          <div class="chip ${STATE.lang === 'en' ? 'active' : ''}" onclick="setLang('en')">English</div>
-          <div class="chip ${STATE.lang === 'hi' ? 'active' : ''}" onclick="setLang('hi')">Hindi</div>
-          <div class="chip ${STATE.theme === 'dark' ? 'active' : ''}" onclick="toggleTheme()">${STATE.theme === 'dark' ? '☀ Light' : '🌙 Dark'}</div>
+          ${flag('showLanguageToggle') ? `<div class="chip ${STATE.lang === 'en' ? 'active' : ''}" onclick="setLang('en')">English</div>
+          <div class="chip ${STATE.lang === 'hi' ? 'active' : ''}" onclick="setLang('hi')">Hindi</div>` : ''}
+          ${flag('showDarkMode') ? `<div class="chip ${STATE.theme === 'dark' ? 'active' : ''}" onclick="toggleTheme()">${STATE.theme === 'dark' ? '☀ Light' : '🌙 Dark'}</div>` : ''}
         </div>
         <button class="btn" onclick="saveProfile()">Save Profile</button>
       </div>
@@ -882,12 +1460,12 @@ const screens = {
         <div class="mini-title">⚡ Quick Links</div>
         <div class="quick-tray">
           <div class="chip" onclick="nav('orders')"><span class="tic">📦</span>Orders<br><small>${STATE.orders.length}</small></div>
-          <div class="chip" onclick="nav('wishlist')"><span class="tic">❤️</span>Wishlist<br><small>${STATE.wishlist.length}</small></div>
+          ${flag('showWishlist') ? `<div class="chip" onclick="nav('wishlist')"><span class="tic">❤️</span>Wishlist<br><small>${STATE.wishlist.length}</small></div>` : ''}
           <div class="chip" onclick="nav('bookings')"><span class="tic">📅</span>Bookings<br><small>${STATE.bookings.length}</small></div>
         </div>
       </div>
       ${rewardCard()}
-      <div class="card">
+      ${flag('showCarProfile') ? `<div class="card">
         <div class="mini-title">Car Profile</div>
         ${(STATE.user?.cars || []).map(car => `<div class="line-item">
           <div><b>${car.brand || ''} ${car.model || ''}</b><div class="muted">${car.carNumber} • ${car.fuelType || '-'}</div><div class="muted">RC: ${car.rcNumber || '-'} ${car.insuranceExpiry ? `• Insurance: ${new Date(car.insuranceExpiry).toDateString()}` : ''}</div></div>
@@ -908,8 +1486,8 @@ const screens = {
           <input id="carPuc" type="date" placeholder="PUC expiry">
         </div>
         <button class="btn btn-out" onclick="addCar()">Add Car</button>
-      </div>
-      <div class="card">
+      </div>` : ''}
+      ${flag('showReminders') ? `<div class="card">
         <div class="mini-title">${t('reminders')}</div>
         ${remindersList()}
         <input id="remTitle" placeholder="Reminder title">
@@ -919,11 +1497,12 @@ const screens = {
         </div>
         <textarea id="remNote" placeholder="Reminder note"></textarea>
         <button class="btn btn-out" onclick="addReminder()">Add Reminder</button>
-      </div>
-      <div class="card">
+      </div>` : ''}
+      ${flag('showHistory') ? `<div class="card">
         <div class="mini-title">${t('history')}</div>
         ${historyList()}
-      </div>
+      </div>` : ''}
+      <div class="profile-more-hidden" style="display:none">
       <div class="card-section-title" style="font-size:11px;font-weight:700;color:var(--l);text-transform:uppercase;letter-spacing:1px;margin:18px 14px 8px">More</div>
       <div class="qlink-card">
         <div class="qlink" onclick="openNotifications()">
@@ -932,62 +1511,77 @@ const screens = {
           ${STATE.notifUnread ? `<span class="qlink-pill">${STATE.notifUnread}</span>` : ''}
           <span class="qlink-arrow">›</span>
         </div>
-        <div class="qlink" onclick="nav('offers')">
+        ${flag('showOffers') ? `<div class="qlink" onclick="nav('offers')">
           <div class="qlink-icon offer">🎟</div>
           <div class="qlink-text"><div class="qlink-title">Offers & Coupons</div><div class="qlink-sub">${(STATE.coupons || []).length || 3} active offers</div></div>
           <span class="qlink-arrow">›</span>
-        </div>
-        <div class="qlink" onclick="nav('supportChat')">
+        </div>` : ''}
+        ${flag('showSupportChat') ? `<div class="qlink" onclick="nav('supportChat')">
           <div class="qlink-icon" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);color:#1565C0">💬</div>
           <div class="qlink-text"><div class="qlink-title">Chat with Support</div><div class="qlink-sub">Voice note bhi bhej sakte ho</div></div>
           <span class="qlink-pill" style="background:linear-gradient(135deg,#1565C0,#1B6FC2)">LIVE</span>
           <span class="qlink-arrow">›</span>
-        </div>
-        <div class="qlink" onclick="nav('chatbot')">
+        </div>` : ''}
+        ${flag('showChatbot') ? `<div class="qlink" onclick="nav('chatbot')">
           <div class="qlink-icon" style="background:linear-gradient(135deg,#F3E5F5,#E1BEE7);color:#7B1FA2">🤖</div>
           <div class="qlink-text"><div class="qlink-title">CarBot AI Assistant</div><div class="qlink-sub">Car ke baare me kuch bhi pucho</div></div>
           <span class="qlink-pill" style="background:linear-gradient(135deg,#7B1FA2,#9C27B0)">NEW</span>
           <span class="qlink-arrow">›</span>
-        </div>
-        <div class="qlink" onclick="openLeaderboard()">
+        </div>` : ''}
+        ${flag('showLeaderboard') ? `<div class="qlink" onclick="openLeaderboard()">
           <div class="qlink-icon" style="background:linear-gradient(135deg,#FFF8E1,#FFE082);color:#F57C00">🏆</div>
           <div class="qlink-text"><div class="qlink-title">Leaderboard</div><div class="qlink-sub">Top referrers ko dekho</div></div>
           <span class="qlink-arrow">›</span>
-        </div>
-        <div class="qlink" onclick="nav('gallery')">
+        </div>` : ''}
+        ${flag('showGallery') ? `<div class="qlink" onclick="nav('gallery')">
           <div class="qlink-icon" style="background:linear-gradient(135deg,#E0F2F1,#B2DFDB);color:#00695C">📸</div>
           <div class="qlink-text"><div class="qlink-title">Service Gallery</div><div class="qlink-sub">Pichli services ke before/after photos</div></div>
           <span class="qlink-arrow">›</span>
-        </div>
+        </div>` : ''}
         <div class="qlink" onclick="setBirthday()">
           <div class="qlink-icon" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD0);color:#C2185B">🎂</div>
           <div class="qlink-text"><div class="qlink-title">Birthday ${STATE.user?.birthday ? '✓' : 'Set Birthday'}</div><div class="qlink-sub">${STATE.user?.birthday ? 'Birthday me 20% off automatic' : 'Set karne par birthday me special offer milega'}</div></div>
           <span class="qlink-arrow">›</span>
         </div>
-        <div class="qlink" onclick="nav('refer')">
+        ${flag('showRefer') ? `<div class="qlink" onclick="nav('refer')">
           <div class="qlink-icon refer">🎁</div>
           <div class="qlink-text"><div class="qlink-title">Refer & Earn ₹100</div><div class="qlink-sub">Friends ko bulao, dono ko ₹100</div></div>
           <span class="qlink-arrow">›</span>
-        </div>
-        <div class="qlink" onclick="nav('packages')">
+        </div>` : ''}
+        ${flag('showPackages') ? `<div class="qlink" onclick="nav('packages')">
           <div class="qlink-icon pkg">📦</div>
           <div class="qlink-text"><div class="qlink-title">Service Packages</div><div class="qlink-sub">Silver & Gold care plans</div></div>
           <span class="qlink-arrow">›</span>
-        </div>
-        <div class="qlink" onclick="nav('branches')">
+        </div>` : ''}
+        ${flag('showBranches') ? `<div class="qlink" onclick="nav('branches')">
           <div class="qlink-icon branch">📍</div>
           <div class="qlink-text"><div class="qlink-title">Find a Branch</div><div class="qlink-sub">${(STATE.support?.branches || []).length} branches</div></div>
           <span class="qlink-arrow">›</span>
-        </div>
-        <div class="qlink" onclick="nav('emergency')">
+        </div>` : ''}
+        ${flag('showEmergency') ? `<div class="qlink" onclick="nav('emergency')">
           <div class="qlink-icon sos">🚨</div>
           <div class="qlink-text"><div class="qlink-title">Emergency Help</div><div class="qlink-sub">24x7 roadside assistance</div></div>
           <span class="qlink-arrow">›</span>
-        </div>
+        </div>` : ''}
         <div class="qlink" onclick="nav('support')">
           <div class="qlink-icon support">🛟</div>
           <div class="qlink-text"><div class="qlink-title">Support Hub</div><div class="qlink-sub">FAQ, tips, packages</div></div>
           <span class="qlink-arrow">›</span>
+        </div>
+        <div class="qlink" onclick="nav('privacy')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9);color:#2E7D32">i</div>
+          <div class="qlink-text"><div class="qlink-title">Privacy Policy</div><div class="qlink-sub">Data collection and user choices</div></div>
+          <span class="qlink-arrow">â€º</span>
+        </div>
+        <div class="qlink" onclick="nav('terms')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);color:#1565C0">§</div>
+          <div class="qlink-text"><div class="qlink-title">Terms & Conditions</div><div class="qlink-sub">Service, booking, and payment rules</div></div>
+          <span class="qlink-arrow">â€º</span>
+        </div>
+        <div class="qlink" onclick="window.open(STATE.apiUrl.replace(/\\/api\\/?$/, '') + '/legal/delete-account', '_blank')">
+          <div class="qlink-icon" style="background:linear-gradient(135deg,#FFEBEE,#FFCDD2);color:#C62828">!</div>
+          <div class="qlink-text"><div class="qlink-title">Request Account Deletion</div><div class="qlink-sub">Open deletion request instructions</div></div>
+          <span class="qlink-arrow">â€º</span>
         </div>
         <div class="qlink" onclick="logout()" style="color:var(--er)">
           <div class="qlink-icon logout">⏻</div>
@@ -995,10 +1589,51 @@ const screens = {
           <span class="qlink-arrow">›</span>
         </div>
       </div>
+      </div>
     </div>
     ${tabbar('profile')}`,
 
+  more: () => `
+    ${topbar('More')}
+    <div class="screen">
+      ${moreLinks()}
+    </div>
+    ${tabbar('more')}`,
+
   // ========== NEW SCREENS ==========
+
+  privacy: () => `
+    ${topbar('Privacy Policy', { screen: 'profile' })}
+    <div class="screen">
+      <div class="card">
+        <div class="mini-title">Privacy Policy</div>
+        <p class="muted">VS SERVICES uses your information to create your account, book vehicle services, manage service history, process orders, send reminders, and provide support.</p>
+        <div class="line-item"><div><b>Data we collect</b><div class="muted">Name, mobile number, email, vehicle details, booking details, address/location when you choose location features, optional voice notes, orders, wishlist, rewards, reminders, ratings, and support messages.</div></div></div>
+        <div class="line-item"><div><b>How we use it</b><div class="muted">Service booking, customer support, order fulfilment, notifications, security, reminders, and app functionality.</div></div></div>
+        <div class="line-item"><div><b>Sharing</b><div class="muted">Required details may be shared with authorized staff/admin only for service fulfilment, support, and delivery. We do not sell personal information.</div></div></div>
+        <div class="line-item"><div><b>Security</b><div class="muted">Production API communication uses HTTPS. Users can contact support for account or data-related requests.</div></div></div>
+      </div>
+      <div class="card">
+        <div class="mini-title">Contact</div>
+        <div class="muted">Phone: 8839533202</div>
+        <div class="muted">Support email: add official support email before Play Store release.</div>
+      </div>
+    </div>
+    ${tabbar('profile')}`,
+
+  terms: () => `
+    ${topbar('Terms & Conditions', { screen: 'profile' })}
+    <div class="screen">
+      <div class="card">
+        <div class="mini-title">Terms & Conditions</div>
+        <div class="line-item"><div><b>Services</b><div class="muted">The app helps users book vehicle services, track bookings, manage reminders, contact support, and order accessories or spare parts where available.</div></div></div>
+        <div class="line-item"><div><b>User responsibility</b><div class="muted">Users must provide accurate account, vehicle, booking, and address details before confirming a service.</div></div></div>
+        <div class="line-item"><div><b>Bookings and payments</b><div class="muted">Pricing, time slots, pickup/drop, home service, offers, and spare parts depend on availability. Final cost may change after inspection if extra work or parts are required.</div></div></div>
+        <div class="line-item"><div><b>Cancellations and refunds</b><div class="muted">Cancellation, refund, and rescheduling depend on booking status, work already done, parts ordered, and business policy.</div></div></div>
+        <div class="line-item"><div><b>Offers and rewards</b><div class="muted">Coupons, wallet benefits, rewards, referrals, and packages can be changed, paused, or removed based on business rules and misuse prevention.</div></div></div>
+      </div>
+    </div>
+    ${tabbar('profile')}`,
 
   notifications: () => `
     ${topbar('Notifications', { screen: 'profile' })}
@@ -1117,17 +1752,9 @@ const screens = {
     ${tabbar('profile')}`,
 
   emergency: () => `
-    ${topbar('Emergency Help', { screen: 'profile' })}
+    ${topbar('Emergency Help', { screen: 'more' })}
     <div class="screen">
-      <div class="card" style="background:linear-gradient(135deg,#FFE5E5,#FFCDD2);border:1px solid #FFAAAA;text-align:center">
-        <div style="font-size:42px">🚨</div>
-        <h3 style="margin:8px 0;color:#C62828;font-size:18px">24x7 Roadside Assistance</h3>
-        <div class="muted" style="margin-bottom:14px">Sab kuch 30-60 min me reach karega.</div>
-        <div style="display:flex;gap:8px;justify-content:center">
-          <a class="btn" style="text-decoration:none;background:#C62828" href="tel:8839533202">📞 Call Now</a>
-          <a class="btn btn-sm" style="text-decoration:none;background:#25D366" href="https://wa.me/918839533202?text=EMERGENCY:%20mujhe%20car%20help%20chahiye%20ASAP">💬 WhatsApp</a>
-        </div>
-      </div>
+      ${sosCard()}
       <div class="grid quick-grid">${(STATE.support?.emergency || []).map(item => `
         <div class="action">
           <div class="ic" style="font-size:26px">${({ 'jump-start':'⚡', 'puncture':'🛞', 'battery':'🔋', 'towing':'🚚' })[item.id] || '🆘'}</div>
@@ -1136,7 +1763,7 @@ const screens = {
           <a class="mini-link" href="tel:${item.phone.replace(/\s+/g, '')}">📞 Call</a>
         </div>`).join('')}</div>
     </div>
-    ${tabbar('profile')}`,
+    ${tabbar('more')}`,
 
   chatbot: () => {
     const msgs = STATE.chatMessages || [];
@@ -1327,6 +1954,7 @@ async function submitRating(bookingId) {
 
 function render() {
   app.innerHTML = (screens[STATE.current] || screens.splash)();
+  applyUiTextOverrides(app);
   // Initialize map for branches screen
   if (STATE.current === 'branches') {
     setTimeout(() => initBranchMap(), 100);
@@ -1342,7 +1970,7 @@ function render() {
   // Lazy load images
   setupLazyImages();
   // Bot FAB on main screens (not on chatbot itself, login, splash)
-  const showBot = ['home', 'accessories', 'bookings', 'profile', 'orders', 'wishlist', 'support', 'leaderboard', 'gallery', 'offers'].includes(STATE.current);
+  const showBot = flag('showChatbot') && ['home', 'accessories', 'bookings', 'profile', 'orders', 'wishlist', 'support', 'leaderboard', 'gallery', 'offers'].includes(STATE.current);
   if (showBot && !document.getElementById('botFab')) {
     const fab = document.createElement('button');
     fab.id = 'botFab';
@@ -1380,6 +2008,9 @@ async function loadInitData() {
     if (tip.success) STATE.tipOfDay = tip.tip;
   } catch (e) {}
 
+  // Remote feature flags + config values (admin can toggle from admin app)
+  await refreshAppConfig({ force: true });
+
   if (STATE.token) {
     const [me, bookings, orders, history, reminders, rewards, wishlist, recs, notif] = await Promise.all([
       api('/users/me'),
@@ -1397,7 +2028,7 @@ async function loadInitData() {
     // Touch streak (silent) — once per session
     const lastStreak = sessionStorage.getItem('streakTouched');
     const today = new Date().toDateString();
-    if (lastStreak !== today) {
+    if (flag('showStreak') && lastStreak !== today) {
       api('/users/streak', 'POST', null, { silent: true }).then(s => {
         if (s.success) {
           if (s.bonus) toast(`🔥 ${s.streakDays}-day streak! +${s.bonus} bonus points!`, 'success');
@@ -1441,10 +2072,8 @@ function filterProductsDebounced() {
 async function registerGuest() {
   const name = ($('setupName')?.value || '').trim();
   const mobile = ($('setupMobile')?.value || '').trim();
-  const apiUrlInput = ($('apiUrlInput')?.value || '').trim();
-  if (apiUrlInput) STATE.apiUrl = apiUrlInput;
   if (name.length < 2) return toast('Please enter name');
-  if (!/^\d{10}$/.test(mobile)) return toast('Enter valid 10-digit mobile');
+  if (mobile && !/^\d{10}$/.test(mobile)) return toast('Enter valid 10-digit mobile');
   const response = await api('/auth/register-guest', 'POST', { name, mobile });
   if (!response.success) return toast(response.message || 'Login failed');
   STATE.token = response.token;
@@ -1452,6 +2081,103 @@ async function registerGuest() {
   save();
   await loadInitData();
   // Start push polling after login
+  requestMobileNotifPermission().then(g => { if (g) startMobilePushPolling(); });
+  nav('home');
+}
+
+function loadGoogleIdentityScript() {
+  return new Promise((resolve, reject) => {
+    if (window.google?.accounts?.id) return resolve();
+    const existing = document.querySelector('script[data-google-identity]');
+    if (existing) {
+      existing.addEventListener('load', resolve, { once: true });
+      existing.addEventListener('error', reject, { once: true });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.dataset.googleIdentity = 'true';
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('Google login script failed to load'));
+    document.head.appendChild(script);
+  });
+}
+
+let nativeGoogleInitializedFor = '';
+
+function isNativeCapacitorApp() {
+  const cap = window.Capacitor;
+  return !!cap && (cap.isNativePlatform?.() || cap.getPlatform?.() === 'android' || cap.getPlatform?.() === 'ios');
+}
+
+async function tryNativeGoogleLogin(clientId) {
+  const SocialLogin = window.Capacitor?.Plugins?.SocialLogin;
+  if (!isNativeCapacitorApp() || !SocialLogin?.initialize || !SocialLogin?.login) return false;
+
+  if (nativeGoogleInitializedFor !== clientId) {
+    await SocialLogin.initialize({
+      google: {
+        webClientId: clientId,
+        mode: 'online'
+      }
+    });
+    nativeGoogleInitializedFor = clientId;
+  }
+
+  const login = await SocialLogin.login({
+    provider: 'google',
+    options: { scopes: ['email', 'profile'] }
+  });
+  const idToken =
+    login?.result?.idToken ||
+    login?.idToken ||
+    login?.result?.authentication?.idToken ||
+    login?.authentication?.idToken;
+
+  if (!idToken) {
+    throw new Error('Google ID token nahi mila. Google Console me Android OAuth SHA-1 setup check karo.');
+  }
+  await handleGoogleCredential({ credential: idToken });
+  return true;
+}
+
+async function googleLogin() {
+  const clientId = cfgVal('googleClientId', '').trim();
+  if (!clientId) {
+    return toast('Google Client ID admin App Settings me add karo');
+  }
+  try {
+    const handledByNative = await tryNativeGoogleLogin(clientId);
+    if (handledByNative) return;
+
+    await loadGoogleIdentityScript();
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed?.() || notification.isSkippedMoment?.()) {
+        toast('Google sign-in popup blocked. Try again.');
+      }
+    });
+  } catch (err) {
+    toast(err.message || 'Google login unavailable');
+  }
+}
+
+async function handleGoogleCredential(response) {
+  if (!response?.credential) return toast('Google login cancelled');
+  const result = await api('/auth/google-login', 'POST', { idToken: response.credential });
+  if (!result.success) return toast(result.message || 'Google login failed');
+  STATE.token = result.token;
+  STATE.user = result.user;
+  save();
+  await loadInitData();
+  toast(result.needsMobile ? 'Google login done. Booking ke liye mobile number add karein.' : 'Google login successful');
   requestMobileNotifPermission().then(g => { if (g) startMobilePushPolling(); });
   nav('home');
 }
@@ -1495,6 +2221,7 @@ async function saveProfile(silent = false) {
   if (!STATE.token) return nav('login');
   const body = {
     name: $('pName')?.value || STATE.user?.name,
+    mobile: $('pMobile')?.value || STATE.user?.mobile,
     email: $('pEmail')?.value || STATE.user?.email,
     preferredLanguage: STATE.lang
   };
@@ -1567,8 +2294,9 @@ async function calculateEstimate() {
   if (!serviceId) return toast('Select service first');
   STATE.bookingForm.serviceId = serviceId;
   STATE.bookingForm.mode = STATE.bookingForm.mode || 'at_garage';
-  STATE.bookingForm.couponCode = $('couponCode')?.value || '';
-  STATE.bookingForm.partsEstimate = $('partsEstimate')?.value || 0;
+  normalizeConfigState();
+  STATE.bookingForm.couponCode = flag('showCouponInput') ? ($('couponCode')?.value || '') : '';
+  STATE.bookingForm.partsEstimate = flag('showPartsRequest') ? ($('partsEstimate')?.value || 0) : 0;
   const response = await api('/bookings/estimate', 'POST', {
     serviceId,
     serviceMode: STATE.bookingForm.mode,
@@ -1633,11 +2361,41 @@ async function ensureLoggedIn() {
   });
 }
 
+async function ensureBookingMobile() {
+  if (/^\d{10}$/.test(String(STATE.user?.mobile || ''))) return true;
+  return new Promise((resolve) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-bg';
+    wrap.style.cssText = 'position:fixed;inset:0;background:rgba(10,25,51,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:9999';
+    wrap.innerHTML = `<div style="background:#fff;padding:24px;border-radius:16px;width:88%;max-width:340px">
+      <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;color:#0A1933;margin-bottom:6px">Mobile Number Required</h3>
+      <p style="font-size:13px;color:#6B7A92;margin-bottom:14px">Booking confirm karne ke liye 10-digit mobile number zaroori hai.</p>
+      <input id="bmMobile" placeholder="10-digit Mobile" maxlength="10" inputmode="numeric" value="${STATE.user?.mobile || ''}" style="width:100%;padding:11px;border:1.5px solid #E2E8F0;border-radius:10px;margin-bottom:14px;font-size:14px">
+      <button id="bmSave" style="width:100%;padding:12px;background:linear-gradient(135deg,#2D8FE6,#1B6FC2);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">Save & Continue</button>
+      <button id="bmCancel" style="width:100%;padding:8px;margin-top:8px;background:none;color:#6B7A92;border:none;font-size:12px;cursor:pointer">Cancel</button>
+    </div>`;
+    document.body.appendChild(wrap);
+    wrap.querySelector('#bmCancel').onclick = () => { wrap.remove(); resolve(false); };
+    wrap.querySelector('#bmSave').onclick = async () => {
+      const mobile = wrap.querySelector('#bmMobile').value.trim();
+      if (!/^\d{10}$/.test(mobile)) return toast('Enter valid 10-digit mobile');
+      const response = await api('/users/me', 'PUT', { mobile }, { silent: true });
+      if (!response.success) return toast(response.message || 'Mobile save failed');
+      STATE.user = response.user;
+      save();
+      wrap.remove();
+      resolve(true);
+    };
+  });
+}
+
 async function submitBooking() {
   if (!STATE.token) {
     const ok = await ensureLoggedIn();
     if (!ok) return;
   }
+  const hasMobile = await ensureBookingMobile();
+  if (!hasMobile) return;
   const serviceId = STATE.bookingForm.serviceId || STATE.data.serviceId;
   if (!serviceId) return toast('Select service');
 
@@ -1653,11 +2411,12 @@ async function submitBooking() {
     mode: STATE.bookingForm.mode || 'at_garage',
     date: $('bDate').value,
     slot: $('bSlot').value,
-    couponCode: $('couponCode').value,
-    partsEstimate: $('partsEstimate').value,
-    sparePartsRequest: $('sparePartsRequest').value,
-    inspectionPhotos: $('inspectionPhotos').value
+    couponCode: flag('showCouponInput') ? ($('couponCode')?.value || '') : '',
+    partsEstimate: flag('showPartsRequest') ? ($('partsEstimate')?.value || 0) : 0,
+    sparePartsRequest: flag('showPartsRequest') ? ($('sparePartsRequest')?.value || '') : '',
+    inspectionPhotos: flag('showInspectionPhotos') ? ($('inspectionPhotos')?.value || '') : ''
   };
+  normalizeConfigState();
 
   if (!STATE.bookingForm.carNumber || !STATE.bookingForm.date) return toast('Car number and date required');
 
@@ -1679,11 +2438,11 @@ async function submitBooking() {
       city: $('bCity').value,
       pincode: $('bPin').value
     } : undefined,
-    paymentMode: STATE.bookingForm.pay || 'pay_on_service',
-    couponCode: STATE.bookingForm.couponCode,
-    partsEstimate: Number(STATE.bookingForm.partsEstimate || 0),
-    sparePartsRequest: STATE.bookingForm.sparePartsRequest,
-    inspectionPhotos: (STATE.bookingForm.inspectionPhotos || '').split(',').map(x => x.trim()).filter(Boolean)
+    paymentMode: flag('showOnlinePayment') ? (STATE.bookingForm.pay || 'pay_on_service') : 'pay_on_service',
+    couponCode: flag('showCouponInput') ? STATE.bookingForm.couponCode : undefined,
+    partsEstimate: flag('showPartsRequest') ? Number(STATE.bookingForm.partsEstimate || 0) : 0,
+    sparePartsRequest: flag('showPartsRequest') ? STATE.bookingForm.sparePartsRequest : undefined,
+    inspectionPhotos: flag('showInspectionPhotos') ? (STATE.bookingForm.inspectionPhotos || '').split(',').map(x => x.trim()).filter(Boolean) : []
   };
 
   const response = await api('/bookings', 'POST', body);
@@ -1730,6 +2489,83 @@ async function downloadInvoice(id) {
 }
 
 async function payNow(bookingId, amount) {
+  return startOnlinePayment({ bookingId, amount, successScreen: 'bookings' });
+}
+
+async function startOnlinePayment({ bookingId, orderId, amount, successScreen = 'bookings' }) {
+  if (!STATE.token) {
+    const ok = await ensureLoggedIn();
+    if (!ok) return false;
+  }
+  if (!Number(amount || 0)) {
+    toast('Online payment ke liye amount enter karein', 'warn');
+    return false;
+  }
+  showLoader('Opening Razorpay...');
+  const response = await api('/payments/create-order', 'POST', { bookingId, orderId }, { silent: true });
+  hideLoader();
+  if (!response.success) return toast(response.message || 'Payment init failed', 'error');
+
+  if (response.isMock || !window.Razorpay) {
+    const verify = await api('/payments/verify', 'POST', {
+      razorpayOrderId: response.razorpayOrderId,
+      razorpayPaymentId: 'mock_payment_' + Date.now(),
+      razorpaySignature: 'mock_signature',
+      paymentId: response.paymentId
+    });
+    if (!verify.success) return toast(verify.message || 'Payment failed', 'error');
+    await loadInitData();
+    toast(response.isMock ? 'Demo payment successful' : 'Payment successful', 'success');
+    nav(successScreen);
+    return true;
+  }
+
+  const user = STATE.user || {};
+  return new Promise((resolve) => {
+    const checkout = new Razorpay({
+      key: response.key,
+      amount: response.amount,
+      currency: response.currency || 'INR',
+      name: 'VS SERVICES',
+      description: orderId ? 'Accessory order payment' : 'Service booking payment',
+      order_id: response.razorpayOrderId,
+      prefill: { name: user.name || '', email: user.email || '', contact: user.mobile || '' },
+      theme: { color: '#2D8FE6' },
+      handler: async (rp) => {
+        showLoader('Verifying payment...');
+        const verify = await api('/payments/verify', 'POST', {
+          razorpayOrderId: rp.razorpay_order_id,
+          razorpayPaymentId: rp.razorpay_payment_id,
+          razorpaySignature: rp.razorpay_signature,
+          paymentId: response.paymentId
+        }, { silent: true });
+        hideLoader();
+        if (!verify.success) {
+          toast(verify.message || 'Payment verification failed', 'error');
+          resolve(false);
+          return;
+        }
+        await loadInitData();
+        toast('Payment successful', 'success');
+        nav(successScreen);
+        resolve(true);
+      },
+      modal: {
+        ondismiss: () => {
+          toast('Payment cancelled', 'warn');
+          resolve(false);
+        }
+      }
+    });
+    checkout.on('payment.failed', (err) => {
+      toast(err?.error?.description || 'Payment failed', 'error');
+      resolve(false);
+    });
+    checkout.open();
+  });
+}
+
+async function legacyMockPayNow(bookingId, amount) {
   const response = await api('/payments/create-order', 'POST', { amount, bookingId });
   if (!response.success) return toast(response.message || 'Payment init failed');
   const verify = await api('/payments/verify', 'POST', {
@@ -1749,9 +2585,20 @@ function addCart(id) {
   if (!product) return;
   const existing = STATE.cart.find(item => item.productId === id);
   if (existing) existing.quantity += 1;
-  else STATE.cart.push({ productId: id, name: product.name, price: product.discountPrice || product.price, quantity: 1 });
+  else STATE.cart.push({ productId: id, name: product.name, price: 0, quantity: 1, image: (product.images || [])[0] || fallbackProductImage(product) || '' });
   save();
-  toast('Added to cart');
+  const btn = document.getElementById(`addCartBtn-${id}`);
+  if (btn) {
+    btn.textContent = 'Added to Cart';
+    btn.classList.add('btn-gradient');
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.disabled = false;
+      render();
+    }, 650);
+  } else {
+    toast('Added to cart', 'success');
+  }
 }
 
 function removeCart(id) {
@@ -1770,24 +2617,49 @@ function changeQty(id, delta) {
 }
 
 async function placeOrder() {
+  if (!flag('showOnlinePayment') && STATE.payMode === 'online') STATE.payMode = 'cod';
   if (!STATE.token) {
     const ok = await ensureLoggedIn();
     if (!ok) return;
   }
+  const manualAmount = Number($('manualOrderAmount')?.value || 0) || 0;
+  if (STATE.payMode === 'online' && manualAmount <= 0) {
+    toast('Online payment ke liye shop se confirmed amount enter karein', 'warn');
+    return;
+  }
+  const shippingAddress = {
+    line1: $('addr').value,
+    city: $('city').value,
+    pincode: $('pin').value
+  };
+  if (STATE.cartLocation) {
+    shippingAddress.location = {
+      lat: STATE.cartLocation.lat,
+      lng: STATE.cartLocation.lng,
+      address: STATE.cartLocation.address
+    };
+  }
   const response = await api('/orders', 'POST', {
     items: STATE.cart.map(item => ({ productId: item.productId, quantity: item.quantity })),
-    shippingAddress: {
-      line1: $('addr').value,
-      city: $('city').value,
-      pincode: $('pin').value
-    },
-    paymentMode: STATE.payMode === 'online' ? 'online' : 'cod'
+    shippingAddress,
+    paymentMode: STATE.payMode === 'online' ? 'online' : 'cod',
+    manualAmount: manualAmount || undefined
   });
   if (!response.success) return toast(response.message || 'Order failed');
+  const createdOrder = response.order;
   STATE.cart = [];
+  STATE.cartLocation = null;
   save();
-  toast('Order placed');
-  nav('home');
+  if (createdOrder) {
+    STATE.orders = [createdOrder, ...(STATE.orders || []).filter(o => o._id !== createdOrder._id)];
+  }
+  toast('Order placed', 'success');
+  if (STATE.payMode === 'online') {
+    await startOnlinePayment({ orderId: createdOrder._id, amount: createdOrder.totalAmount, successScreen: 'orders' });
+    return;
+  }
+  await loadInitData();
+  nav('orders');
 }
 
 // Hardware back button — Capacitor App plugin (if available) + popstate fallback
@@ -1982,6 +2854,7 @@ async function loadChatSuggestions() {
 
 // ===== Leaderboard =====
 async function openLeaderboard() {
+  if (!flag('showLeaderboard')) return nav('profile');
   if (!STATE.token) return toast('Login first to see your rank', 'warn');
   nav('leaderboard');
   const r = await api('/users/leaderboard', 'GET', null, { silent: true });
@@ -2288,7 +3161,8 @@ function haversine(lat1, lon1, lat2, lon2) {
 }
 
 // ========== Address Picker (booking flow) ==========
-function openMapPicker() {
+function openMapPicker(target = 'booking') {
+  STATE._mapPickTarget = target;
   const wrap = document.createElement('div');
   wrap.id = 'mapPickerWrap';
   wrap.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column';
@@ -2376,11 +3250,20 @@ function confirmMapPick() {
   const p = STATE._pendingPick;
   if (!p) return closeMapPicker();
   STATE.pickedLocation = [p.lat, p.lng];
-  // Fill into booking form
-  if (document.getElementById('bAddr')) document.getElementById('bAddr').value = p.address;
-  if (document.getElementById('bCity')) document.getElementById('bCity').value = p.city;
-  if (document.getElementById('bPin')) document.getElementById('bPin').value = p.pincode;
-  STATE.bookingForm = { ...STATE.bookingForm, addr: p.address, city: p.city, pin: p.pincode };
+  if (STATE._mapPickTarget === 'cart') {
+    if (document.getElementById('addr')) document.getElementById('addr').value = p.address;
+    if (document.getElementById('city')) document.getElementById('city').value = p.city;
+    if (document.getElementById('pin')) document.getElementById('pin').value = p.pincode;
+    STATE.cartLocation = { lat: p.lat, lng: p.lng, address: p.address };
+    const hint = document.getElementById('cartLocationHint');
+    if (hint) hint.textContent = p.address ? `Selected: ${p.address}` : `Selected: ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+  } else {
+    // Fill into booking form
+    if (document.getElementById('bAddr')) document.getElementById('bAddr').value = p.address;
+    if (document.getElementById('bCity')) document.getElementById('bCity').value = p.city;
+    if (document.getElementById('bPin')) document.getElementById('bPin').value = p.pincode;
+    STATE.bookingForm = { ...STATE.bookingForm, addr: p.address, city: p.city, pin: p.pincode };
+  }
   closeMapPicker();
   toast('Location set');
 }
@@ -2431,6 +3314,12 @@ async function openNotifications() {
   STATE.data = {};
   try { history.replaceState({ screen: 'home' }, '', '#home'); } catch (e) {}
   render();
+  setInterval(() => refreshAppConfig({ rerender: true }), 15000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshAppConfig({ force: true, rerender: true });
+  });
+  window.addEventListener('focus', () => refreshAppConfig({ force: true, rerender: true }));
+  window.Capacitor?.Plugins?.App?.addListener?.('resume', () => refreshAppConfig({ force: true, rerender: true }));
   // Start push polling — request permission first if logged in
   if (STATE.token) {
     requestMobileNotifPermission().then(granted => {

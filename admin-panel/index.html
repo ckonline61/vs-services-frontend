@@ -156,7 +156,8 @@ input,select,textarea{width:100%;padding:9px;border:1px solid var(--border);bord
       </div>
       <div class="card">
         <h3>App Text Values</h3>
-        <p class="muted" style="margin:6px 0 16px">Helpline, WhatsApp, maintenance banner jaise text yahan se update honge.</p>
+        <p class="muted" style="margin:6px 0 16px">Helpline, WhatsApp, buttons, labels aur customer app ke static text yahan se update honge.</p>
+        <input id="configValueSearch" placeholder="Search text e.g. Cart, Payment, Support..." oninput="filterConfigValues()" style="margin-bottom:12px">
         <div id="valuesList"></div>
       </div>
     </div>
@@ -489,6 +490,25 @@ async function saveProduct() {
   }
 }
 
+let _configValuesCache = [];
+function filterConfigValues() {
+  const q = (document.getElementById('configValueSearch')?.value || '').toLowerCase().trim();
+  const list = (_configValuesCache || []).filter(item => {
+    if (!q) return true;
+    return [item.key, item.label, item.desc, item.value].some(v => String(v || '').toLowerCase().includes(q));
+  });
+  document.getElementById('valuesList').innerHTML = list.map(item => `
+    <div class="value-row">
+      <div>
+        <label class="flag-title" for="value-${item.key}">${item.label}</label>
+        <div class="muted">${item.desc || item.key}</div>
+        ${String(item.value || '').length > 70 || /Text|Tip|Subtitle|Message/.test(item.label || '') ? `<textarea id="value-${item.key}" rows="3">${String(item.value || '').replace(/</g, '&lt;')}</textarea>` : `<input id="value-${item.key}" value="${String(item.value || '').replace(/"/g, '&quot;')}">`}
+      </div>
+      <button class="btn btn-sm" onclick="saveConfigValue('${item.key}')">Save</button>
+    </div>
+  `).join('') || '<div class="muted">No matching text found</div>';
+}
+
 async function loadConfig() {
   const r = await req('/config/admin');
   if (!r.success) {
@@ -508,16 +528,8 @@ async function loadConfig() {
     </div>
   `).join('');
 
-  document.getElementById('valuesList').innerHTML = (r.values || []).map(item => `
-    <div class="value-row">
-      <div>
-        <label class="flag-title" for="value-${item.key}">${item.label}</label>
-        <div class="muted">${item.desc || item.key}</div>
-        <input id="value-${item.key}" value="${String(item.value || '').replace(/"/g, '&quot;')}">
-      </div>
-      <button class="btn btn-sm" onclick="saveConfigValue('${item.key}')">Save</button>
-    </div>
-  `).join('');
+  _configValuesCache = r.values || [];
+  filterConfigValues();
 }
 
 async function toggleConfigFlag(key, enabled) {

@@ -119,6 +119,10 @@ button{cursor:pointer;border:none;background:none}
 .item-actions{display:flex;gap:7px;flex-wrap:wrap;border-top:1px dashed var(--border);padding-top:11px;margin-top:8px;align-items:center}
 .item-actions select,.item-actions .btn{font-size:12px}
 .item-actions select{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;background:#fff;flex:1;min-width:120px;font-weight:500;color:var(--text)}
+.product-head{display:flex;gap:12px;align-items:flex-start}
+.product-thumb{width:58px;height:58px;border-radius:12px;object-fit:cover;border:1px solid var(--border);background:var(--surface2);flex-shrink:0}
+.product-preview{width:100%;height:150px;object-fit:cover;border-radius:14px;border:1.5px solid var(--border);background:var(--surface2);margin-top:8px}
+.image-note{font-size:11px;color:var(--muted);margin-top:5px}
 
 /* Badges - polished */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:7px;font-size:10.5px;font-weight:700;text-transform:capitalize;letter-spacing:.3px}
@@ -149,6 +153,19 @@ button{cursor:pointer;border:none;background:none}
 .subtab{flex-shrink:0;padding:8px 14px;border-radius:9px;background:#fff;border:1.5px solid var(--border);font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;cursor:pointer;transition:.15s;text-transform:capitalize}
 .subtab:active{transform:scale(.96)}
 .subtab.active{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-color:var(--navy);box-shadow:0 6px 16px rgba(15,42,71,.20)}
+
+/* Customer app settings */
+.settings-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.flag-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow)}
+.flag-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--navy);font-size:13px;margin-bottom:4px}
+.flag-desc{font-size:12px;color:var(--muted);line-height:1.35}
+.toggle{position:relative;width:52px;height:30px;flex:0 0 auto}
+.toggle input{opacity:0;width:0;height:0;margin:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#C8D4DE;border-radius:999px;transition:.2s}
+.slider:before{content:"";position:absolute;height:24px;width:24px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(15,42,71,.25)}
+.toggle input:checked + .slider{background:linear-gradient(135deg,var(--accent2),var(--accent))}
+.toggle input:checked + .slider:before{transform:translateX(22px)}
+.value-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:12px}
 
 /* Modal - polished */
 .modal-bg{position:fixed;inset:0;background:rgba(15,42,71,.55);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;z-index:200;animation:fadeIn .2s}
@@ -388,6 +405,21 @@ input:checked+.slider::before{transform:translateX(18px)}
       <div id="couponsList" class="list"></div>
     </div>
 
+    <!-- CUSTOMER APP SETTINGS -->
+    <div id="tab-config" class="tab-pane hidden">
+      <div class="card">
+        <h3>Customer App Settings</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Toggle OFF karne par customer mobile app me related field ya option hide ho jayega.</p>
+        <div id="flagsGrid" class="settings-grid"></div>
+      </div>
+      <div class="card">
+        <h3>App Text Values</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Helpline, WhatsApp, buttons, labels aur customer app ke static text yahan se update honge.</p>
+        <input id="configValueSearch" placeholder="Search text e.g. Cart, Payment, Support..." oninput="filterConfigValues()" style="margin-bottom:12px">
+        <div id="valuesList"></div>
+      </div>
+    </div>
+
     <!-- MORE -->
     <div id="tab-more" class="tab-pane hidden">
       <div class="card-section-title">Manage</div>
@@ -400,6 +432,7 @@ input:checked+.slider::before{transform:translateX(18px)}
         <a onclick="navTab('gps')" class="more-row">📡 GPS / Staff Location <span>›</span></a>
         <a onclick="navTab('barcode')" class="more-row">📷 Barcode Scanner <span>›</span></a>
         <a onclick="navTab('report')" class="more-row">📊 Monthly Report <span>›</span></a>
+        <a onclick="navTab('config')" class="more-row">App Settings <span>›</span></a>
       </div>
       <div class="card-section-title">Export</div>
       <div class="card" style="padding:0">
@@ -521,6 +554,7 @@ input:checked+.slider::before{transform:translateX(18px)}
 let API = localStorage.getItem('apiUrl') || 'https://vs-services-api.onrender.com/api';
 let TOKEN = localStorage.getItem('adminToken');
 let _inflight = 0;
+let _productImageData = '';
 
 const STATE = {
   bookings: [],
@@ -540,6 +574,63 @@ const BOOKING_STATUSES = ['booked','confirmed','assigned','pickup_scheduled','in
 const ORDER_STATUSES = ['placed','confirmed','shipped','delivered','cancelled'];
 const SERVICE_CATEGORIES = ['service','checkup','repair','denting_painting'];
 const PRODUCT_CATEGORIES = ['seat_cover','mats','perfume','audio','lights','accessory'];
+const CONFIG_FALLBACK_FLAGS = [
+  {key:'showRefer',label:'Refer & Earn',desc:'Profile screen me refer-friend option',enabled:true},
+  {key:'showLeaderboard',label:'Leaderboard',desc:'Top referrers leaderboard',enabled:true},
+  {key:'showGallery',label:'Service Gallery',desc:'Before/after photos screen',enabled:true},
+  {key:'showChatbot',label:'AI CarBot',desc:'Floating AI button',enabled:true},
+  {key:'showSupportChat',label:'Live Support Chat',desc:'Customer-to-admin chat',enabled:true},
+  {key:'showPackages',label:'Service Packages',desc:'Silver/Gold care plans',enabled:true},
+  {key:'showOffers',label:'Offers & Coupons',desc:'Active coupons screen',enabled:true},
+  {key:'showWishlist',label:'Wishlist',desc:'Heart icon on products',enabled:true},
+  {key:'showRewards',label:'Rewards Card',desc:'Wallet points display',enabled:true},
+  {key:'showRecommendations',label:'AI Recommendations',desc:'Smart service suggestions on home',enabled:true},
+  {key:'showVoiceNotes',label:'Voice Notes',desc:'Voice recording on bookings and chat',enabled:true},
+  {key:'showMapPicker',label:'Map Location Picker',desc:'Pick on Map button on booking form',enabled:true},
+  {key:'showOnlinePayment',label:'Online Payment',desc:'Online payment option on booking',enabled:true},
+  {key:'showHomeService',label:'Home Service Mode',desc:'Home service booking option',enabled:true},
+  {key:'showPickupDrop',label:'Pickup & Drop',desc:'Pickup-and-drop mode',enabled:true},
+  {key:'showCouponInput',label:'Coupon Code Input',desc:'Coupon code field on booking',enabled:true},
+  {key:'showPartsRequest',label:'Spare Parts Request',desc:'Parts request textarea',enabled:true},
+  {key:'showInspectionPhotos',label:'Inspection Photos',desc:'Photo URLs input',enabled:true},
+  {key:'showDarkMode',label:'Dark Mode Toggle',desc:'Theme switcher in profile',enabled:true},
+  {key:'showLanguageToggle',label:'English/Hindi Toggle',desc:'Language switcher in profile',enabled:true},
+  {key:'showAccessoriesShop',label:'Accessories Shop',desc:'Shop tab and accessories store',enabled:true},
+  {key:'showEmergency',label:'Emergency Help',desc:'24x7 roadside help screen',enabled:true},
+  {key:'showBranches',label:'Branches & Map',desc:'Find a branch screen',enabled:true},
+  {key:'showCarProfile',label:'Car Profile',desc:'Multi-car management',enabled:true},
+  {key:'showReminders',label:'Reminders',desc:'Service/insurance reminders',enabled:true},
+  {key:'showHistory',label:'Service History',desc:'Past services list',enabled:true},
+  {key:'showDailyTip',label:'Daily Tip',desc:'Tip of the day card on home',enabled:true},
+  {key:'showStreak',label:'Streak Counter',desc:'Daily streak gamification',enabled:true}
+];
+const CONFIG_FALLBACK_VALUES = [
+  {key:'helplinePhone',label:'Helpline Number',desc:'Phone number shown across app',value:'+91 8839533202'},
+  {key:'whatsappNumber',label:'WhatsApp Number',desc:'wa.me link target',value:'918839533202'},
+  {key:'towServiceName',label:'Tow Service Name',desc:'SOS card tow service label',value:'Nearby Tow Service'},
+  {key:'towServicePhone',label:'Tow Service Number',desc:'SOS card tow service phone number',value:'+91 8839533202'},
+  {key:'govEmergencyName',label:'Government Emergency',desc:'SOS card government helpline label',value:'Government Emergency Helpline'},
+  {key:'govEmergencyPhone',label:'Government Helpline No',desc:'SOS card government helpline number',value:'112'},
+  {key:'towSearchQuery',label:'Tow Search Text',desc:'Maps search query for nearby tow',value:'nearby tow service'},
+  {key:'emergencySearchQuery',label:'Emergency Search Text',desc:'Maps search query for emergency help',value:'nearby emergency roadside assistance'},
+  {key:'maintenanceMessage',label:'Maintenance Message',desc:'Banner shown when set',value:''},
+  {key:'businessHours',label:'Business Hours',desc:'Open hours displayed',value:'Mon-Sat 9 AM - 8 PM'},
+  {key:'homeTagline',label:'Front Tagline',desc:'Small tagline below app name',value:'Check . Service . Drive Safe'},
+  {key:'homeHeroTitleGuest',label:'Home Hero Title',desc:'Main front page title for guests',value:'Welcome!'},
+  {key:'homeHeroSubtitle',label:'Home Hero Text',desc:'Main front page description',value:'Trusted car care with fair pricing.\\nSirf zaroori service, sahi daam par.\\nExtra repair ya parts replacement se pehle aapki approval zaroori.'},
+  {key:'trustKicker',label:'Trust Section Kicker',desc:'Small heading above trust text',value:'Why customers trust VS Services'},
+  {key:'trustTitle',label:'Trust Section Title',desc:'Trust panel title',value:'Pehle inspection, phir approval'},
+  {key:'trustSubtitle',label:'Trust Section Text',desc:'Trust panel short description',value:'Bina aapki permission ke extra kaam nahi.'},
+  {key:'tipOfDayTitle',label:'Tip of the Day Title',desc:'Home tip card title',value:''},
+  {key:'tipOfDayBody',label:'Tip of the Day Text',desc:'Home tip card body',value:''},
+  {key:'careTip1Title',label:'Care Tip 1 Title',desc:'First car care tip title',value:''},
+  {key:'careTip1Body',label:'Care Tip 1 Text',desc:'First car care tip body',value:''},
+  {key:'careTip2Title',label:'Care Tip 2 Title',desc:'Second car care tip title',value:''},
+  {key:'careTip2Body',label:'Care Tip 2 Text',desc:'Second car care tip body',value:''},
+  {key:'supportHubTitle',label:'Support Hub Title',desc:'Support hub screen title',value:'Support Hub'},
+  {key:'supportHubSubtitle',label:'Support Hub Text',desc:'Support hub intro text',value:'FAQ, tips, branches aur emergency help ek jagah.'},
+  {key:'supportWhatsappText',label:'WhatsApp Button Text',desc:'Support WhatsApp message text',value:'Hi I need car service help'}
+];
 
 // ============ Helpers ============
 function showLoader(msg){
@@ -583,6 +674,33 @@ function emptyState(icon, msg, sub){return `<div class="empty"><div class="empty
 function closeModal(){document.querySelector('.modal-bg')?.remove();}
 function openModal(html){
   document.getElementById('modalRoot').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()">${html}</div>`;
+}
+
+function compressProductImage(input){
+  const file=input?.files?.[0];
+  if(!file)return;
+  if(!file.type.startsWith('image/'))return toast('Image file select karo','error');
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=720;
+      const scale=Math.min(1,max/Math.max(img.width,img.height));
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.max(1,Math.round(img.width*scale));
+      canvas.height=Math.max(1,Math.round(img.height*scale));
+      const ctx=canvas.getContext('2d');
+      ctx.fillStyle='#fff';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      _productImageData=canvas.toDataURL('image/jpeg',0.72);
+      const preview=document.getElementById('p-image-preview');
+      if(preview){preview.src=_productImageData;preview.style.display='block';}
+      toast('Image compressed');
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 // ============ Auth ============
@@ -643,7 +761,7 @@ function enterApp(){
 }
 
 // ============ Navigation ============
-const TAB_TITLES={dash:'Dashboard',bookings:'Bookings',orders:'Orders',services:'Services',products:'Products',team:'Team',customers:'Customers',coupons:'Coupons',more:'More',map:'Live Map',chats:'Customer Chats',chatDetail:'Chat',report:'Monthly Report',barcode:'Barcode Scanner',gps:'GPS Tracking'};
+const TAB_TITLES={dash:'Dashboard',bookings:'Bookings',orders:'Orders',services:'Services',products:'Products',team:'Team',customers:'Customers',coupons:'Coupons',config:'App Settings',more:'More',map:'Live Map',chats:'Customer Chats',chatDetail:'Chat',report:'Monthly Report',barcode:'Barcode Scanner',gps:'GPS Tracking'};
 
 // Per-tab scroll memory
 const TAB_SCROLL = {};
@@ -731,6 +849,7 @@ function loadTab(tab){
   else if(tab==='team')loadStaff();
   else if(tab==='customers')loadCustomers();
   else if(tab==='coupons')loadCoupons();
+  else if(tab==='config')loadConfig();
   else if(tab==='more'){renderRevChart();updateChatBadge();}
   else if(tab==='map')setTimeout(loadLiveMap,150);
   else if(tab==='chats')loadChats();
@@ -1011,11 +1130,18 @@ async function loadProducts(){
 
 function openProductModal(id){
   const x=id?STATE.products.find(p=>p._id===id):{};
+  _productImageData=(x.images&&x.images[0])||'';
   openModal(`<div class="modal">
     <div class="modal-head"><h3>${id?'Edit':'Add'} Product</h3><button class="modal-close" onclick="closeModal()">×</button></div>
     <div class="field"><label>Name</label><input id="p-name" value="${x.name||''}" placeholder="e.g. Premium Seat Cover"></div>
     <div class="field"><label>Category</label><select id="p-cat">${PRODUCT_CATEGORIES.map(c=>`<option value="${c}" ${x.category===c?'selected':''}>${c}</option>`).join('')}</select></div>
     <div class="field"><label>Description</label><textarea id="p-desc" placeholder="Product details...">${x.description||''}</textarea></div>
+    <div class="field">
+      <label>Product Image</label>
+      <input id="p-image" type="file" accept="image/*" onchange="compressProductImage(this)">
+      <div class="image-note">Image automatic compress hoke save hogi.</div>
+      <img id="p-image-preview" class="product-preview" src="${_productImageData||''}" style="${_productImageData?'':'display:none'}" alt="Product preview">
+    </div>
     <div class="row2">
       <div class="field"><label>Price (₹)</label><input id="p-price" type="number" value="${x.price||''}"></div>
       <div class="field"><label>Discount Price</label><input id="p-discount" type="number" value="${x.discountPrice||''}"></div>
@@ -1030,11 +1156,12 @@ async function saveProduct(id){
     name:document.getElementById('p-name').value.trim(),
     category:document.getElementById('p-cat').value,
     description:document.getElementById('p-desc').value.trim(),
-    price:+document.getElementById('p-price').value,
+    price:+document.getElementById('p-price').value||0,
     discountPrice:+document.getElementById('p-discount').value||undefined,
-    stock:+document.getElementById('p-stock').value
+    stock:+document.getElementById('p-stock').value,
+    images:_productImageData?[_productImageData]:[]
   };
-  if(!data.name||!data.price){return toast('Name & price required','error')}
+  if(!data.name){return toast('Name required','error')}
   const r=id?await req('/products/'+id,'PUT',data):await req('/products','POST',data);
   if(r.success){toast(id?'Updated':'Added');closeModal();loadProducts()}
   else{toast(r.message||'Failed','error')}
@@ -1202,6 +1329,70 @@ async function delCoupon(id){
   if(!confirm('Delete this coupon?'))return;
   await req('/coupons/'+id,'DELETE');
   toast('Deleted');loadCoupons();
+}
+
+// ============ Customer App Settings ============
+let _configValuesCache = [];
+function renderConfig(flags,values,isOffline=false){
+  const flagsGrid=document.getElementById('flagsGrid');
+  const valuesList=document.getElementById('valuesList');
+  _configValuesCache = values || [];
+  flagsGrid.innerHTML=(isOffline?`
+    <div class="card" style="background:#FFF8E6;border-color:#F5D98B;margin-bottom:10px">
+      <h3 style="margin-bottom:6px">Backend update pending</h3>
+      <p style="font-size:12px;color:#8A6500">Settings list dikh rahi hai, par save tabhi hoga jab live backend me /api/config route deployed hoga.</p>
+    </div>`:'')+(flags||[]).map(flag=>`
+    <div class="flag-item">
+      <div>
+        <div class="flag-title">${flag.label}</div>
+        <div class="flag-desc">${flag.desc||flag.key}</div>
+      </div>
+      <label class="toggle" title="${flag.key}">
+        <input type="checkbox" ${flag.enabled?'checked':''} onchange="toggleConfigFlag('${flag.key}',this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+  `).join('');
+  filterConfigValues();
+}
+function filterConfigValues(){
+  const valuesList=document.getElementById('valuesList');
+  if(!valuesList)return;
+  const q=(document.getElementById('configValueSearch')?.value||'').toLowerCase().trim();
+  const list=(_configValuesCache||[]).filter(item=>{
+    if(!q)return true;
+    return [item.key,item.label,item.desc,item.value].some(v=>String(v||'').toLowerCase().includes(q));
+  });
+  valuesList.innerHTML=list.map(item=>`
+    <div class="value-row">
+      <div class="field" style="margin-bottom:0">
+        <label for="value-${item.key}">${item.label}</label>
+        ${String(item.value||'').length > 70 || /Text|Tip|Subtitle|Message/.test(item.label || '') ? `<textarea id="value-${item.key}" rows="3" placeholder="${item.desc||item.key}">${String(item.value||'').replace(/</g,'&lt;')}</textarea>` : `<input id="value-${item.key}" value="${String(item.value||'').replace(/"/g,'&quot;')}" placeholder="${item.desc||item.key}">`}
+        <div class="hint">${item.desc||item.key}</div>
+      </div>
+      <button class="btn primary sm" onclick="saveConfigValue('${item.key}')">Save</button>
+    </div>
+  `).join('') || '<div class="empty">No matching text found</div>';
+}
+async function loadConfig(){
+  const r=await req('/config/admin');
+  if(!r.success){
+    renderConfig(CONFIG_FALLBACK_FLAGS,CONFIG_FALLBACK_VALUES,true);
+    toast(r.message||'Backend config route not available','error');
+    return;
+  }
+  renderConfig(r.flags||[],r.values||[]);
+}
+async function toggleConfigFlag(key,enabled){
+  const r=await req('/config/flag/'+key,'PUT',{enabled});
+  if(r.success){toast(enabled?'Enabled':'Disabled')}
+  else{toast(r.message||'Setting update failed','error');loadConfig()}
+}
+async function saveConfigValue(key){
+  const value=document.getElementById('value-'+key).value;
+  const r=await req('/config/value/'+key,'PUT',{value});
+  if(r.success)toast('Saved');
+  else toast(r.message||'Value update failed','error');
 }
 
 // ============ CSV Export ============
